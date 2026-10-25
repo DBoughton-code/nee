@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tech Device Reconciler</title>
+  <!-- ZXing Engine for Data Matrix Decoding -->
+  <script src="https://unpkg.com/@zxing/library@latest"></script>
   <style>
     :root {
       --primary: #2563eb;
@@ -58,25 +60,14 @@
       font-size: 0.95rem;
     }
 
-    #video-container {
-      width: 100%;
-      height: 280px;
-      border-radius: 8px;
-      overflow: hidden;
-      background: #000;
-      position: relative;
-    }
-
-    video { width: 100%; height: 100%; object-fit: cover; }
-
     .btn {
       background-color: var(--primary);
       color: white;
       border: none;
-      padding: 12px;
+      padding: 14px;
       border-radius: 8px;
       font-weight: 600;
-      font-size: 0.95rem;
+      font-size: 1rem;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -85,6 +76,7 @@
       width: 100%;
     }
 
+    .btn:hover { background-color: var(--primary-hover); }
     .btn-secondary { background-color: #64748b; }
     .btn-danger { background-color: #ef4444; }
 
@@ -92,9 +84,10 @@
 
     .status-msg {
       font-size: 0.85rem;
-      padding: 8px;
+      padding: 10px;
       border-radius: 6px;
       text-align: center;
+      margin-top: 10px;
       display: none;
     }
 
@@ -112,6 +105,9 @@
     th { background: #f1f5f9; }
 
     .delete-btn { color: #ef4444; cursor: pointer; font-weight: bold; }
+
+    /* Hidden Camera Input Trigger */
+    #fileInput { display: none; }
   </style>
 </head>
 <body>
@@ -119,6 +115,7 @@
 <div class="container">
   <h2>Tech Device Reconciler</h2>
 
+  <!-- Session Data -->
   <div class="card">
     <div class="form-group">
       <label for="techName">Tech Name / ID</label>
@@ -134,14 +131,14 @@
     </div>
   </div>
 
+  <!-- High-Res Native Photo Trigger -->
   <div class="card">
-    <div id="video-container">
-      <video id="video" playsinline></video>
-    </div>
+    <input type="file" id="fileInput" accept="image/*" capture="environment">
+    <button id="snapBtn" class="btn">📸 Snap Photo of Tag</button>
     <div id="status" class="status-msg"></div>
-    <button id="startScanBtn" class="btn" style="margin-top: 12px;">Start Scanner</button>
   </div>
 
+  <!-- Scan Results -->
   <div class="card">
     <div style="display: flex; justify-content: space-between; align-items: center;">
       <h3 style="margin: 0; font-size: 1rem;">Scanned Items (<span id="scanCount">0</span>)</h3>
@@ -168,9 +165,7 @@
 
 <script>
   let scans = JSON.parse(localStorage.getItem('tech_recon_scans') || '[]');
-  let videoStream = null;
-  let isScanning = false;
-  let scanInterval = null;
+  const codeReader = new ZXing.BrowserMultiFormatReader();
 
   document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('techName').value = localStorage.getItem('tech_recon_name') || '';
@@ -186,66 +181,36 @@
 
     renderTable();
 
-    document.getElementById('startScanBtn').addEventListener('click', toggleScanner);
+    const snapBtn = document.getElementById('snapBtn');
+    const fileInput = document.getElementById('fileInput');
+
+    snapBtn.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', processPhoto);
+
     document.getElementById('downloadCsvBtn').addEventListener('click', downloadCSV);
     document.getElementById('shareEmailBtn').addEventListener('click', shareOrEmail);
     document.getElementById('clearBtn').addEventListener('click', clearScans);
   });
 
-  async function toggleScanner() {
-    const btn = document.getElementById('startScanBtn');
-    const video = document.getElementById('video');
+  async function processPhoto(e) {
+    const file = e.target.files[0];
+    if (!file) return;
 
-    if (!isScanning) {
+    showStatus("Decoding photo...", "warning");
+
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(file);
+
+    img.onload = async () => {
       try {
-        videoStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { exact: "environment" } }
-        }).catch(() => {
-          return navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-        });
-
-        video.srcObject = videoStream;
-        await video.play();
-
-        isScanning = true;
-        btn.textContent = "Stop Scanner";
-        btn.classList.add('btn-secondary');
-
-        // Hardware-Accelerated Barcode Detector API
-        if ('BarcodeDetector' in window) {
-          const barcodeDetector = new BarcodeDetector({
-            formats: ['data_matrix', 'qr_code', 'code_128', 'code_39', 'ean_13']
-          });
-
-          scanInterval = setInterval(async () => {
-            try {
-              const barcodes = await barcodeDetector.detect(video);
-              if (barcodes.length > 0) {
-                onScanSuccess(barcodes[0].rawValue);
-              }
-            } catch (e) {}
-          }, 200);
-        } else {
-          showStatus("Please use iOS 17+ Safari for hardware scanning.", "warning");
+        const result = await codeReader.decodeFromImageElement(img);
+        if (result) {
+          onScanSuccess(result.getText());
         }
-
       } catch (err) {
-        showStatus("Unable to access camera.", "warning");
+        showStatus("Could not decode tag. Try taking photo slightly further back with clear lighting.", "warning");
       }
-    } else {
-      stopScanner();
-    }
-  }
-
-  function stopScanner() {
-    const btn = document.getElementById('startScanBtn');
-    if (scanInterval) clearInterval(scanInterval);
-    if (videoStream) {
-      videoStream.getTracks().forEach(track => track.stop());
-    }
-    isScanning = false;
-    btn.textContent = "Start Scanner";
-    btn.classList.remove('btn-secondary');
+    };
   }
 
   function onScanSuccess(decodedText) {
@@ -263,7 +228,7 @@
 
     scans.unshift(record);
     localStorage.setItem('tech_recon_scans', JSON.stringify(scans));
-    showStatus(`Scanned: ${decodedText}`, 'success');
+    showStatus(`Success! Scanned: ${decodedText}`, 'success');
     renderTable();
   }
 
@@ -302,7 +267,6 @@
     el.textContent = msg;
     el.className = `status-msg status-${type}`;
     el.style.display = 'block';
-    setTimeout(() => { el.style.display = 'none'; }, 3000);
   }
 
   function generateCSVString() {
