@@ -3,15 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tech Device Reconciler</title>
+  <title>Prince Telecom QC Inspection</title>
   <style>
     :root {
-      --primary: #2563eb;
-      --primary-hover: #1d4ed8;
+      --primary: #1e40af;
+      --primary-hover: #1e3a8a;
       --bg: #f8fafc;
       --card-bg: #ffffff;
       --text: #0f172a;
-      --border: #e2e8f0;
+      --border: #cbd5e1;
+      --success: #16a34a;
     }
 
     body {
@@ -32,14 +33,38 @@
       gap: 16px;
     }
 
-    h2 { margin: 0; font-size: 1.25rem; text-align: center; }
+    .header {
+      text-align: center;
+      padding: 8px 0;
+    }
+
+    .header h2 {
+      margin: 0;
+      color: var(--primary);
+      font-size: 1.3rem;
+    }
+
+    .header p {
+      margin: 4px 0 0 0;
+      font-size: 0.85rem;
+      color: #64748b;
+    }
 
     .card {
       background: var(--card-bg);
       border-radius: 12px;
       padding: 16px;
       border: 1px solid var(--border);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #334155;
+      border-bottom: 2px solid #f1f5f9;
+      padding-bottom: 6px;
     }
 
     .form-group {
@@ -49,323 +74,124 @@
       margin-bottom: 12px;
     }
 
-    label { font-size: 0.85rem; font-weight: 600; color: #475569; }
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #475569;
+    }
 
-    input {
+    input, select, textarea {
       padding: 10px;
       border-radius: 6px;
       border: 1px solid var(--border);
       font-size: 0.95rem;
+      box-sizing: border-box;
+      width: 100%;
     }
 
-    #video-container {
-      width: 100%;
-      height: 280px;
-      border-radius: 8px;
-      overflow: hidden;
-      background: #000;
+    textarea {
+      resize: vertical;
+      min-height: 70px;
+    }
+
+    .photo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .photo-box {
+      border: 2px dashed var(--border);
+      border-radius: 10px;
+      padding: 12px 8px;
+      text-align: center;
+      background: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 120px;
+      cursor: pointer;
       position: relative;
     }
 
-    video { width: 100%; height: 100%; object-fit: cover; }
+    .photo-box.has-photo {
+      border-style: solid;
+      border-color: var(--success);
+      background: #f0fdf4;
+    }
+
+    .photo-box label {
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    .photo-box img {
+      max-width: 100%;
+      max-height: 90px;
+      border-radius: 6px;
+      margin-top: 6px;
+      object-fit: cover;
+    }
+
+    .photo-icon {
+      font-size: 1.5rem;
+      margin-bottom: 4px;
+    }
+
+    .badge {
+      font-size: 0.7rem;
+      background: var(--success);
+      color: white;
+      padding: 2px 6px;
+      border-radius: 10px;
+      margin-top: 4px;
+    }
 
     .btn {
       background-color: var(--primary);
       color: white;
       border: none;
-      padding: 12px;
+      padding: 14px;
       border-radius: 8px;
-      font-weight: 600;
-      font-size: 0.95rem;
+      font-weight: 700;
+      font-size: 1rem;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
       width: 100%;
+      margin-top: 8px;
     }
 
-    .btn-secondary { background-color: #64748b; }
-    .btn-danger { background-color: #ef4444; }
+    .btn:hover { background-color: var(--primary-hover); }
 
-    .actions { display: flex; gap: 8px; margin-top: 12px; }
+    .btn-reset {
+      background-color: #64748b;
+      margin-top: 8px;
+    }
 
-    .status-msg {
-      font-size: 0.85rem;
-      padding: 8px;
-      border-radius: 6px;
-      text-align: center;
+    input[type="file"] {
       display: none;
     }
 
-    .status-success { background: #dcfce7; color: #15803d; }
-    .status-warning { background: #fef3c7; color: #b45309; }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 12px;
+    .status-msg {
       font-size: 0.85rem;
+      padding: 10px;
+      border-radius: 6px;
+      text-align: center;
+      margin-top: 8px;
+      display: none;
     }
 
-    th, td { padding: 8px; text-align: left; border-bottom: 1px solid var(--border); }
-    th { background: #f1f5f9; }
-
-    .delete-btn { color: #ef4444; cursor: pointer; font-weight: bold; }
+    .status-warning { background: #fef3c7; color: #b45309; }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h2>Tech Device Reconciler</h2>
-
-  <div class="card">
-    <div class="form-group">
-      <label for="techName">Tech Name / ID</label>
-      <input type="text" id="techName" placeholder="e.g. John Doe">
-    </div>
-    <div class="form-group">
-      <label for="location">Location / Building</label>
-      <input type="text" id="location" placeholder="e.g. Warehouse 4">
-    </div>
-    <div class="form-group">
-      <label for="supEmail">Supervisor Email</label>
-      <input type="email" id="supEmail" placeholder="supervisor@company.com">
-    </div>
-  </div>
-
-  <div class="card">
-    <div id="video-container">
-      <video id="video" playsinline></video>
-    </div>
-    <div id="status" class="status-msg"></div>
-    <button id="startScanBtn" class="btn" style="margin-top: 12px;">Start Scanner</button>
-  </div>
-
-  <div class="card">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-      <h3 style="margin: 0; font-size: 1rem;">Scanned Items (<span id="scanCount">0</span>)</h3>
-      <button id="clearBtn" class="btn btn-danger" style="width: auto; padding: 6px 12px; font-size: 0.8rem;">Clear All</button>
-    </div>
-
-    <table id="scanTable">
-      <thead>
-        <tr>
-          <th>Asset / Serial Data</th>
-          <th>Time</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="scanTableBody"></tbody>
-    </table>
-
-    <div class="actions">
-      <button id="shareEmailBtn" class="btn">Share via Email</button>
-      <button id="downloadCsvBtn" class="btn btn-secondary">Save CSV</button>
-    </div>
-  </div>
-</div>
-
-<script>
-  let scans = JSON.parse(localStorage.getItem('tech_recon_scans') || '[]');
-  let videoStream = null;
-  let isScanning = false;
-  let scanInterval = null;
-
-  document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('techName').value = localStorage.getItem('tech_recon_name') || '';
-    document.getElementById('location').value = localStorage.getItem('tech_recon_loc') || '';
-    document.getElementById('supEmail').value = localStorage.getItem('tech_recon_email') || '';
-
-    ['techName', 'location', 'supEmail'].forEach(id => {
-      document.getElementById(id).addEventListener('input', (e) => {
-        const keyMap = { techName: 'tech_recon_name', location: 'tech_recon_loc', supEmail: 'tech_recon_email' };
-        localStorage.setItem(keyMap[id], e.target.value);
-      });
-    });
-
-    renderTable();
-
-    document.getElementById('startScanBtn').addEventListener('click', toggleScanner);
-    document.getElementById('downloadCsvBtn').addEventListener('click', downloadCSV);
-    document.getElementById('shareEmailBtn').addEventListener('click', shareOrEmail);
-    document.getElementById('clearBtn').addEventListener('click', clearScans);
-  });
-
-  async function toggleScanner() {
-    const btn = document.getElementById('startScanBtn');
-    const video = document.getElementById('video');
-
-    if (!isScanning) {
-      try {
-        videoStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { exact: "environment" } }
-        }).catch(() => {
-          return navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-        });
-
-        video.srcObject = videoStream;
-        await video.play();
-
-        isScanning = true;
-        btn.textContent = "Stop Scanner";
-        btn.classList.add('btn-secondary');
-
-        // Hardware-Accelerated Barcode Detector API
-        if ('BarcodeDetector' in window) {
-          const barcodeDetector = new BarcodeDetector({
-            formats: ['data_matrix', 'qr_code', 'code_128', 'code_39', 'ean_13']
-          });
-
-          scanInterval = setInterval(async () => {
-            try {
-              const barcodes = await barcodeDetector.detect(video);
-              if (barcodes.length > 0) {
-                onScanSuccess(barcodes[0].rawValue);
-              }
-            } catch (e) {}
-          }, 200);
-        } else {
-          showStatus("Please use iOS 17+ Safari for hardware scanning.", "warning");
-        }
-
-      } catch (err) {
-        showStatus("Unable to access camera.", "warning");
-      }
-    } else {
-      stopScanner();
-    }
-  }
-
-  function stopScanner() {
-    const btn = document.getElementById('startScanBtn');
-    if (scanInterval) clearInterval(scanInterval);
-    if (videoStream) {
-      videoStream.getTracks().forEach(track => track.stop());
-    }
-    isScanning = false;
-    btn.textContent = "Start Scanner";
-    btn.classList.remove('btn-secondary');
-  }
-
-  function onScanSuccess(decodedText) {
-    if (scans.some(s => s.code === decodedText)) {
-      showStatus(`Duplicate scan ignored: ${decodedText}`, 'warning');
-      return;
-    }
-
-    if (navigator.vibrate) navigator.vibrate(120);
-
-    const record = {
-      code: decodedText,
-      timestamp: new Date().toLocaleString()
-    };
-
-    scans.unshift(record);
-    localStorage.setItem('tech_recon_scans', JSON.stringify(scans));
-    showStatus(`Scanned: ${decodedText}`, 'success');
-    renderTable();
-  }
-
-  function renderTable() {
-    const tbody = document.getElementById('scanTableBody');
-    document.getElementById('scanCount').textContent = scans.length;
-    tbody.innerHTML = '';
-
-    scans.forEach((item, index) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td><strong>${escapeHtml(item.code)}</strong></td>
-        <td>${item.timestamp}</td>
-        <td><span class="delete-btn" onclick="deleteScan(${index})">&times;</span></td>
-      `;
-      tbody.appendChild(tr);
-    });
-  }
-
-  function deleteScan(index) {
-    scans.splice(index, 1);
-    localStorage.setItem('tech_recon_scans', JSON.stringify(scans));
-    renderTable();
-  }
-
-  function clearScans() {
-    if (confirm("Clear all scanned assets for this session?")) {
-      scans = [];
-      localStorage.setItem('tech_recon_scans', JSON.stringify(scans));
-      renderTable();
-    }
-  }
-
-  function showStatus(msg, type) {
-    const el = document.getElementById('status');
-    el.textContent = msg;
-    el.className = `status-msg status-${type}`;
-    el.style.display = 'block';
-    setTimeout(() => { el.style.display = 'none'; }, 3000);
-  }
-
-  function generateCSVString() {
-    const tech = document.getElementById('techName').value || 'N/A';
-    const loc = document.getElementById('location').value || 'N/A';
-
-    let csvContent = "Tech Name,Location,Timestamp,Asset Serial / Tag\n";
-    scans.forEach(s => {
-      csvContent += `"${tech}","${loc}","${s.timestamp}","${s.code}"\n`;
-    });
-    return csvContent;
-  }
-
-  function downloadCSV() {
-    if (scans.length === 0) {
-      alert("No scans available to export.");
-      return;
-    }
-    const blob = new Blob([generateCSVString()], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', `Reconcile_${new Date().toISOString().slice(0,10)}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }
-
-  async function shareOrEmail() {
-    if (scans.length === 0) {
-      alert("No scans to share.");
-      return;
-    }
-
-    const tech = document.getElementById('techName').value || 'Tech';
-    const loc = document.getElementById('location').value || 'Field';
-    const supEmail = document.getElementById('supEmail').value;
-    const csvData = generateCSVString();
+  <div class="header">
     
-    const fileName = `Recon_${tech.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.csv`;
-    const file = new File([csvData], fileName, { type: 'text/csv' });
-
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      try {
-        await navigator.share({
-          title: `Reconciliation Report - ${tech}`,
-          text: `Attached is the reconciliation log for location: ${loc}. Total items: ${scans.length}`,
-          files: [file]
-        });
-      } catch (err) {
-        if (err.name !== 'AbortError') console.error('Share failed:', err);
-      }
-    } else {
-      const subject = encodeURIComponent(`Reconciliation Report - ${tech} (${loc})`);
-      const body = encodeURIComponent(`Hi Supervisor,\n\nHere is the scan summary for ${loc}:\n\nTotal Items: ${scans.length}\n\nScan Data:\n` + csvData);
-      window.location.href = `mailto:${supEmail}?subject=${subject}&body=${body}`;
-    }
-  }
-
-  function escapeHtml(text) {
-    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  }
-</script>
-
-</body>
-</html>
