@@ -245,11 +245,7 @@
 
     <div class="form-group">
       <label for="qcType">Inspection Standard *</label>
-      <select id="qcType" onchange="updateQCType()">
-        <option value="Prince Telecom QC">Prince Telecom QC</option>
-        <option value="Comcast QC">Comcast QC</option>
-        <option value="Gateway Fiber QC">Gateway Fiber QC</option>
-      </select>
+      <select id="qcType" onchange="updateQCType()"></select>
     </div>
 
     <div class="form-group">
@@ -344,7 +340,35 @@
     document.getElementById('techNum').value = localStorage.getItem('qc_tech_num') || '';
     document.getElementById('city').value = localStorage.getItem('qc_city') || '';
     document.getElementById('state').value = localStorage.getItem('qc_state') || '';
-    document.getElementById('qcType').value = localStorage.getItem('qc_type') || 'Prince Telecom QC';
+
+    // Check URL parameters for custom mode (?mode=comcast or ?mode=gateway)
+    const urlParams = new URLSearchParams(window.location.search);
+    const mode = (urlParams.get('mode') || '').toLowerCase();
+    const select = document.getElementById('qcType');
+
+    if (mode === 'comcast') {
+      select.innerHTML = `
+        <option value="Comcast QC">Comcast QC</option>
+        <option value="Prince Telecom QC">Prince Telecom QC</option>
+      `;
+    } else if (mode === 'gateway') {
+      select.innerHTML = `
+        <option value="Gateway Fiber QC">Gateway Fiber QC</option>
+      `;
+    } else {
+      select.innerHTML = `
+        <option value="Prince Telecom QC">Prince Telecom QC</option>
+        <option value="Comcast QC">Comcast QC</option>
+        <option value="Gateway Fiber QC">Gateway Fiber QC</option>
+      `;
+    }
+
+    const savedType = localStorage.getItem('qc_type');
+    if (savedType && select.querySelector(`option[value="${savedType}"]`)) {
+      select.value = savedType;
+    } else {
+      select.value = select.options[0].value;
+    }
 
     updateQCType();
 
@@ -576,7 +600,6 @@
     const timestamp = new Date().toLocaleString();
     const cleanJob = jobNum.replace(/[^a-zA-Z0-9]/g, '_');
 
-    // Build files list dynamically from active schema
     const attachedFiles = [];
     schema.forEach((item, idx) => {
       const itemFile = activeRequiredPhotos[item.id].file;
@@ -592,7 +615,6 @@
       }
     });
 
-    // 1. Database Sync Payload
     if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE") {
       showStatus("Saving inspection data to Google Sheets & Drive...", "info");
       
@@ -626,7 +648,6 @@
       }
     }
 
-    // 2. Share / Email Formatting
     const extraPhotosCount = attachedFiles.length - schema.length;
     const emailSubject = `🚨 ${qcType.toUpperCase()} SUBMISSION | Job #${jobNum} | Tech ${techNum} | ${address}, ${city}, ${state}`;
     
