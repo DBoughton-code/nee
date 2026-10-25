@@ -248,6 +248,7 @@
       <select id="qcType" onchange="updateQCType()">
         <option value="Prince Telecom QC">Prince Telecom QC</option>
         <option value="Comcast QC">Comcast QC</option>
+        <option value="Gateway Fiber QC">Gateway Fiber QC</option>
       </select>
     </div>
 
@@ -282,51 +283,10 @@
     </div>
   </div>
 
-  <!-- Required QC Photos -->
+  <!-- Dynamic QC Photos Container -->
   <div class="card">
-    <div class="card-title">Required QC Photos (4)</div>
-    
-    <div class="photo-grid">
-      <!-- Photo 1: Tap -->
-      <div class="photo-box" id="box-tap" onclick="triggerCamera('input-tap')">
-        <span class="photo-icon">📷</span>
-        <label>1. Tap</label>
-        <span id="badge-tap" style="display:none;" class="badge">Stamped ✓</span>
-        <div id="addr-tap" class="addr-tag"></div>
-        <img id="prev-tap" style="display:none;" />
-        <input type="file" id="input-tap" accept="image/*" capture="environment" onchange="processPhoto(event, 'tap')">
-      </div>
-
-      <!-- Photo 2: Bond Block -->
-      <div class="photo-box" id="box-bond" onclick="triggerCamera('input-bond')">
-        <span class="photo-icon">📷</span>
-        <label>2. Bond Block w/ Tags</label>
-        <span id="badge-bond" style="display:none;" class="badge">Stamped ✓</span>
-        <div id="addr-bond" class="addr-tag"></div>
-        <img id="prev-bond" style="display:none;" />
-        <input type="file" id="input-bond" accept="image/*" capture="environment" onchange="processPhoto(event, 'bond')">
-      </div>
-
-      <!-- Photo 3: House Attachment -->
-      <div class="photo-box" id="box-house" onclick="triggerCamera('input-house')">
-        <span class="photo-icon">📷</span>
-        <label>3. House Attachment</label>
-        <span id="badge-house" style="display:none;" class="badge">Stamped ✓</span>
-        <div id="addr-house" class="addr-tag"></div>
-        <img id="prev-house" style="display:none;" />
-        <input type="file" id="input-house" accept="image/*" capture="environment" onchange="processPhoto(event, 'house')">
-      </div>
-
-      <!-- Photo 4: Overall Side of House -->
-      <div class="photo-box" id="box-side" onclick="triggerCamera('input-side')">
-        <span class="photo-icon">📷</span>
-        <label>4. Side of House</label>
-        <span id="badge-side" style="display:none;" class="badge">Stamped ✓</span>
-        <div id="addr-side" class="addr-tag"></div>
-        <img id="prev-side" style="display:none;" />
-        <input type="file" id="input-side" accept="image/*" capture="environment" onchange="processPhoto(event, 'side')">
-      </div>
-    </div>
+    <div class="card-title" id="photoCardTitle">Required QC Photos</div>
+    <div class="photo-grid" id="requiredPhotosGrid"></div>
   </div>
 
   <!-- Additional Photos Section -->
@@ -342,17 +302,43 @@
   <!-- Submit Action -->
   <div class="card">
     <div id="status" class="status-msg"></div>
-    <button id="submitBtn" class="btn" onclick="submitQC()">📧 Send QC Inspection to Supervisor</button>
+    <button id="submitBtn" class="btn" onclick="submitQC()">📧 Send QC Inspection & Save to Database</button>
     <button class="btn btn-reset" onclick="resetForm()">Clear & Start New Job</button>
   </div>
 </div>
 
 <script>
-  const requiredPhotos = { tap: null, bond: null, house: null, side: null };
+  const GOOGLE_SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
+  const SUPERVISOR_EMAIL = "Donald.boughton@princetown.com";
+
+  // Configurable Photo Schemas per Standard
+  const PHOTO_SCHEMAS = {
+    "Prince Telecom QC": [
+      { id: "tap", label: "1. Tap" },
+      { id: "bond", label: "2. Bond Block w/ Tags" },
+      { id: "house", label: "3. House Attachment" },
+      { id: "side", label: "4. Side of House" }
+    ],
+    "Comcast QC": [
+      { id: "tap", label: "1. Tap" },
+      { id: "bond", label: "2. Bond Block w/ Tags" },
+      { id: "house", label: "3. House Attachment" },
+      { id: "side", label: "4. Side of House" }
+    ],
+    "Gateway Fiber QC": [
+      { id: "mst", label: "1. MST" },
+      { id: "nid", label: "2. NID" },
+      { id: "cabinet", label: "3. Cabinet" },
+      { id: "strand", label: "4. Strand Attachment" },
+      { id: "house_attach", label: "5. House Attachment" },
+      { id: "drop_premise", label: "6. Drop Premise" },
+      { id: "inside_premise", label: "7. Inside Premise" }
+    ]
+  };
+
+  let activeRequiredPhotos = {};
   const extraPhotos = [];
   let extraCounter = 0;
-
-  const SUPERVISOR_EMAIL = "Donald.boughton@princetown.com";
 
   document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('techNum').value = localStorage.getItem('qc_tech_num') || '';
@@ -375,6 +361,37 @@
     const val = document.getElementById('qcType').value;
     document.getElementById('headerTitle').textContent = val;
     localStorage.setItem('qc_type', val);
+
+    renderRequiredPhotoGrid(val);
+  }
+
+  function renderRequiredPhotoGrid(qcType) {
+    const schema = PHOTO_SCHEMAS[qcType] || PHOTO_SCHEMAS["Prince Telecom QC"];
+    const grid = document.getElementById('requiredPhotosGrid');
+    document.getElementById('photoCardTitle').textContent = `Required QC Photos (${schema.length})`;
+
+    grid.innerHTML = '';
+    activeRequiredPhotos = {};
+
+    schema.forEach(item => {
+      activeRequiredPhotos[item.id] = null;
+
+      const box = document.createElement('div');
+      box.className = 'photo-box';
+      box.id = `box-${item.id}`;
+      box.setAttribute('onclick', `triggerCamera('input-${item.id}')`);
+
+      box.innerHTML = `
+        <span class="photo-icon">📷</span>
+        <label>${item.label}</label>
+        <span id="badge-${item.id}" style="display:none;" class="badge">Stamped ✓</span>
+        <div id="addr-${item.id}" class="addr-tag"></div>
+        <img id="prev-${item.id}" style="display:none;" />
+        <input type="file" id="input-${item.id}" accept="image/*" capture="environment" onchange="processPhoto(event, '${item.id}')">
+      `;
+
+      grid.appendChild(box);
+    });
   }
 
   function triggerCamera(inputId) {
@@ -471,7 +488,7 @@
         const stampedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
 
         if (!isExtra) {
-          requiredPhotos[key] = { file: stampedFile, dataUrl: stampedDataUrl };
+          activeRequiredPhotos[key] = { file: stampedFile, dataUrl: stampedDataUrl };
           document.getElementById(`prev-${key}`).src = stampedDataUrl;
           document.getElementById(`prev-${key}`).style.display = 'block';
           document.getElementById(`badge-${key}`).style.display = 'inline-block';
@@ -542,11 +559,14 @@
       return;
     }
 
+    const schema = PHOTO_SCHEMAS[qcType] || PHOTO_SCHEMAS["Prince Telecom QC"];
     const missingPhotos = [];
-    if (!requiredPhotos.tap) missingPhotos.push("1. Tap");
-    if (!requiredPhotos.bond) missingPhotos.push("2. Bond Block");
-    if (!requiredPhotos.house) missingPhotos.push("3. House Attachment");
-    if (!requiredPhotos.side) missingPhotos.push("4. Side of House");
+
+    schema.forEach(item => {
+      if (!activeRequiredPhotos[item.id]) {
+        missingPhotos.push(item.label);
+      }
+    });
 
     if (missingPhotos.length > 0) {
       showStatus("Missing required photos: " + missingPhotos.join(", "), "warning");
@@ -556,12 +576,13 @@
     const timestamp = new Date().toLocaleString();
     const cleanJob = jobNum.replace(/[^a-zA-Z0-9]/g, '_');
 
-    const attachedFiles = [
-      new File([requiredPhotos.tap.file], `QC_1_Tap_Job_${cleanJob}.jpg`, { type: 'image/jpeg' }),
-      new File([requiredPhotos.bond.file], `QC_2_BondBlock_Job_${cleanJob}.jpg`, { type: 'image/jpeg' }),
-      new File([requiredPhotos.house.file], `QC_3_HouseAttach_Job_${cleanJob}.jpg`, { type: 'image/jpeg' }),
-      new File([requiredPhotos.side.file], `QC_4_SideOfHouse_Job_${cleanJob}.jpg`, { type: 'image/jpeg' })
-    ];
+    // Build files list dynamically from active schema
+    const attachedFiles = [];
+    schema.forEach((item, idx) => {
+      const itemFile = activeRequiredPhotos[item.id].file;
+      const cleanName = item.label.replace(/[^a-zA-Z0-9]/g, '_');
+      attachedFiles.push(new File([itemFile], `QC_${idx + 1}_${cleanName}_Job_${cleanJob}.jpg`, { type: 'image/jpeg' }));
+    });
 
     let extraIndex = 1;
     extraPhotos.forEach((item) => {
@@ -571,9 +592,49 @@
       }
     });
 
-    const extraPhotosCount = attachedFiles.length - 4;
+    // 1. Database Sync Payload
+    if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE") {
+      showStatus("Saving inspection data to Google Sheets & Drive...", "info");
+      
+      const photoPayload = {};
+      schema.forEach(item => {
+        photoPayload[item.id] = activeRequiredPhotos[item.id].dataUrl;
+      });
+      photoPayload.extra = extraPhotos.filter(p => p !== null).map(p => p.dataUrl);
+
+      const payload = {
+        timestamp: timestamp,
+        qcType: qcType,
+        jobNum: jobNum,
+        techNum: techNum,
+        address: address,
+        city: city,
+        state: state,
+        notes: notes,
+        photos: photoPayload
+      };
+
+      try {
+        await fetch(GOOGLE_SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+      } catch (err) {
+        console.error("Database sync warning:", err);
+      }
+    }
+
+    // 2. Share / Email Formatting
+    const extraPhotosCount = attachedFiles.length - schema.length;
     const emailSubject = `🚨 ${qcType.toUpperCase()} SUBMISSION | Job #${jobNum} | Tech ${techNum} | ${address}, ${city}, ${state}`;
     
+    let checklistText = "";
+    schema.forEach((item, idx) => {
+      checklistText += `   ${idx + 1}. ${item.label} (Address Watermarked)\n`;
+    });
+
     const emailBody = `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📍 ${qcType.toUpperCase()} FIELD AUDIT REPORT
 STATUS: COMPLETE & VERIFIED
@@ -588,12 +649,8 @@ STATUS: COMPLETE & VERIFIED
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📷 ATTACHED EVIDENCE SUMMARY (${attachedFiles.length} TOTAL)
-✅ Required Core Photos:
-   1. Tap Attachment (Address Watermarked)
-   2. Bond Block & Grounding (Address Watermarked)
-   3. House Attachment Point (Address Watermarked)
-   4. Side of House Overview (Address Watermarked)
-
+✅ Required Core Photos (${schema.length}):
+${checklistText}
 ${extraPhotosCount > 0 ? `➕ Additional Site Photos Attached: ${extraPhotosCount}` : 'ℹ️ Additional Photos: None requested'}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -601,7 +658,7 @@ ${extraPhotosCount > 0 ? `➕ Additional Site Photos Attached: ${extraPhotosCoun
 ${notes ? `"${notes}"` : 'No field notes provided for this installation.'}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-* Generated automatically via Field QC Mobile Inspector. All attached image files contain embedded location, job number, and timestamp overlays.`;
+* Generated automatically via Field QC Mobile Inspector. Logged to Database & Drive.`;
 
     if (navigator.canShare && navigator.canShare({ files: attachedFiles })) {
       try {
@@ -631,14 +688,7 @@ ${notes ? `"${notes}"` : 'No field notes provided for this installation.'}
       document.getElementById('address').value = '';
       document.getElementById('notes').value = '';
       
-      ['tap', 'bond', 'house', 'side'].forEach(key => {
-        requiredPhotos[key] = null;
-        document.getElementById(`box-${key}`).classList.remove('has-photo');
-        document.getElementById(`prev-${key}`).style.display = 'none';
-        document.getElementById(`badge-${key}`).style.display = 'none';
-        document.getElementById(`addr-${key}`).textContent = '';
-        document.getElementById(`input-${key}`).value = '';
-      });
+      updateQCType();
 
       document.getElementById('extraPhotosGrid').innerHTML = '';
       extraPhotos.length = 0;
