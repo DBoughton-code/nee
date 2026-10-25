@@ -4,6 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Field QC Inspection Log</title>
+  
+  <!-- PWA Settings for Mobile Home Screen -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0f172a">
+
   <style>
     :root {
       --bg: #0f172a;
@@ -52,6 +58,17 @@
       margin: 4px 0 0 0;
       font-size: 0.85rem;
       color: var(--text-muted);
+    }
+
+    .offline-banner {
+      background-color: #b45309;
+      color: #fff;
+      text-align: center;
+      padding: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      border-radius: 6px;
+      display: none;
     }
 
     .card {
@@ -239,6 +256,8 @@
     <p>Field Inspection & Geotagged Photo Log</p>
   </div>
 
+  <div id="offlineBanner" class="offline-banner">⚠️ Working Offline - Jobs Will Auto-Sync When Online</div>
+
   <!-- Job Details -->
   <div class="card">
     <div class="card-title">Job Details</div>
@@ -341,6 +360,11 @@
     document.getElementById('city').value = localStorage.getItem('qc_city') || '';
     document.getElementById('state').value = localStorage.getItem('qc_state') || '';
 
+    // Online/Offline Listeners
+    window.addEventListener('online', updateNetworkStatus);
+    window.addEventListener('offline', updateNetworkStatus);
+    updateNetworkStatus();
+
     // Check URL parameters for custom mode (?mode=comcast or ?mode=gateway)
     const urlParams = new URLSearchParams(window.location.search);
     const mode = (urlParams.get('mode') || '').toLowerCase();
@@ -376,10 +400,19 @@
     document.getElementById('city').addEventListener('input', (e) => localStorage.setItem('qc_city', e.target.value));
     document.getElementById('state').addEventListener('input', (e) => localStorage.setItem('qc_state', e.target.value));
 
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(() => {}, () => {}, { enableHighAccuracy: true });
-    }
+    registerOfflineServiceWorker();
+    syncOfflineQueue();
   });
+
+  function updateNetworkStatus() {
+    const banner = document.getElementById('offlineBanner');
+    if (navigator.onLine) {
+      banner.style.display = 'none';
+      syncOfflineQueue();
+    } else {
+      banner.style.display = 'block';
+    }
+  }
 
   function updateQCType() {
     const val = document.getElementById('qcType').value;
@@ -428,8 +461,8 @@
       const userCity = document.getElementById('city').value.trim();
       const userState = document.getElementById('state').value.trim();
 
-      if (!("geolocation" in navigator)) {
-        resolve(formatManualAddress(userAddr, userCity, userState));
+      if (!navigator.onLine || !("geolocation" in navigator)) {
+        resolve(formatManualAddress(userAddr, userCity, userState) || "Offline (Address Pending)");
         return;
       }
 
@@ -461,7 +494,7 @@
           resolve(formatManualAddress(userAddr, userCity, userState) || `GPS: ${lat.toFixed(5)}, ${lng.toFixed(5)}`);
         },
         () => resolve(formatManualAddress(userAddr, userCity, userState) || "Location Unavailable"),
-        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+        { enableHighAccuracy: true, timeout: 4000, maximumAge: 0 }
       );
     });
   }
@@ -600,6 +633,34 @@
     const timestamp = new Date().toLocaleString();
     const cleanJob = jobNum.replace(/[^a-zA-Z0-9]/g, '_');
 
+    const photoPayload = {};
+    schema.forEach(item => {
+      photoPayload[item.id] = activeRequiredPhotos[item.id].dataUrl;
+    });
+    photoPayload.extra = extraPhotos.filter(p => p !== null).map(p => p.dataUrl);
+
+    const payload = {
+      timestamp: timestamp,
+      qcType: qcType,
+      jobNum: jobNum,
+      techNum: techNum,
+      address: address,
+      city: city,
+      state: state,
+      notes: notes,
+      photos: photoPayload
+    };
+
+    // If offline, save to local queue
+    if (!navigator.onLine) {
+      queueOfflineSubmission(payload);
+      showStatus("Offline Mode: Inspection saved locally! Will auto-upload when back in service.", "warning");
+    } else if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE") {
+      showStatus("Saving inspection data to Google Sheets & Drive...", "info");
+      sendToDatabase(payload);
+    }
+
+    // Trigger local share / email draft
     const attachedFiles = [];
     schema.forEach((item, idx) => {
       const itemFile = activeRequiredPhotos[item.id].file;
@@ -614,39 +675,6 @@
         extraIndex++;
       }
     });
-
-    if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE") {
-      showStatus("Saving inspection data to Google Sheets & Drive...", "info");
-      
-      const photoPayload = {};
-      schema.forEach(item => {
-        photoPayload[item.id] = activeRequiredPhotos[item.id].dataUrl;
-      });
-      photoPayload.extra = extraPhotos.filter(p => p !== null).map(p => p.dataUrl);
-
-      const payload = {
-        timestamp: timestamp,
-        qcType: qcType,
-        jobNum: jobNum,
-        techNum: techNum,
-        address: address,
-        city: city,
-        state: state,
-        notes: notes,
-        photos: photoPayload
-      };
-
-      try {
-        await fetch(GOOGLE_SCRIPT_URL, {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-      } catch (err) {
-        console.error("Database sync warning:", err);
-      }
-    }
 
     const extraPhotosCount = attachedFiles.length - schema.length;
     const emailSubject = `🚨 ${qcType.toUpperCase()} SUBMISSION | Job #${jobNum} | Tech ${techNum} | ${address}, ${city}, ${state}`;
@@ -679,7 +707,7 @@ ${extraPhotosCount > 0 ? `➕ Additional Site Photos Attached: ${extraPhotosCoun
 ${notes ? `"${notes}"` : 'No field notes provided for this installation.'}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-* Generated automatically via Field QC Mobile Inspector. Logged to Database & Drive.`;
+* Generated automatically via Field QC Mobile Inspector. Saved to Offline Queue & Database.`;
 
     if (navigator.canShare && navigator.canShare({ files: attachedFiles })) {
       try {
@@ -696,6 +724,42 @@ ${notes ? `"${notes}"` : 'No field notes provided for this installation.'}
     } else {
       fallbackMailto(emailSubject, emailBody);
     }
+  }
+
+  async function sendToDatabase(payload) {
+    try {
+      await fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+    } catch (err) {
+      queueOfflineSubmission(payload);
+    }
+  }
+
+  // Offline Queue Functions
+  function queueOfflineSubmission(payload) {
+    const queue = JSON.parse(localStorage.getItem('qc_offline_queue') || '[]');
+    queue.push(payload);
+    localStorage.setItem('qc_offline_queue', JSON.stringify(queue));
+  }
+
+  async function syncOfflineQueue() {
+    if (!navigator.onLine || !GOOGLE_SCRIPT_URL) return;
+    const queue = JSON.parse(localStorage.getItem('qc_offline_queue') || '[]');
+    if (queue.length === 0) return;
+
+    showStatus(`Uploading ${queue.length} offline saved inspections...`, "info");
+
+    for (const item of queue) {
+      await sendToDatabase(item);
+    }
+
+    localStorage.removeItem('qc_offline_queue');
+    showStatus("All offline inspections synced successfully!", "info");
+    setTimeout(hideStatus, 3000);
   }
 
   function fallbackMailto(subject, body) {
@@ -729,6 +793,24 @@ ${notes ? `"${notes}"` : 'No field notes provided for this installation.'}
 
   function hideStatus() {
     document.getElementById('status').style.display = 'none';
+  }
+
+  // Self-contained Service Worker for 100% Offline Caching
+  function registerOfflineServiceWorker() {
+    if ('serviceWorker' in navigator) {
+      const swCode = `
+        const CACHE_NAME = 'qc-app-v1';
+        self.addEventListener('install', e => {
+          e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(['./'])));
+        });
+        self.addEventListener('fetch', e => {
+          e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
+        });
+      `;
+      const blob = new Blob([swCode], { type: 'application/javascript' });
+      const swUrl = URL.createObjectURL(blob);
+      navigator.serviceWorker.register(swUrl).catch(() => {});
+    }
   }
 </script>
 
