@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tech Asset Reconciliation</title>
+<!-- HTML5-QRCode Library -->
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<style>
+:root {
+--primary: #2563eb;
+--primary-hover: #1d4ed8;
+--bg: #f8fafc;
+--card-bg: #ffffff;
+--text: #0f172a;
+--border: #e2e8f0;
+}
+
+body {
+font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+background-color: var(--bg);
+color: var(--text);
+margin: 0;
+padding: 16px;
+display: flex;
+justify-content: center;
+}
+
+.container {
+width: 100%;
+max-width: 500px;
+display: flex;
+flex-direction: column;
+gap: 16px;
+}
+
+h2 {
+margin: 0;
+font-size: 1.25rem;
+text-align: center;
+}
+
+.card {
+background: var(--card-bg);
+border-radius: 12px;
+padding: 16px;
+border: 1px solid var(--border);
+box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.form-group {
+display: flex;
+flex-direction: column;
+gap: 6px;
+margin-bottom: 12px;
+}
+
+label {
+font-size: 0.85rem;
+font-weight: 600;
+color: #475569;
+}
+
+input, select {
+padding: 10px;
+border-radius: 6px;
+border: 1px solid var(--border);
+font-size: 0.95rem;
+}
+
+#reader {
+width: 100%;
+border-radius: 8px;
+overflow: hidden;
+background: #000;
+}
+
+.btn {
+background-color: var(--primary);
+color: white;
+border: none;
+padding: 12px;
+border-radius: 8px;
+font-weight: 600;
+font-size: 0.95rem;
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 8px;
+width: 100%;
+}
+
+.btn:hover { background-color: var(--primary-hover); }
+.btn-secondary { background-color: #64748b; }
+.btn-secondary:hover { background-color: #475569; }
+.btn-danger { background-color: #ef4444; }
+.btn-danger:hover { background-color: #dc2626; }
+
+.actions {
+display: flex;
+gap: 8px;
+margin-top: 12px;
+}
+
+.status-msg {
+font-size: 0.85rem;
+padding: 8px;
+border-radius: 6px;
+text-align: center;
+display: none;
+}
+
+.status-success { background: #dcfce7; color: #15803d; }
+.status-warning { background: #fef3c7; color: #b45309; }
+
+table {
+width: 100%;
+border-collapse: collapse;
+margin-top: 12px;
+font-size: 0.85rem;
+}
+
+th, td {
+padding: 8px;
+text-align: left;
+border-bottom: 1px solid var(--border);
+}
+
+th { background: #f1f5f9; }
+
+.delete-btn {
+color: #ef4444;
+cursor: pointer;
+font-weight: bold;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+<h2>Tech Device Reconciler</h2>
+
+<!-- Session Setup Card -->
+<div class="card">
+<div class="form-group">
+<label for="techName">Tech Name / ID</label>
+<input type="text" id="techName" placeholder="e.g. John Doe">
+</div>
+<div class="form-group">
+<label for="location">Location / Building</label>
+<input type="text" id="location" placeholder="e.g. Warehouse 4 - Rack 2B">
+</div>
+<div class="form-group">
+<label for="supEmail">Supervisor Email</label>
+<input type="email" id="supEmail" placeholder="supervisor@company.com">
+</div>
+</div>
+
+<!-- Scanner Card -->
+<div class="card">
+<div id="reader"></div>
+<div id="status" class="status-msg"></div>
+<button id="startScanBtn" class="btn" style="margin-top: 12px;">Start Scanner</button>
+</div>
+
+<!-- Scan Results Card -->
+<div class="card">
+<div style="display: flex; justify-content: space-between; align-items: center;">
+<h3 style="margin: 0; font-size: 1rem;">Scanned Items (<span id="scanCount">0</span>)</h3>
+<button id="clearBtn" class="btn btn-danger" style="width: auto; padding: 6px 12px; font-size: 0.8rem;">Clear All</button>
+</div>
+
+<table id="scanTable">
+<thead>
+<tr>
+<th>Asset / Serial</th>
+<th>Time</th>
+<th></th>
+</tr>
+</thead>
+<tbody id="scanTableBody">
+<!-- Rows dynamically added here -->
+</tbody>
+</table>
+
+<div class="actions">
+<button id="shareEmailBtn" class="btn">Share via Email</button>
+<button id="downloadCsvBtn" class="btn btn-secondary">Save CSV</button>
+</div>
+</div>
+</div>
+
+<script>
+let scans = JSON.parse(localStorage.getItem('tech_recon_scans') || '[]');
+let html5QrCode = null;
+let isScanning = false;
+
+// Initialize UI & Load Saved Data
+document.addEventListener('DOMContentLoaded', () => {
+document.getElementById('techName').value = localStorage.getItem('tech_recon_name') || '';
+document.getElementById('location').value = localStorage.getItem('tech_recon_loc') || '';
+document.getElementById('supEmail').value = localStorage.getItem('tech_recon_email') || '';
+
+// Save metadata input on change
+['techName', 'location', 'supEmail'].forEach(id => {
+document.getElementById(id).addEventListener('input', (e) => {
+const keyMap = { techName: 'tech_recon_name', location: 'tech_recon_loc', supEmail: 'tech_recon_email' };
+localStorage.setItem(keyMap[id], e.target.value);
+});
+});
+
+renderTable();
+
+document.getElementById('startScanBtn').addEventListener('click', toggleScanner);
+document.getElementById('downloadCsvBtn').addEventListener('click', downloadCSV);
+document.getElementById('shareEmailBtn').addEventListener('click', shareOrEmail);
+document.getElementById('clearBtn').addEventListener('click', clearScans);
+});
+
+function toggleScanner() {
+const btn = document.getElementById('startScanBtn');
+if (!isScanning) {
+html5QrCode = new Html5Qrcode("reader");
+const config = { fps: 10, qrbox: { width: 250, height: 150 } };
+
+html5QrCode.start(
+{ facingMode: "environment" },
+config,
+onScanSuccess
+).then(() => {
+isScanning = true;
+btn.textContent = "Stop Scanner";
+btn.classList.add('btn-secondary');
+}).catch(err => {
+showStatus("Camera access denied or unavailble.", "warning");
+});
+} else {
+html5QrCode.stop().then(() => {
+html5QrCode.clear();
+isScanning = false;
+btn.textContent = "Start Scanner";
+btn.classList.remove('btn-secondary');
+});
+}
+}
+
+function onScanSuccess(decodedText) {
+// Prevent duplicate within current session
+if (scans.some(s => s.code === decodedText)) {
+showStatus(`Duplicate scan ignored: ${decodedText}`, 'warning');
+return;
+}
+
+// Audio / Haptic Feedback
+if (navigator.vibrate) navigator.vibrate(100);
+
+const record = {
+code: decodedText,
+timestamp: new Date().toLocaleString()
+};
+
+scans.unshift(record);
+localStorage.setItem('tech_recon_scans', JSON.stringify(scans));
+showStatus(`Scanned: ${decodedText}`, 'success');
+renderTable();
+}
+
+function renderTable() {
+const tbody = document.getElementById('scanTableBody');
+document.getElementById('scanCount').textContent = scans.length;
+tbody.innerHTML = '';
+
+scans.forEach((item, index) => {
+const tr = document.createElement('tr');
+tr.innerHTML = `
+<td><strong>${escapeHtml(item.code)}</strong></td>
+<td>${item.timestamp}</td>
+<td><span class="delete-btn" onclick="deleteScan(${index})">&times;</span></td>
+`;
+tbody.appendChild(tr);
+});
+}
+
+function deleteScan(index) {
+scans.splice(index, 1);
+localStorage.setItem('tech_recon_scans', JSON.stringify(scans));
+renderTable();
+}
+
+function clearScans() {
+if (confirm("Clear all scanned assets for this session?")) {
+scans = [];
+localStorage.setItem('tech_recon_scans', JSON.stringify(scans));
+renderTable();
+}
+}
+
+function showStatus(msg, type) {
+const el = document.getElementById('status');
+el.textContent = msg;
+el.className = `status-msg status-${type}`;
+el.style.display = 'block';
+setTimeout(() => { el.style.display = 'none'; }, 3000);
+}
+
+function generateCSVString() {
+const tech = document.getElementById('techName').value || 'N/A';
+const loc = document.getElementById('location').value || 'N/A';
+
+let csvContent = "Tech Name,Location,Timestamp,Asset Serial\n";
+scans.forEach(s => {
+csvContent += `"${tech}","${loc}","${s.timestamp}","${s.code}"\n`;
+});
+return csvContent;
+}
+
+function downloadCSV() {
+if (scans.length === 0) {
+alert("No scans available to export.");
+return;
+}
+const blob = new Blob([generateCSVString()], { type: 'text/csv;charset=utf-8;' });
+const url = URL.createObjectURL(blob);
+const link = document.createElement('a');
+link.href = url;
+link.setAttribute('download', `Reconcile_${new Date().toISOString().slice(0,10)}.csv`);
+document.body.appendChild(link);
+link.click();
+document.body.removeChild(link);
+}
+
+async function shareOrEmail() {
+if (scans.length === 0) {
+alert("No scans to share.");
+return;
+}
+
+const tech = document.getElementById('techName').value || 'Tech';
+const loc = document.getElementById('location').value || 'Field';
+const supEmail = document.getElementById('supEmail').value;
+const csvData = generateCSVString();
+
+const fileName = `Recon_${tech.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.csv`;
+const file = new File([csvData], fileName, { type: 'text/csv' });
+
+// Use Web Share API if supported (Mobile Chrome, Safari)
+if (navigator.canShare && navigator.canShare({ files: [file] })) {
+try {
+await navigator.share({
+title: `Reconciliation Report - ${tech}`,
+text: `Attached is the reconciliation log for location: ${loc}. Total items: ${scans.length}`,
+files: [file]
+});
+} catch (err) {
+if (err.name !== 'AbortError') console.error('Share failed:', err);
+}
+} else {
+// Fallback: Mailto link with CSV text embedded in body
+const subject = encodeURIComponent(`Reconciliation Report - ${tech} (${loc})`);
+const body = encodeURIComponent(`Hi Supervisor,\n\nHere is the scan summary for ${loc}:\n\nTotal Items: ${scans.length}\n\nScan Data:\n` + csvData);
+window.location.href = `mailto:${supEmail}?subject=${subject}&body=${body}`;
+}
+}
+
+function escapeHtml(text) {
+return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+</script>
+
+</body>
+</html>
