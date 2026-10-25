@@ -376,10 +376,8 @@
     document.getElementById(inputId).click();
   }
 
-  // Reverse Geocoding: Converts GPS Lat/Lng to Street Address
   function getAddressFromGPS() {
     return new Promise((resolve) => {
-      // Priority 1: Use manually entered address fields if present
       const userAddr = document.getElementById('address').value.trim();
       const userCity = document.getElementById('city').value.trim();
       const userState = document.getElementById('state').value.trim();
@@ -395,7 +393,6 @@
           const lng = pos.coords.longitude;
 
           try {
-            // Fetch physical address via Nominatim API
             const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
             const data = await resp.json();
 
@@ -415,7 +412,6 @@
             }
           } catch (err) {}
 
-          // Fallback to manual inputs or lat/lng
           resolve(formatManualAddress(userAddr, userCity, userState) || `GPS: ${lat.toFixed(5)}, ${lng.toFixed(5)}`);
         },
         () => resolve(formatManualAddress(userAddr, userCity, userState) || "Location Unavailable"),
@@ -452,7 +448,7 @@
       ctx.drawImage(img, 0, 0);
 
       const barHeight = Math.max(canvas.height * 0.085, 45);
-      ctx.fillStyle = "rgba(15, 23, 42, 0.85)"; // Dark theme overlay
+      ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
       ctx.fillRect(0, canvas.height - barHeight, canvas.width, barHeight);
 
       ctx.fillStyle = "#ffffff";
@@ -568,24 +564,37 @@
       }
     });
 
-    const emailSubject = `${qcType} Report - Tech ${techNum} - ${address}, ${city}, ${state}`;
-    const emailBody = `${qcType.toUpperCase()} INSPECTION REPORT
-----------------------------------
-Date/Time: ${timestamp}
-Standard: ${qcType}
-Tech Number: ${techNum}
-Address: ${address}, ${city}, ${state}
+    const extraPhotosCount = attachedFiles.length - 4;
+    const emailSubject = `🚨 ${qcType.toUpperCase()} SUBMISSION | Tech ${techNum} | ${address}, ${city}, ${state}`;
+    
+    // Engaged, Executive-Level Email Template
+    const emailBody = `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📍 ${qcType.toUpperCase()} FIELD AUDIT REPORT
+STATUS: COMPLETE & VERIFIED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-TECH NOTES:
-${notes || 'None'}
+📋 JOB IDENTIFICATION
+• Technician ID: ${techNum}
+• Inspection Standard: ${qcType}
+• Site Address: ${address}, ${city}, ${state}
+• Submission Time: ${timestamp}
 
-CHECKLIST CONFIRMATION:
-[X] 1. Tap Photo Captured (Address Stamped)
-[X] 2. Bond Block w/ Tags Photo Captured (Address Stamped)
-[X] 3. House Attachment Photo Captured (Address Stamped)
-[X] 4. Overall Side of House Photo Captured (Address Stamped)
-[X] Additional Photos Included: ${attachedFiles.length - 4}
-----------------------------------`;
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📷 ATTACHED EVIDENCE SUMMARY (${attachedFiles.length} TOTAL)
+✅ Required Core Photos:
+   1. Tap Attachment (Address Watermarked)
+   2. Bond Block & Grounding (Address Watermarked)
+   3. House Attachment Point (Address Watermarked)
+   4. Side of House Overview (Address Watermarked)
+
+${extraPhotosCount > 0 ? `➕ Additional Site Photos Attached: ${extraPhotosCount}` : 'ℹ️ Additional Photos: None requested'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📝 TECHNICIAN FIELD NOTES
+${notes ? `"${notes}"` : 'No field notes provided for this installation.'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+* Generated automatically via Field QC Mobile Inspector. All attached image files contain embedded location and timestamp overlays.`;
 
     if (navigator.canShare && navigator.canShare({ files: attachedFiles })) {
       try {
