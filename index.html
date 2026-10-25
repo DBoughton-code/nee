@@ -194,4 +194,231 @@
 
 <div class="container">
   <div class="header">
+    <h2>Prince Telecom QC</h2>
+    <p>Field Inspection & Photo Log</p>
+  </div>
+
+  <!-- Tech & Job Metadata -->
+  <div class="card">
+    <div class="card-title">Job Details</div>
     
+    <div class="form-group">
+      <label for="techNum">Tech Number *</label>
+      <input type="text" id="techNum" placeholder="e.g. T-10492">
+    </div>
+
+    <div class="form-group">
+      <label for="address">Street Address *</label>
+      <input type="text" id="address" placeholder="e.g. 123 Main St">
+    </div>
+
+    <div class="form-group">
+      <label for="state">State *</label>
+      <input type="text" id="state" placeholder="e.g. CT">
+    </div>
+
+    <div class="form-group">
+      <label for="notes">Tech Notes (Optional)</label>
+      <textarea id="notes" placeholder="Add any access notes, exceptions, or observations..."></textarea>
+    </div>
+  </div>
+
+  <!-- Required QC Photos -->
+  <div class="card">
+    <div class="card-title">Required QC Photos (4)</div>
+    
+    <div class="photo-grid">
+      <!-- Photo 1: Tap -->
+      <div class="photo-box" id="box-tap" onclick="triggerCamera('input-tap')">
+        <span class="photo-icon">📷</span>
+        <label>1. Tap</label>
+        <span id="badge-tap" style="display:none;" class="badge">Captured ✓</span>
+        <img id="prev-tap" style="display:none;" />
+        <input type="file" id="input-tap" accept="image/*" capture="environment" onchange="handlePhoto(event, 'tap')">
+      </div>
+
+      <!-- Photo 2: Bond Block -->
+      <div class="photo-box" id="box-bond" onclick="triggerCamera('input-bond')">
+        <span class="photo-icon">📷</span>
+        <label>2. Bond Block w/ Tags</label>
+        <span id="badge-bond" style="display:none;" class="badge">Captured ✓</span>
+        <img id="prev-bond" style="display:none;" />
+        <input type="file" id="input-bond" accept="image/*" capture="environment" onchange="handlePhoto(event, 'bond')">
+      </div>
+
+      <!-- Photo 3: House Attachment -->
+      <div class="photo-box" id="box-house" onclick="triggerCamera('input-house')">
+        <span class="photo-icon">📷</span>
+        <label>3. House Attachment</label>
+        <span id="badge-house" style="display:none;" class="badge">Captured ✓</span>
+        <img id="prev-house" style="display:none;" />
+        <input type="file" id="input-house" accept="image/*" capture="environment" onchange="handlePhoto(event, 'house')">
+      </div>
+
+      <!-- Photo 4: Overall Side of House -->
+      <div class="photo-box" id="box-side" onclick="triggerCamera('input-side')">
+        <span class="photo-icon">📷</span>
+        <label>4. Side of House</label>
+        <span id="badge-side" style="display:none;" class="badge">Captured ✓</span>
+        <img id="prev-side" style="display:none;" />
+        <input type="file" id="input-side" accept="image/*" capture="environment" onchange="handlePhoto(event, 'side')">
+      </div>
+    </div>
+
+    <div id="status" class="status-msg"></div>
+  </div>
+
+  <!-- Submit Action -->
+  <div class="card">
+    <button id="submitBtn" class="btn" onclick="submitQC()">📧 Send QC Inspection to Supervisor</button>
+    <button class="btn btn-reset" onclick="resetForm()">Clear & Start New Job</button>
+  </div>
+</div>
+
+<script>
+  const photos = {
+    tap: null,
+    bond: null,
+    house: null,
+    side: null
+  };
+
+  const SUPERVISOR_EMAIL = "Donald.boughton@princetown.com"; // Set target email
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Restore saved tech info if available
+    document.getElementById('techNum').value = localStorage.getItem('qc_tech_num') || '';
+    document.getElementById('state').value = localStorage.getItem('qc_state') || '';
+
+    // Remember Tech Number & State across jobs
+    document.getElementById('techNum').addEventListener('input', (e) => localStorage.setItem('qc_tech_num', e.target.value));
+    document.getElementById('state').addEventListener('input', (e) => localStorage.setItem('qc_state', e.target.value));
+  });
+
+  function triggerCamera(inputId) {
+    document.getElementById(inputId).click();
+  }
+
+  function handlePhoto(event, key) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      photos[key] = {
+        name: file.name,
+        file: file,
+        dataUrl: e.target.result
+      };
+
+      // Update UI preview
+      const box = document.getElementById(`box-${key}`);
+      const img = document.getElementById(`prev-${key}`);
+      const badge = document.getElementById(`badge-${key}`);
+
+      img.src = e.target.result;
+      img.style.display = 'block';
+      badge.style.display = 'inline-block';
+      box.classList.add('has-photo');
+    };
+    reader.readAsDataURL(file);
+  }
+
+  async function submitQC() {
+    const techNum = document.getElementById('techNum').value.trim();
+    const address = document.getElementById('address').value.trim();
+    const state = document.getElementById('state').value.trim();
+    const notes = document.getElementById('notes').value.trim();
+
+    // Validation
+    if (!techNum || !address || !state) {
+      showStatus("Please enter Tech Number, Address, and State.", "warning");
+      return;
+    }
+
+    const missingPhotos = [];
+    if (!photos.tap) missingPhotos.push("1. Tap");
+    if (!photos.bond) missingPhotos.push("2. Bond Block");
+    if (!photos.house) missingPhotos.push("3. House Attachment");
+    if (!photos.side) missingPhotos.push("4. Side of House");
+
+    if (missingPhotos.length > 0) {
+      showStatus("Missing required photos: " + missingPhotos.join(", "), "warning");
+      return;
+    }
+
+    const timestamp = new Date().toLocaleString();
+    const photoFiles = [
+      new File([photos.tap.file], `QC_1_Tap_${address}.jpg`, { type: photos.tap.file.type }),
+      new File([photos.bond.file], `QC_2_BondBlock_${address}.jpg`, { type: photos.bond.file.type }),
+      new File([photos.house.file], `QC_3_HouseAttach_${address}.jpg`, { type: photos.house.file.type }),
+      new File([photos.side.file], `QC_4_SideOfHouse_${address}.jpg`, { type: photos.side.file.type })
+    ];
+
+    const emailSubject = `QC Inspection Report - Tech ${techNum} - ${address}, ${state}`;
+    const emailBody = `PRINCE TELECOM QC INSPECTION REPORT
+----------------------------------
+Date/Time: ${timestamp}
+Tech Number: ${techNum}
+Address: ${address}, ${state}
+
+TECH NOTES:
+${notes || 'None'}
+
+CHECKLIST CONFIRMATION:
+[X] 1. Tap Photo Captured
+[X] 2. Bond Block w/ Tags Photo Captured
+[X] 3. House Attachment Photo Captured
+[X] 4. Overall Side of House Photo Captured
+----------------------------------`;
+
+    // Use Native Share API (Attaches images directly in Mail on iOS/Android)
+    if (navigator.canShare && navigator.canShare({ files: photoFiles })) {
+      try {
+        await navigator.share({
+          title: emailSubject,
+          text: emailBody,
+          files: photoFiles
+        });
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          fallbackMailto(emailSubject, emailBody);
+        }
+      }
+    } else {
+      fallbackMailto(emailSubject, emailBody);
+    }
+  }
+
+  function fallbackMailto(subject, body) {
+    const mailtoUrl = `mailto:${SUPERVISOR_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailtoUrl;
+  }
+
+  function resetForm() {
+    if (confirm("Start a new QC Inspection? Current job photos will be cleared.")) {
+      document.getElementById('address').value = '';
+      document.getElementById('notes').value = '';
+      
+      ['tap', 'bond', 'house', 'side'].forEach(key => {
+        photos[key] = null;
+        document.getElementById(`box-${key}`).classList.remove('has-photo');
+        document.getElementById(`prev-${key}`).style.display = 'none';
+        document.getElementById(`badge-${key}`).style.display = 'none';
+        document.getElementById(`input-${key}`).value = '';
+      });
+
+      document.getElementById('status').style.display = 'none';
+    }
+  }
+
+  function showStatus(msg, type) {
+    const el = document.getElementById('status');
+    el.textContent = msg;
+    el.className = `status-msg status-${type}`;
+    el.style.display = 'block';
+  }
+</script>
+
+</body>
+</html>
