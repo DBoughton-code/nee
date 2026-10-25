@@ -139,4 +139,245 @@
 <body>
 
 <div class="container">
-  <h2>Tech
+  <h2>Tech Device Reconciler</h2>
+
+  <!-- Session Setup Card -->
+  <div class="card">
+    <div class="form-group">
+      <label for="techName">Tech Name / ID</label>
+      <input type="text" id="techName" placeholder="e.g. John Doe">
+    </div>
+    <div class="form-group">
+      <label for="location">Location / Building</label>
+      <input type="text" id="location" placeholder="e.g. Warehouse 4 - Rack 2B">
+    </div>
+    <div class="form-group">
+      <label for="supEmail">Supervisor Email</label>
+      <input type="email" id="supEmail" placeholder="supervisor@company.com">
+    </div>
+  </div>
+
+  <!-- Scanner Card -->
+  <div class="card">
+    <div id="reader"></div>
+    <div id="status" class="status-msg"></div>
+    <button id="startScanBtn" class="btn" style="margin-top: 12px;">Start Scanner</button>
+  </div>
+
+  <!-- Scan Results Card -->
+  <div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h3 style="margin: 0; font-size: 1rem;">Scanned Items (<span id="scanCount">0</span>)</h3>
+      <button id="clearBtn" class="btn btn-danger" style="width: auto; padding: 6px 12px; font-size: 0.8rem;">Clear All</button>
+    </div>
+
+    <table id="scanTable">
+      <thead>
+        <tr>
+          <th>Asset / Serial Data</th>
+          <th>Time</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="scanTableBody">
+        <!-- Rows dynamically added here -->
+      </tbody>
+    </table>
+
+    <div class="actions">
+      <button id="shareEmailBtn" class="btn">Share via Email</button>
+      <button id="downloadCsvBtn" class="btn btn-secondary">Save CSV</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let scans = JSON.parse(localStorage.getItem('tech_recon_scans') || '[]');
+  let html5QrCode = null;
+  let isScanning = false;
+
+  // Initialize UI & Load Saved Data
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('techName').value = localStorage.getItem('tech_recon_name') || '';
+    document.getElementById('location').value = localStorage.getItem('tech_recon_loc') || '';
+    document.getElementById('supEmail').value = localStorage.getItem('tech_recon_email') || '';
+    
+    // Save metadata input on change
+    ['techName', 'location', 'supEmail'].forEach(id => {
+      document.getElementById(id).addEventListener('input', (e) => {
+        const keyMap = { techName: 'tech_recon_name', location: 'tech_recon_loc', supEmail: 'tech_recon_email' };
+        localStorage.setItem(keyMap[id], e.target.value);
+      });
+    });
+
+    renderTable();
+
+    document.getElementById('startScanBtn').addEventListener('click', toggleScanner);
+    document.getElementById('downloadCsvBtn').addEventListener('click', downloadCSV);
+    document.getElementById('shareEmailBtn').addEventListener('click', shareOrEmail);
+    document.getElementById('clearBtn').addEventListener('click', clearScans);
+  });
+
+  function toggleScanner() {
+    const btn = document.getElementById('startScanBtn');
+    if (!isScanning) {
+      html5QrCode = new Html5Qrcode("reader");
+
+      // Multi-format configuration including Data Matrix for telecom tags
+      const config = { 
+        fps: 15, 
+        qrbox: { width: 250, height: 250 },
+        formatsToSupport: [ 
+          Html5QrcodeSupportedFormats.DATA_MATRIX,
+          Html5QrcodeSupportedFormats.QR_CODE,
+          Html5QrcodeSupportedFormats.CODE_128,
+          Html5QrcodeSupportedFormats.CODE_39
+        ]
+      };
+
+      html5QrCode.start(
+        { facingMode: "environment" },
+        config,
+        onScanSuccess
+      ).then(() => {
+        isScanning = true;
+        btn.textContent = "Stop Scanner";
+        btn.classList.add('btn-secondary');
+      }).catch(err => {
+        showStatus("Camera access denied or unavailable.", "warning");
+      });
+    } else {
+      html5QrCode.stop().then(() => {
+        html5QrCode.clear();
+        isScanning = false;
+        btn.textContent = "Start Scanner";
+        btn.classList.remove('btn-secondary');
+      });
+    }
+  }
+
+  function onScanSuccess(decodedText) {
+    // Prevent duplicate within current session
+    if (scans.some(s => s.code === decodedText)) {
+      showStatus(`Duplicate scan ignored: ${decodedText}`, 'warning');
+      return;
+    }
+
+    // Audio / Haptic Feedback
+    if (navigator.vibrate) navigator.vibrate(100);
+
+    const record = {
+      code: decodedText,
+      timestamp: new Date().toLocaleString()
+    };
+
+    scans.unshift(record);
+    localStorage.setItem('tech_recon_scans', JSON.stringify(scans));
+    showStatus(`Scanned: ${decodedText}`, 'success');
+    renderTable();
+  }
+
+  function renderTable() {
+    const tbody = document.getElementById('scanTableBody');
+    document.getElementById('scanCount').textContent = scans.length;
+    tbody.innerHTML = '';
+
+    scans.forEach((item, index) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><strong>${escapeHtml(item.code)}</strong></td>
+        <td>${item.timestamp}</td>
+        <td><span class="delete-btn" onclick="deleteScan(${index})">&times;</span></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function deleteScan(index) {
+    scans.splice(index, 1);
+    localStorage.setItem('tech_recon_scans', JSON.stringify(scans));
+    renderTable();
+  }
+
+  function clearScans() {
+    if (confirm("Clear all scanned assets for this session?")) {
+      scans = [];
+      localStorage.setItem('tech_recon_scans', JSON.stringify(scans));
+      renderTable();
+    }
+  }
+
+  function showStatus(msg, type) {
+    const el = document.getElementById('status');
+    el.textContent = msg;
+    el.className = `status-msg status-${type}`;
+    el.style.display = 'block';
+    setTimeout(() => { el.style.display = 'none'; }, 3000);
+  }
+
+  function generateCSVString() {
+    const tech = document.getElementById('techName').value || 'N/A';
+    const loc = document.getElementById('location').value || 'N/A';
+
+    let csvContent = "Tech Name,Location,Timestamp,Asset Serial / Tag\n";
+    scans.forEach(s => {
+      csvContent += `"${tech}","${loc}","${s.timestamp}","${s.code}"\n`;
+    });
+    return csvContent;
+  }
+
+  function downloadCSV() {
+    if (scans.length === 0) {
+      alert("No scans available to export.");
+      return;
+    }
+    const blob = new Blob([generateCSVString()], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `Reconcile_${new Date().toISOString().slice(0,10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  async function shareOrEmail() {
+    if (scans.length === 0) {
+      alert("No scans to share.");
+      return;
+    }
+
+    const tech = document.getElementById('techName').value || 'Tech';
+    const loc = document.getElementById('location').value || 'Field';
+    const supEmail = document.getElementById('supEmail').value;
+    const csvData = generateCSVString();
+    
+    const fileName = `Recon_${tech.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.csv`;
+    const file = new File([csvData], fileName, { type: 'text/csv' });
+
+    // Web Share API for native mobile file attachments
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({
+          title: `Reconciliation Report - ${tech}`,
+          text: `Attached is the reconciliation log for location: ${loc}. Total items: ${scans.length}`,
+          files: [file]
+        });
+      } catch (err) {
+        if (err.name !== 'AbortError') console.error('Share failed:', err);
+      }
+    } else {
+      // Fallback mailto trigger
+      const subject = encodeURIComponent(`Reconciliation Report - ${tech} (${loc})`);
+      const body = encodeURIComponent(`Hi Supervisor,\n\nHere is the scan summary for ${loc}:\n\nTotal Items: ${scans.length}\n\nScan Data:\n` + csvData);
+      window.location.href = `mailto:${supEmail}?subject=${subject}&body=${body}`;
+    }
+  }
+
+  function escapeHtml(text) {
+    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+</script>
+
+</body>
+</html>
