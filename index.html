@@ -121,7 +121,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 140px;
+      min-height: 130px;
       cursor: pointer;
       position: relative;
     }
@@ -135,21 +135,7 @@
     .photo-box label { cursor: pointer; font-size: 0.8rem; font-weight: 600; color: var(--text); }
     .photo-box img { max-width: 100%; max-height: 90px; border-radius: 6px; margin-top: 6px; object-fit: cover; }
 
-    .sample-btn {
-      font-size: 0.68rem;
-      background: #334155;
-      color: #38bdf8;
-      border: 1px solid #0284c7;
-      padding: 2px 8px;
-      border-radius: 12px;
-      margin-top: 4px;
-      font-weight: 700;
-      cursor: pointer;
-      display: inline-block;
-    }
-
-    .sample-btn:hover { background: #0284c7; color: #fff; }
-    .photo-icon { font-size: 1.5rem; margin-bottom: 2px; }
+    .photo-icon { font-size: 1.5rem; margin-bottom: 4px; }
     .badge { font-size: 0.7rem; background: var(--success); color: white; padding: 2px 6px; border-radius: 10px; margin-top: 4px; }
     .addr-tag { font-size: 0.65rem; color: #4ade80; margin-top: 4px; font-weight: 600; line-height: 1.2; }
 
@@ -195,54 +181,6 @@
       font-weight: bold;
       font-size: 1.2rem;
       cursor: pointer;
-    }
-
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(15, 23, 42, 0.92);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-      padding: 16px;
-      box-sizing: border-box;
-    }
-
-    .modal-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      max-width: 420px;
-      width: 100%;
-      max-height: 90vh;
-      overflow-y: auto;
-      padding: 16px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-      position: relative;
-    }
-
-    .modal-header {
-      font-weight: bold;
-      font-size: 1.1rem;
-      color: var(--primary);
-      margin-bottom: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .modal-close { cursor: pointer; font-size: 1.5rem; color: var(--text-muted); }
-    .modal-img-container { display: flex; flex-direction: column; gap: 12px; margin: 12px 0; }
-    .modal-img-container img { width: 100%; border-radius: 8px; border: 1px solid var(--card-border); }
-    .modal-notes {
-      font-size: 0.85rem;
-      color: var(--text);
-      background: #0f172a;
-      padding: 10px;
-      border-radius: 6px;
-      border-left: 3px solid var(--primary);
-      line-height: 1.4;
     }
   </style>
 </head>
@@ -320,18 +258,6 @@
   </div>
 </div>
 
-<!-- Modal Dialog for Sample Photo View -->
-<div id="sampleModal" class="modal-overlay">
-  <div class="modal-card">
-    <div class="modal-header">
-      <span id="modalTitle">Sample QC Standard</span>
-      <span class="modal-close" onclick="closeSampleModal()">&times;</span>
-    </div>
-    <div class="modal-img-container" id="modalImageContainer"></div>
-    <div class="modal-notes" id="modalNotes"></div>
-  </div>
-</div>
-
 <script>
   const GOOGLE_FORM_RESPONSE_URL = "https://docs.google.com/forms/d/e/YOUR_FORM_ID_HERE/formResponse";
 
@@ -347,41 +273,18 @@
 
   const SUPERVISOR_EMAIL = "Donald.boughton@princetown.com";
 
-  const SAMPLE_DATA = {
-    tap: {
-      title: "Tap Connection Standard",
-      images: ["IMG_2600.jpeg"],
-      notes: "• Must show clean drop connection with proper weather seal boot.<br>• House tag zip-tied securely to drop wire below connector.<br>• Cable properly routed along strand."
-    },
-    bond: {
-      title: "Bond Block & Intersystem Termination Standard",
-      images: ["IMG_2602.jpeg", "IMG_2603.jpeg"],
-      notes: "• Enclosure: Neat service loop with filter/ground wire attached.<br>• Grounding: Green Comcast ground tag secured to ground wire at intersystem bonding block or ground rod."
-    },
-    house: {
-      title: "House Attachment & Drip Loop Standard",
-      images: ["IMG_2604.jpeg"],
-      notes: "• Drop clamp attached securely to house hook/bracket.<br>• Proper smooth drip loop before cable entry or fascia run.<br>• Cable zip-tied neatly to prevent sway."
-    },
-    side: {
-      title: "Side of House Overview Standard",
-      images: ["IMG_2604.jpeg"],
-      notes: "• Wide view showing entire drop run along wall/siding.<br>• Cable routed straight and clipped neatly along siding/trim lines."
-    }
-  };
-
   const PHOTO_SCHEMAS = {
     "Prince Telecom QC": [
-      { id: "tap", label: "1. Tap", sample: true },
-      { id: "bond", label: "2. Bond Block w/ Tags", sample: true },
-      { id: "house", label: "3. House Attachment", sample: true },
-      { id: "side", label: "4. Side of House", sample: true }
+      { id: "tap", label: "1. Tap" },
+      { id: "bond", label: "2. Bond Block w/ Tags" },
+      { id: "house", label: "3. House Attachment" },
+      { id: "side", label: "4. Side of House" }
     ],
     "Comcast QC": [
-      { id: "tap", label: "1. Tap", sample: true },
-      { id: "bond", label: "2. Bond Block w/ Tags", sample: true },
-      { id: "house", label: "3. House Attachment", sample: true },
-      { id: "side", label: "4. Side of House", sample: true }
+      { id: "tap", label: "1. Tap" },
+      { id: "bond", label: "2. Bond Block w/ Tags" },
+      { id: "house", label: "3. House Attachment" },
+      { id: "side", label: "4. Side of House" }
     ],
     "Gateway Fiber QC": [
       { id: "mst", label: "1. MST" },
@@ -479,12 +382,9 @@
       box.id = `box-${item.id}`;
       box.setAttribute('onclick', `triggerCamera('input-${item.id}')`);
 
-      const sampleBtnHtml = item.sample ? `<span class="sample-btn" onclick="event.stopPropagation(); openSampleModal('${item.id}')">👁️ View Sample</span>` : '';
-
       box.innerHTML = `
         <span class="photo-icon">📷</span>
         <label>${item.label}</label>
-        ${sampleBtnHtml}
         <span id="badge-${item.id}" style="display:none;" class="badge">Stamped ✓</span>
         <div id="addr-${item.id}" class="addr-tag"></div>
         <img id="prev-${item.id}" style="display:none;" />
@@ -493,29 +393,6 @@
 
       grid.appendChild(box);
     });
-  }
-
-  function openSampleModal(key) {
-    const data = SAMPLE_DATA[key];
-    if (!data) return;
-
-    document.getElementById('modalTitle').textContent = data.title;
-    
-    const container = document.getElementById('modalImageContainer');
-    container.innerHTML = '';
-
-    data.images.forEach(imgName => {
-      const img = document.createElement('img');
-      img.src = imgName;
-      container.appendChild(img);
-    });
-
-    document.getElementById('modalNotes').innerHTML = data.notes;
-    document.getElementById('sampleModal').style.display = 'flex';
-  }
-
-  function closeSampleModal() {
-    document.getElementById('sampleModal').style.display = 'none';
   }
 
   function triggerCamera(inputId) {
