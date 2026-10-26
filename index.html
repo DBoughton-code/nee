@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Field QC Inspection Log</title>
   
-  <!-- PWA Settings for Mobile Home Screen -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#0f172a">
@@ -43,22 +42,9 @@
       gap: 16px;
     }
 
-    .header {
-      text-align: center;
-      padding: 8px 0;
-    }
-
-    .header h2 {
-      margin: 0;
-      color: var(--primary);
-      font-size: 1.4rem;
-    }
-
-    .header p {
-      margin: 4px 0 0 0;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
+    .header { text-align: center; padding: 8px 0; }
+    .header h2 { margin: 0; color: var(--primary); font-size: 1.4rem; }
+    .header p { margin: 4px 0 0 0; font-size: 0.85rem; color: var(--text-muted); }
 
     .offline-banner {
       background-color: #b45309;
@@ -98,11 +84,7 @@
       margin-bottom: 12px;
     }
 
-    label {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--text-muted);
-    }
+    label { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
 
     input, select, textarea {
       padding: 12px;
@@ -121,10 +103,7 @@
       box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
     }
 
-    textarea {
-      resize: vertical;
-      min-height: 70px;
-    }
+    textarea { resize: vertical; min-height: 70px; }
 
     .photo-grid {
       display: grid;
@@ -142,7 +121,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 130px;
+      min-height: 140px;
       cursor: pointer;
       position: relative;
     }
@@ -153,42 +132,26 @@
       background: #064e3b22;
     }
 
-    .photo-box label {
+    .photo-box label { cursor: pointer; font-size: 0.8rem; font-weight: 600; color: var(--text); }
+    .photo-box img { max-width: 100%; max-height: 90px; border-radius: 6px; margin-top: 6px; object-fit: cover; }
+
+    .sample-btn {
+      font-size: 0.68rem;
+      background: #334155;
+      color: #38bdf8;
+      border: 1px solid #0284c7;
+      padding: 2px 8px;
+      border-radius: 12px;
+      margin-top: 4px;
+      font-weight: 700;
       cursor: pointer;
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--text);
+      display: inline-block;
     }
 
-    .photo-box img {
-      max-width: 100%;
-      max-height: 90px;
-      border-radius: 6px;
-      margin-top: 6px;
-      object-fit: cover;
-    }
-
-    .photo-icon {
-      font-size: 1.5rem;
-      margin-bottom: 4px;
-    }
-
-    .badge {
-      font-size: 0.7rem;
-      background: var(--success);
-      color: white;
-      padding: 2px 6px;
-      border-radius: 10px;
-      margin-top: 4px;
-    }
-
-    .addr-tag {
-      font-size: 0.65rem;
-      color: #4ade80;
-      margin-top: 4px;
-      font-weight: 600;
-      line-height: 1.2;
-    }
+    .sample-btn:hover { background: #0284c7; color: #fff; }
+    .photo-icon { font-size: 1.5rem; margin-bottom: 2px; }
+    .badge { font-size: 0.7rem; background: var(--success); color: white; padding: 2px 6px; border-radius: 10px; margin-top: 4px; }
+    .addr-tag { font-size: 0.65rem; color: #4ade80; margin-top: 4px; font-weight: 600; line-height: 1.2; }
 
     .btn {
       background-color: var(--primary);
@@ -208,22 +171,9 @@
     }
 
     .btn:hover { background-color: var(--primary-hover); }
-
-    .btn-secondary {
-      background-color: #334155;
-      color: var(--text);
-      padding: 10px;
-      font-size: 0.9rem;
-    }
-
-    .btn-reset {
-      background-color: #475569;
-      margin-top: 8px;
-    }
-
-    input[type="file"] {
-      display: none;
-    }
+    .btn-secondary { background-color: #334155; color: var(--text); padding: 10px; font-size: 0.9rem; }
+    .btn-reset { background-color: #475569; margin-top: 8px; }
+    input[type="file"] { display: none; }
 
     .status-msg {
       font-size: 0.85rem;
@@ -245,6 +195,54 @@
       font-weight: bold;
       font-size: 1.2rem;
       cursor: pointer;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(15, 23, 42, 0.92);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      padding: 16px;
+      box-sizing: border-box;
+    }
+
+    .modal-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      max-width: 420px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      position: relative;
+    }
+
+    .modal-header {
+      font-weight: bold;
+      font-size: 1.1rem;
+      color: var(--primary);
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-close { cursor: pointer; font-size: 1.5rem; color: var(--text-muted); }
+    .modal-img-container { display: flex; flex-direction: column; gap: 12px; margin: 12px 0; }
+    .modal-img-container img { width: 100%; border-radius: 8px; border: 1px solid var(--card-border); }
+    .modal-notes {
+      font-size: 0.85rem;
+      color: var(--text);
+      background: #0f172a;
+      padding: 10px;
+      border-radius: 6px;
+      border-left: 3px solid var(--primary);
+      line-height: 1.4;
     }
   </style>
 </head>
@@ -322,23 +320,68 @@
   </div>
 </div>
 
+<!-- Modal Dialog for Sample Photo View -->
+<div id="sampleModal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header">
+      <span id="modalTitle">Sample QC Standard</span>
+      <span class="modal-close" onclick="closeSampleModal()">&times;</span>
+    </div>
+    <div class="modal-img-container" id="modalImageContainer"></div>
+    <div class="modal-notes" id="modalNotes"></div>
+  </div>
+</div>
+
 <script>
-  const GOOGLE_SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
+  const GOOGLE_FORM_RESPONSE_URL = "https://docs.google.com/forms/d/e/YOUR_FORM_ID_HERE/formResponse";
+
+  const FORM_ENTRY_IDS = {
+    qcType: "entry.111111111",
+    jobNum: "entry.222222222",
+    techNum: "entry.333333333",
+    address: "entry.444444444",
+    city: "entry.555555555",
+    state: "entry.666666666",
+    notes: "entry.777777777"
+  };
+
   const SUPERVISOR_EMAIL = "Donald.boughton@princetown.com";
 
-  // Configurable Photo Schemas per Standard
+  const SAMPLE_DATA = {
+    tap: {
+      title: "Tap Connection Standard",
+      images: ["image_2.png"],
+      notes: "• Must show clean drop connection with proper weather seal boot.<br>• House tag zip-tied securely to drop wire below connector.<br>• Cable properly routed along strand."
+    },
+    bond: {
+      title: "Bond Block & Intersystem Termination Standard",
+      images: ["image.png", "image_4.png"],
+      notes: "• Enclosure: Neat service loop with filter/ground wire attached.<br>• Grounding: Green Comcast ground tag secured to ground wire at intersystem bonding block or ground rod."
+    },
+    house: {
+      title: "House Attachment & Drip Loop Standard",
+      images: ["image_3.png"],
+      notes: "• Drop clamp attached securely to house hook/bracket.<br>• Proper smooth drip loop before cable entry or fascia run.<br>• Cable zip-tied neatly to prevent sway."
+    },
+    side: {
+      title: "Side of House Overview Standard",
+      images: ["image_3.png"],
+      notes: "• Wide view showing entire drop run along wall/siding.<br>• Cable routed straight and clipped neatly along siding/trim lines."
+    }
+  };
+
   const PHOTO_SCHEMAS = {
     "Prince Telecom QC": [
-      { id: "tap", label: "1. Tap" },
-      { id: "bond", label: "2. Bond Block w/ Tags" },
-      { id: "house", label: "3. House Attachment" },
-      { id: "side", label: "4. Side of House" }
+      { id: "tap", label: "1. Tap", sample: true },
+      { id: "bond", label: "2. Bond Block w/ Tags", sample: true },
+      { id: "house", label: "3. House Attachment", sample: true },
+      { id: "side", label: "4. Side of House", sample: true }
     ],
     "Comcast QC": [
-      { id: "tap", label: "1. Tap" },
-      { id: "bond", label: "2. Bond Block w/ Tags" },
-      { id: "house", label: "3. House Attachment" },
-      { id: "side", label: "4. Side of House" }
+      { id: "tap", label: "1. Tap", sample: true },
+      { id: "bond", label: "2. Bond Block w/ Tags", sample: true },
+      { id: "house", label: "3. House Attachment", sample: true },
+      { id: "side", label: "4. Side of House", sample: true }
     ],
     "Gateway Fiber QC": [
       { id: "mst", label: "1. MST" },
@@ -360,12 +403,10 @@
     document.getElementById('city').value = localStorage.getItem('qc_city') || '';
     document.getElementById('state').value = localStorage.getItem('qc_state') || '';
 
-    // Online/Offline Listeners
     window.addEventListener('online', updateNetworkStatus);
     window.addEventListener('offline', updateNetworkStatus);
     updateNetworkStatus();
 
-    // Check URL parameters for custom mode (?mode=comcast or ?mode=gateway)
     const urlParams = new URLSearchParams(window.location.search);
     const mode = (urlParams.get('mode') || '').toLowerCase();
     const select = document.getElementById('qcType');
@@ -438,9 +479,12 @@
       box.id = `box-${item.id}`;
       box.setAttribute('onclick', `triggerCamera('input-${item.id}')`);
 
+      const sampleBtnHtml = item.sample ? `<span class="sample-btn" onclick="event.stopPropagation(); openSampleModal('${item.id}')">👁️ View Sample</span>` : '';
+
       box.innerHTML = `
         <span class="photo-icon">📷</span>
         <label>${item.label}</label>
+        ${sampleBtnHtml}
         <span id="badge-${item.id}" style="display:none;" class="badge">Stamped ✓</span>
         <div id="addr-${item.id}" class="addr-tag"></div>
         <img id="prev-${item.id}" style="display:none;" />
@@ -449,6 +493,29 @@
 
       grid.appendChild(box);
     });
+  }
+
+  function openSampleModal(key) {
+    const data = SAMPLE_DATA[key];
+    if (!data) return;
+
+    document.getElementById('modalTitle').textContent = data.title;
+    
+    const container = document.getElementById('modalImageContainer');
+    container.innerHTML = '';
+
+    data.images.forEach(imgName => {
+      const img = document.createElement('img');
+      img.src = imgName;
+      container.appendChild(img);
+    });
+
+    document.getElementById('modalNotes').innerHTML = data.notes;
+    document.getElementById('sampleModal').style.display = 'flex';
+  }
+
+  function closeSampleModal() {
+    document.getElementById('sampleModal').style.display = 'none';
   }
 
   function triggerCamera(inputId) {
@@ -633,34 +700,24 @@
     const timestamp = new Date().toLocaleString();
     const cleanJob = jobNum.replace(/[^a-zA-Z0-9]/g, '_');
 
-    const photoPayload = {};
-    schema.forEach(item => {
-      photoPayload[item.id] = activeRequiredPhotos[item.id].dataUrl;
-    });
-    photoPayload.extra = extraPhotos.filter(p => p !== null).map(p => p.dataUrl);
-
-    const payload = {
-      timestamp: timestamp,
+    const formDataPayload = {
       qcType: qcType,
       jobNum: jobNum,
       techNum: techNum,
       address: address,
       city: city,
       state: state,
-      notes: notes,
-      photos: photoPayload
+      notes: notes
     };
 
-    // If offline, save to local queue
     if (!navigator.onLine) {
-      queueOfflineSubmission(payload);
-      showStatus("Offline Mode: Inspection saved locally! Will auto-upload when back in service.", "warning");
-    } else if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE") {
-      showStatus("Saving inspection data to Google Sheets & Drive...", "info");
-      sendToDatabase(payload);
+      queueOfflineSubmission(formDataPayload);
+      showStatus("Offline Mode: Saved locally! Will auto-sync when back in service.", "warning");
+    } else {
+      showStatus("Saving inspection data to Google Form & Sheet...", "info");
+      sendToGoogleForm(formDataPayload);
     }
 
-    // Trigger local share / email draft
     const attachedFiles = [];
     schema.forEach((item, idx) => {
       const itemFile = activeRequiredPhotos[item.id].file;
@@ -707,7 +764,7 @@ ${extraPhotosCount > 0 ? `➕ Additional Site Photos Attached: ${extraPhotosCoun
 ${notes ? `"${notes}"` : 'No field notes provided for this installation.'}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-* Generated automatically via Field QC Mobile Inspector. Saved to Offline Queue & Database.`;
+* Generated automatically via Field QC Mobile Inspector. Submitted to Google Database.`;
 
     if (navigator.canShare && navigator.canShare({ files: attachedFiles })) {
       try {
@@ -726,20 +783,30 @@ ${notes ? `"${notes}"` : 'No field notes provided for this installation.'}
     }
   }
 
-  async function sendToDatabase(payload) {
+  async function sendToGoogleForm(data) {
+    if (!GOOGLE_FORM_RESPONSE_URL || GOOGLE_FORM_RESPONSE_URL.includes("YOUR_FORM_ID_HERE")) return;
+
+    const formBody = new URLSearchParams();
+    formBody.append(FORM_ENTRY_IDS.qcType, data.qcType);
+    formBody.append(FORM_ENTRY_IDS.jobNum, data.jobNum);
+    formBody.append(FORM_ENTRY_IDS.techNum, data.techNum);
+    formBody.append(FORM_ENTRY_IDS.address, data.address);
+    formBody.append(FORM_ENTRY_IDS.city, data.city);
+    formBody.append(FORM_ENTRY_IDS.state, data.state);
+    formBody.append(FORM_ENTRY_IDS.notes, data.notes);
+
     try {
-      await fetch(GOOGLE_SCRIPT_URL, {
+      await fetch(GOOGLE_FORM_RESPONSE_URL, {
         method: "POST",
         mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: formBody.toString()
       });
     } catch (err) {
-      queueOfflineSubmission(payload);
+      queueOfflineSubmission(data);
     }
   }
 
-  // Offline Queue Functions
   function queueOfflineSubmission(payload) {
     const queue = JSON.parse(localStorage.getItem('qc_offline_queue') || '[]');
     queue.push(payload);
@@ -747,14 +814,14 @@ ${notes ? `"${notes}"` : 'No field notes provided for this installation.'}
   }
 
   async function syncOfflineQueue() {
-    if (!navigator.onLine || !GOOGLE_SCRIPT_URL) return;
+    if (!navigator.onLine) return;
     const queue = JSON.parse(localStorage.getItem('qc_offline_queue') || '[]');
     if (queue.length === 0) return;
 
     showStatus(`Uploading ${queue.length} offline saved inspections...`, "info");
 
     for (const item of queue) {
-      await sendToDatabase(item);
+      await sendToGoogleForm(item);
     }
 
     localStorage.removeItem('qc_offline_queue');
@@ -795,7 +862,6 @@ ${notes ? `"${notes}"` : 'No field notes provided for this installation.'}
     document.getElementById('status').style.display = 'none';
   }
 
-  // Self-contained Service Worker for 100% Offline Caching
   function registerOfflineServiceWorker() {
     if ('serviceWorker' in navigator) {
       const swCode = `
