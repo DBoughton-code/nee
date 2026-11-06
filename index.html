@@ -103,14 +103,14 @@
       display: flex;
       flex-direction: column;
       gap: 14px;
-      margin-top: 8px;
+      margin-top: 4px;
     }
 
     .hub-tile {
       background: #111827;
       border: 1.5px solid var(--card-border);
       border-radius: 12px;
-      padding: 18px 16px;
+      padding: 20px 16px;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -125,8 +125,8 @@
 
     .hub-icon-wrap {
       font-size: 2rem;
-      width: 48px;
-      height: 48px;
+      width: 50px;
+      height: 50px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -139,13 +139,13 @@
     }
 
     .hub-title {
-      font-size: 1.05rem;
+      font-size: 1.1rem;
       font-weight: 700;
       color: var(--text);
     }
 
     .hub-sub {
-      font-size: 0.8rem;
+      font-size: 0.82rem;
       color: var(--text-muted);
       margin-top: 2px;
     }
@@ -157,7 +157,6 @@
       border-radius: 8px;
       padding: 12px 14px;
       margin-bottom: 14px;
-      display: none;
     }
 
     .comcast-reminder-title {
@@ -309,7 +308,7 @@
 <div class="container">
   <div id="offlineBanner" class="offline-banner">⚠️ Working Offline - Jobs Will Auto-Sync When Online</div>
 
-  <!-- SCREEN 1: MAIN MENU -->
+  <!-- SCREEN 1: MAIN MENU (Cleaned - Profile Removed) -->
   <div id="view-dashboard" class="view-screen view-active">
     <div class="header">
       <h2>Prince Telecom Field Suite</h2>
@@ -317,37 +316,21 @@
     </div>
 
     <div class="card">
-      <div class="card-title">Technician Profile</div>
-      <div class="form-group" style="margin-bottom: 8px;">
-        <label for="hubTechNum">Tech Number *</label>
-        <input type="text" id="hubTechNum" placeholder="e.g. T-10492" oninput="syncTechNum(this.value)">
-      </div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-        <div class="form-group" style="margin-bottom: 0;">
-          <label for="hubCity">Default City</label>
-          <input type="text" id="hubCity" placeholder="Hartford" oninput="syncCity(this.value)">
-        </div>
-        <div class="form-group" style="margin-bottom: 0;">
-          <label for="hubState">State</label>
-          <input type="text" id="hubState" placeholder="CT" oninput="syncState(this.value)">
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
       <div class="card-title">Select Job Workflow</div>
       <div class="hub-grid">
+        <!-- Choice 1: Comcast QC -->
         <div class="hub-tile" onclick="openQCView()">
           <div class="hub-tile-left">
             <div class="hub-icon-wrap">📋</div>
             <div>
-              <div class="hub-title">Job QC Inspection</div>
-              <div class="hub-sub">Comcast, Prince & Gateway photo logs</div>
+              <div class="hub-title">Comcast Job QC</div>
+              <div class="hub-sub">Required 5-point geotagged photo audit</div>
             </div>
           </div>
           <span style="font-size: 1.2rem; color: var(--text-muted);">❯</span>
         </div>
 
+        <!-- Choice 2: Downed Job -->
         <div class="hub-tile" onclick="openDownedView()">
           <div class="hub-tile-left">
             <div class="hub-icon-wrap hub-icon-downed">🛑</div>
@@ -362,24 +345,20 @@
     </div>
   </div>
 
-  <!-- SCREEN 2: COMCAST / QC INSPECTION -->
+  <!-- SCREEN 2: COMCAST QC INSPECTION -->
   <div id="view-qc" class="view-screen">
     <div class="nav-top-bar">
       <button type="button" class="btn-back" onclick="navigateHome()">❮ Main Menu</button>
-      <span style="font-size: 0.8rem; font-weight: 700; color: var(--primary);">FIELD QC MODE</span>
+      <span style="font-size: 0.8rem; font-weight: 700; color: var(--primary);">COMCAST QC MODE</span>
     </div>
 
     <div class="header">
-      <h2 id="headerTitle">Comcast QC</h2>
+      <h2>Comcast QC Inspection</h2>
       <p>Field Inspection & Geotagged Photo Log</p>
     </div>
 
     <div class="card">
       <div class="card-title">Job Details</div>
-      <div class="form-group">
-        <label for="qcType">Inspection Standard *</label>
-        <select id="qcType" onchange="updateQCType()"></select>
-      </div>
       <div class="form-group">
         <label for="jobNum">Job Number *</label>
         <input type="text" id="jobNum" placeholder="e.g. WO-982341">
@@ -392,24 +371,26 @@
         <label for="address">Street Address *</label>
         <input type="text" id="address" placeholder="e.g. 123 Main St">
       </div>
-      <div class="form-group">
-        <label for="city">City *</label>
-        <input type="text" id="city" placeholder="Hartford" oninput="syncCity(this.value)">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="city">City *</label>
+          <input type="text" id="city" placeholder="Hartford" oninput="syncCity(this.value)">
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="state">State *</label>
+          <input type="text" id="state" placeholder="CT" oninput="syncState(this.value)">
+        </div>
       </div>
-      <div class="form-group">
-        <label for="state">State *</label>
-        <input type="text" id="state" placeholder="CT" oninput="syncState(this.value)">
-      </div>
-      <div class="form-group">
+      <div class="form-group" style="margin-top: 12px;">
         <label for="notes">Tech Notes (Optional)</label>
         <textarea id="notes" placeholder="Add any access notes, exceptions, or observations..."></textarea>
       </div>
     </div>
 
     <div class="card">
-      <div class="card-title" id="photoCardTitle">Required QC Photos</div>
-      <div id="comcastReminders" class="comcast-reminder-box">
-        <div class="comcast-reminder-title"><span>⚠️</span> Comcast Standard Checklist Reminders:</div>
+      <div class="card-title">Required Comcast Photos (5)</div>
+      <div class="comcast-reminder-box">
+        <div class="comcast-reminder-title"><span>⚠️</span> Comcast Checklist Reminders:</div>
         <ul class="comcast-reminder-list">
           <li>New connectors</li>
           <li>Drop tag w/ address</li>
@@ -466,11 +447,11 @@
         <input type="text" id="downedAddress" placeholder="e.g. 123 Main St">
       </div>
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-        <div class="form-group">
+        <div class="form-group" style="margin-bottom: 0;">
           <label for="downedCity">City *</label>
           <input type="text" id="downedCity" placeholder="Hartford" oninput="syncCity(this.value)">
         </div>
-        <div class="form-group">
+        <div class="form-group" style="margin-bottom: 0;">
           <label for="downedState">State *</label>
           <input type="text" id="downedState" placeholder="CT" oninput="syncState(this.value)">
         </div>
@@ -537,31 +518,14 @@
   };
   const SUPERVISOR_EMAIL = "Donald.boughton@princetown.com";
 
-  const PHOTO_SCHEMAS = {
-    "Comcast QC": [
-      { id: "tap", label: "1. Tap w/ Drop Tag & Strand Attachment" },
-      { id: "bond", label: "2. Bond Block w/ Tags" },
-      { id: "house", label: "3. House Attachment Showing Drop Hanger" },
-      { id: "side", label: "4. Side of Home Showing All Wire Runs" },
-      { id: "bond_attachment", label: "5. Bonding Attachment" }
-    ],
-    "Prince Telecom QC": [
-      { id: "tap", label: "1. Tap w/ Drop Tag & Strand Attachment" },
-      { id: "bond", label: "2. Bond Block w/ Tags" },
-      { id: "house", label: "3. House Attachment Showing Drop Hanger" },
-      { id: "side", label: "4. Side of Home Showing All Wire Runs" },
-      { id: "bond_attachment", label: "5. Bonding Attachment" }
-    ],
-    "Gateway Fiber QC": [
-      { id: "mst", label: "1. MST" },
-      { id: "nid", label: "2. NID" },
-      { id: "cabinet", label: "3. Cabinet" },
-      { id: "strand", label: "4. Strand Attachment" },
-      { id: "house_attach", label: "5. House Attachment" },
-      { id: "drop_premise", label: "6. Drop Premise" },
-      { id: "inline_fiber_run", label: "7. Inline Fiber Run" }
-    ]
-  };
+  // Exclusively Comcast QC Schema
+  const COMCAST_PHOTO_SCHEMA = [
+    { id: "tap", label: "1. Tap w/ Drop Tag & Strand Attachment" },
+    { id: "bond", label: "2. Bond Block w/ Tags" },
+    { id: "house", label: "3. House Attachment Showing Drop Hanger" },
+    { id: "side", label: "4. Side of Home Showing All Wire Runs" },
+    { id: "bond_attachment", label: "5. Bonding Attachment" }
+  ];
 
   let activeRequiredPhotos = {};
   const extraPhotos = [];
@@ -582,21 +546,18 @@
   }
 
   function syncTechNum(val) {
-    document.getElementById('hubTechNum').value = val;
     document.getElementById('techNum').value = val;
     document.getElementById('downedTechNum').value = val;
     localStorage.setItem('qc_tech_num', val);
   }
 
   function syncCity(val) {
-    document.getElementById('hubCity').value = val;
     document.getElementById('city').value = val;
     document.getElementById('downedCity').value = val;
     localStorage.setItem('qc_city', val);
   }
 
   function syncState(val) {
-    document.getElementById('hubState').value = val;
     document.getElementById('state').value = val;
     document.getElementById('downedState').value = val;
     localStorage.setItem('qc_state', val);
@@ -611,14 +572,7 @@
     window.addEventListener('offline', updateNetworkStatus);
     updateNetworkStatus();
 
-    const select = document.getElementById('qcType');
-    select.innerHTML = `
-      <option value="Comcast QC">Comcast QC</option>
-      <option value="Prince Telecom QC">Prince Telecom QC</option>
-      <option value="Gateway Fiber QC">Gateway Fiber QC</option>
-    `;
-    select.value = localStorage.getItem('qc_type') || "Comcast QC";
-    updateQCType();
+    renderRequiredPhotoGrid();
   });
 
   function updateNetworkStatus() {
@@ -626,22 +580,12 @@
     banner.style.display = navigator.onLine ? 'none' : 'block';
   }
 
-  function updateQCType() {
-    const val = document.getElementById('qcType').value;
-    document.getElementById('headerTitle').textContent = val;
-    localStorage.setItem('qc_type', val);
-    document.getElementById('comcastReminders').style.display = (val === 'Comcast QC') ? 'block' : 'none';
-    renderRequiredPhotoGrid(val);
-  }
-
-  function renderRequiredPhotoGrid(qcType) {
-    const schema = PHOTO_SCHEMAS[qcType] || PHOTO_SCHEMAS["Comcast QC"];
+  function renderRequiredPhotoGrid() {
     const grid = document.getElementById('requiredPhotosGrid');
-    document.getElementById('photoCardTitle').textContent = `Required QC Photos (${schema.length})`;
     grid.innerHTML = '';
     activeRequiredPhotos = {};
 
-    schema.forEach(item => {
+    COMCAST_PHOTO_SCHEMA.forEach(item => {
       activeRequiredPhotos[item.id] = null;
       const box = document.createElement('div');
       box.className = 'photo-box';
@@ -708,7 +652,6 @@
     const timestamp = new Date().toLocaleString();
     const techNum = document.getElementById(isDowned ? 'downedTechNum' : 'techNum').value.trim() || 'Tech';
     const jobNum = document.getElementById(isDowned ? 'downedJobNum' : 'jobNum').value.trim() || 'N/A';
-    const qcType = document.getElementById('qcType').value;
 
     const img = new Image();
     img.src = URL.createObjectURL(file);
@@ -725,7 +668,7 @@
 
       ctx.fillStyle = "#ffffff";
       ctx.font = `bold ${Math.max(canvas.height * 0.022, 14)}px sans-serif`;
-      const prefix = isDowned ? "DOWNED JOB" : qcType.toUpperCase();
+      const prefix = isDowned ? "DOWNED JOB" : "COMCAST QC";
       ctx.fillText(`${prefix} | JOB: ${jobNum} | TECH: ${techNum} | ${timestamp}`, 15, canvas.height - (barHeight / 2) - 2);
       ctx.fillText(`LOCATION: ${locationAddress}`, 15, canvas.height - (barHeight / 6));
 
@@ -793,7 +736,6 @@
   }
 
   async function submitQC() {
-    const qcType = document.getElementById('qcType').value;
     const jobNum = document.getElementById('jobNum').value.trim();
     const techNum = document.getElementById('techNum').value.trim();
     const address = document.getElementById('address').value.trim();
@@ -806,15 +748,14 @@
       return;
     }
 
-    const schema = PHOTO_SCHEMAS[qcType] || PHOTO_SCHEMAS["Comcast QC"];
-    const missing = schema.filter(item => !activeRequiredPhotos[item.id]);
+    const missing = COMCAST_PHOTO_SCHEMA.filter(item => !activeRequiredPhotos[item.id]);
     if (missing.length > 0) {
       alert("Missing required photos: " + missing.map(m => m.label).join(", "));
       return;
     }
 
     const attachedFiles = [];
-    schema.forEach((item, idx) => {
+    COMCAST_PHOTO_SCHEMA.forEach((item, idx) => {
       attachedFiles.push(new File([activeRequiredPhotos[item.id].file], `QC_${idx + 1}_Job_${jobNum}.jpg`, { type: 'image/jpeg' }));
     });
     extraPhotos.forEach((item, idx) => {
@@ -823,9 +764,9 @@
       }
     });
 
-    const emailSubject = `🚨 ${qcType.toUpperCase()} SUBMISSION | Job #${jobNum} | Tech ${techNum} | ${address}`;
-    let listText = schema.map(item => `  ✓ ${item.label}`).join('\n');
-    const emailBody = `FIELD QC AUDIT REPORT\nStandard: ${qcType}\nStatus: Verified\n\nJOB DETAILS:\n• Job: ${jobNum}\n• Tech: ${techNum}\n• Address: ${address}, ${city}, ${state}\n\nPHOTOS ATTACHED (${attachedFiles.length}):\n${listText}\n\nTECH NOTES:\n${notes || 'None'}`;
+    const emailSubject = `🚨 COMCAST QC SUBMISSION | Job #${jobNum} | Tech ${techNum} | ${address}`;
+    let listText = COMCAST_PHOTO_SCHEMA.map(item => `  ✓ ${item.label}`).join('\n');
+    const emailBody = `FIELD QC AUDIT REPORT\nStandard: Comcast QC\nStatus: Verified\n\nJOB DETAILS:\n• Job: ${jobNum}\n• Tech: ${techNum}\n• Address: ${address}, ${city}, ${state}\n\nPHOTOS ATTACHED (${attachedFiles.length}):\n${listText}\n\nTECH NOTES:\n${notes || 'None'}`;
 
     dispatchPayload(emailSubject, emailBody, attachedFiles);
   }
@@ -883,7 +824,7 @@
     document.getElementById('jobNum').value = '';
     document.getElementById('address').value = '';
     document.getElementById('notes').value = '';
-    renderRequiredPhotoGrid(document.getElementById('qcType').value);
+    renderRequiredPhotoGrid();
     document.getElementById('extraPhotosGrid').innerHTML = '';
     extraPhotos.length = 0;
     extraCounter = 0;
