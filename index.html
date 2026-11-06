@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Field QC Inspection Log</title>
+  <title>Prince Telecom Field Tech Suite</title>
   
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -20,7 +20,6 @@
       --primary-hover: #2563eb;
       --success: #22c55e;
       --danger: #ef4444;
-      --danger-hover: #dc2626;
       --warning: #f59e0b;
       --input-bg: #0f172a;
       --input-border: #475569;
@@ -44,9 +43,30 @@
       gap: 16px;
     }
 
-    .header { text-align: center; padding: 8px 0; }
+    .header { text-align: center; padding: 4px 0 8px 0; }
     .header h2 { margin: 0; color: var(--primary); font-size: 1.4rem; }
     .header p { margin: 4px 0 0 0; font-size: 0.85rem; color: var(--text-muted); }
+
+    .nav-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .btn-back {
+      background: #334155;
+      color: var(--text);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
 
     .offline-banner {
       background-color: #b45309;
@@ -79,7 +99,57 @@
       align-items: center;
     }
 
-    /* Comcast Field Reminders Banner */
+    .hub-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 8px;
+    }
+
+    .hub-tile {
+      background: #111827;
+      border: 1.5px solid var(--card-border);
+      border-radius: 12px;
+      padding: 18px 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .hub-tile-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .hub-icon-wrap {
+      font-size: 2rem;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      background: rgba(59, 130, 246, 0.12);
+    }
+
+    .hub-icon-downed {
+      background: rgba(239, 68, 68, 0.15);
+    }
+
+    .hub-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .hub-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
     .comcast-reminder-box {
       background: rgba(245, 158, 11, 0.08);
       border: 1px solid #b45309;
@@ -145,12 +215,6 @@
       width: 100%;
     }
 
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-    }
-
     textarea { resize: vertical; min-height: 70px; }
 
     .photo-grid {
@@ -180,11 +244,16 @@
       background: #064e3b22;
     }
 
+    .photo-box.downed-photo.has-photo {
+      border-color: var(--danger);
+      background: rgba(239, 68, 68, 0.12);
+    }
+
     .photo-box label { cursor: pointer; font-size: 0.8rem; font-weight: 600; color: var(--text); }
     .photo-box img { max-width: 100%; max-height: 90px; border-radius: 6px; margin-top: 6px; object-fit: cover; }
-
     .photo-icon { font-size: 1.5rem; margin-bottom: 4px; }
     .badge { font-size: 0.7rem; background: var(--success); color: white; padding: 2px 6px; border-radius: 10px; margin-top: 4px; }
+    .badge-downed { background: var(--danger); }
     .addr-tag { font-size: 0.65rem; color: #4ade80; margin-top: 4px; font-weight: 600; line-height: 1.2; }
 
     .btn {
@@ -204,11 +273,9 @@
       margin-top: 8px;
     }
 
-    .btn:hover { background-color: var(--primary-hover); }
     .btn-secondary { background-color: #334155; color: var(--text); padding: 10px; font-size: 0.9rem; }
     .btn-reset { background-color: #475569; margin-top: 8px; }
     .btn-downed { background-color: var(--danger); margin-top: 8px; }
-    .btn-downed:hover { background-color: var(--danger-hover); }
     input[type="file"] { display: none; }
 
     .status-msg {
@@ -233,204 +300,232 @@
       cursor: pointer;
     }
 
-    /* Modal Backdrop for Downed Job */
-    .modal-backdrop {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(4px);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-      padding: 16px;
-      box-sizing: border-box;
-      overflow-y: auto;
-    }
-
-    .modal-box {
-      background: var(--card-bg);
-      border: 1px solid var(--danger);
-      border-radius: 12px;
-      padding: 18px;
-      width: 100%;
-      max-width: 480px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-
-    .modal-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      border-bottom: 1px solid var(--card-border);
-      padding-bottom: 10px;
-      margin-bottom: 14px;
-    }
-
-    .modal-header h3 {
-      margin: 0;
-      font-size: 1.15rem;
-      color: var(--danger);
-    }
+    .view-screen { display: none; flex-direction: column; gap: 16px; }
+    .view-active { display: flex; }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <div class="header">
-    <h2 id="headerTitle">Prince Telecom QC</h2>
-    <p>Field Inspection & Geotagged Photo Log</p>
-  </div>
-
   <div id="offlineBanner" class="offline-banner">⚠️ Working Offline - Jobs Will Auto-Sync When Online</div>
 
-  <!-- Job Details -->
-  <div class="card">
-    <div class="card-title">Job Details</div>
-
-    <div class="form-group">
-      <label for="qcType">Inspection Standard *</label>
-      <select id="qcType" onchange="updateQCType()"></select>
+  <!-- SCREEN 1: MAIN MENU -->
+  <div id="view-dashboard" class="view-screen view-active">
+    <div class="header">
+      <h2>Prince Telecom Field Suite</h2>
+      <p>Technician Action Hub & Mobile Logging</p>
     </div>
 
-    <div class="form-group">
-      <label for="jobNum">Job Number *</label>
-      <input type="text" id="jobNum" placeholder="e.g. WO-982341">
-    </div>
-    
-    <div class="form-group">
-      <label for="techNum">Tech Number *</label>
-      <input type="text" id="techNum" placeholder="e.g. T-10492">
-    </div>
-
-    <div class="form-group">
-      <label for="address">Street Address *</label>
-      <input type="text" id="address" placeholder="e.g. 123 Main St">
-    </div>
-
-    <div class="form-group">
-      <label for="city">City *</label>
-      <input type="text" id="city" placeholder="e.g. Hartford">
-    </div>
-
-    <div class="form-group">
-      <label for="state">State *</label>
-      <input type="text" id="state" placeholder="e.g. CT">
-    </div>
-
-    <div class="form-group">
-      <label for="notes">Tech Notes (Optional)</label>
-      <textarea id="notes" placeholder="Add any access notes, exceptions, or observations..."></textarea>
-    </div>
-  </div>
-
-  <!-- Dynamic QC Photos Container -->
-  <div class="card">
-    <div class="card-title" id="photoCardTitle">Required QC Photos</div>
-
-    <!-- Comcast-Specific Inline Reminder -->
-    <div id="comcastReminders" class="comcast-reminder-box">
-      <div class="comcast-reminder-title">
-        <span>⚠️</span> Comcast Standard Checklist Reminders:
+    <div class="card">
+      <div class="card-title">Technician Profile</div>
+      <div class="form-group" style="margin-bottom: 8px;">
+        <label for="hubTechNum">Tech Number *</label>
+        <input type="text" id="hubTechNum" placeholder="e.g. T-10492" oninput="syncTechNum(this.value)">
       </div>
-      <ul class="comcast-reminder-list">
-        <li>New connectors</li>
-        <li>Drop tag w/ address</li>
-        <li>2 green ground tags</li>
-        <li>Wrench tight connectors</li>
-        <li>Drop hangers used</li>
-        <li>All holes sealed</li>
-        <li style="grid-column: span 2;">House box closed & secured</li>
-      </ul>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="hubCity">Default City</label>
+          <input type="text" id="hubCity" placeholder="Hartford" oninput="syncCity(this.value)">
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="hubState">State</label>
+          <input type="text" id="hubState" placeholder="CT" oninput="syncState(this.value)">
+        </div>
+      </div>
     </div>
 
-    <div class="photo-grid" id="requiredPhotosGrid"></div>
-  </div>
+    <div class="card">
+      <div class="card-title">Select Job Workflow</div>
+      <div class="hub-grid">
+        <div class="hub-tile" onclick="openQCView()">
+          <div class="hub-tile-left">
+            <div class="hub-icon-wrap">📋</div>
+            <div>
+              <div class="hub-title">Job QC Inspection</div>
+              <div class="hub-sub">Comcast, Prince & Gateway photo logs</div>
+            </div>
+          </div>
+          <span style="font-size: 1.2rem; color: var(--text-muted);">❯</span>
+        </div>
 
-  <!-- Additional Photos Section -->
-  <div class="card">
-    <div class="card-title">
-      <span>Additional Photos</span>
-      <span id="extraCount" style="font-size:0.8rem; color:var(--text-muted);">(0)</span>
+        <div class="hub-tile" onclick="openDownedView()">
+          <div class="hub-tile-left">
+            <div class="hub-icon-wrap hub-icon-downed">🛑</div>
+            <div>
+              <div class="hub-title" style="color: #f87171;">Downed Job Report</div>
+              <div class="hub-sub">Customer not home, referrals & rewires</div>
+            </div>
+          </div>
+          <span style="font-size: 1.2rem; color: var(--text-muted);">❯</span>
+        </div>
+      </div>
     </div>
-    <div class="photo-grid" id="extraPhotosGrid"></div>
-    <button type="button" class="btn btn-secondary" onclick="addExtraPhotoSlot()" style="margin-top: 12px;">➕ Add Extra Photo</button>
   </div>
 
-  <!-- Submit Action -->
-  <div class="card">
-    <div id="status" class="status-msg"></div>
-    <button type="button" id="submitBtn" class="btn" onclick="submitQC()">📧 Send QC Inspection & Save to Database</button>
-    <button type="button" class="btn btn-downed" onclick="openDownedJobModal()">🛑 Report Downed Job (Can't Complete)</button>
-    <button type="button" class="btn btn-reset" onclick="resetForm()">Clear & Start New Job</button>
+  <!-- SCREEN 2: COMCAST / QC INSPECTION -->
+  <div id="view-qc" class="view-screen">
+    <div class="nav-top-bar">
+      <button type="button" class="btn-back" onclick="navigateHome()">❮ Main Menu</button>
+      <span style="font-size: 0.8rem; font-weight: 700; color: var(--primary);">FIELD QC MODE</span>
+    </div>
+
+    <div class="header">
+      <h2 id="headerTitle">Comcast QC</h2>
+      <p>Field Inspection & Geotagged Photo Log</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Job Details</div>
+      <div class="form-group">
+        <label for="qcType">Inspection Standard *</label>
+        <select id="qcType" onchange="updateQCType()"></select>
+      </div>
+      <div class="form-group">
+        <label for="jobNum">Job Number *</label>
+        <input type="text" id="jobNum" placeholder="e.g. WO-982341">
+      </div>
+      <div class="form-group">
+        <label for="techNum">Tech Number *</label>
+        <input type="text" id="techNum" placeholder="e.g. T-10492" oninput="syncTechNum(this.value)">
+      </div>
+      <div class="form-group">
+        <label for="address">Street Address *</label>
+        <input type="text" id="address" placeholder="e.g. 123 Main St">
+      </div>
+      <div class="form-group">
+        <label for="city">City *</label>
+        <input type="text" id="city" placeholder="Hartford" oninput="syncCity(this.value)">
+      </div>
+      <div class="form-group">
+        <label for="state">State *</label>
+        <input type="text" id="state" placeholder="CT" oninput="syncState(this.value)">
+      </div>
+      <div class="form-group">
+        <label for="notes">Tech Notes (Optional)</label>
+        <textarea id="notes" placeholder="Add any access notes, exceptions, or observations..."></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title" id="photoCardTitle">Required QC Photos</div>
+      <div id="comcastReminders" class="comcast-reminder-box">
+        <div class="comcast-reminder-title"><span>⚠️</span> Comcast Standard Checklist Reminders:</div>
+        <ul class="comcast-reminder-list">
+          <li>New connectors</li>
+          <li>Drop tag w/ address</li>
+          <li>2 green ground tags</li>
+          <li>Wrench tight connectors</li>
+          <li>Drop hangers used</li>
+          <li>All holes sealed</li>
+          <li style="grid-column: span 2;">House box closed & secured</li>
+        </ul>
+      </div>
+      <div class="photo-grid" id="requiredPhotosGrid"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span>Additional Photos</span>
+        <span id="extraCount" style="font-size:0.8rem; color:var(--text-muted);">(0)</span>
+      </div>
+      <div class="photo-grid" id="extraPhotosGrid"></div>
+      <button type="button" class="btn btn-secondary" onclick="addExtraPhotoSlot()" style="margin-top: 12px;">➕ Add Extra Photo</button>
+    </div>
+
+    <div class="card">
+      <div id="status" class="status-msg"></div>
+      <button type="button" id="submitBtn" class="btn" onclick="submitQC()">📧 Send QC Inspection & Save to Database</button>
+      <button type="button" class="btn btn-reset" onclick="resetForm()">Clear & Start New Job</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: DOWNED JOB -->
+  <div id="view-downed" class="view-screen">
+    <div class="nav-top-bar">
+      <button type="button" class="btn-back" onclick="navigateHome()">❮ Main Menu</button>
+      <span style="font-size: 0.8rem; font-weight: 700; color: var(--danger);">DOWNED JOB MODE</span>
+    </div>
+
+    <div class="header">
+      <h2 style="color: var(--danger);">Downed Job Notice</h2>
+      <p>Log Unserviceable Job & Alert Dispatch</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Site & Tech Information</div>
+      <div class="form-group">
+        <label for="downedTechNum">Tech Number *</label>
+        <input type="text" id="downedTechNum" placeholder="e.g. T-10492" oninput="syncTechNum(this.value)">
+      </div>
+      <div class="form-group">
+        <label for="downedJobNum">Job Number *</label>
+        <input type="text" id="downedJobNum" placeholder="e.g. WO-982341">
+      </div>
+      <div class="form-group">
+        <label for="downedAddress">Street Address *</label>
+        <input type="text" id="downedAddress" placeholder="e.g. 123 Main St">
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+        <div class="form-group">
+          <label for="downedCity">City *</label>
+          <input type="text" id="downedCity" placeholder="Hartford" oninput="syncCity(this.value)">
+        </div>
+        <div class="form-group">
+          <label for="downedState">State *</label>
+          <input type="text" id="downedState" placeholder="CT" oninput="syncState(this.value)">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Incompletion Details</div>
+      <div class="form-group">
+        <label for="downedReason">Reason for Downed Job *</label>
+        <select id="downedReason" onchange="checkDownedReason()">
+          <option value="Customer Not Home">Customer Not Home</option>
+          <option value="Refer to Construction">Refer to Construction</option>
+          <option value="Refer to Underground">Refer to Underground</option>
+          <option value="MDU Rewire">MDU Rewire</option>
+          <option value="Other (Need Notes)">Other (Need Notes)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="downedNotes" id="downedNotesLabel">Detailed Explanation *</label>
+        <textarea id="downedNotes" placeholder="Explain what prevented completion..."></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Required Evidence Photos *</div>
+      <div class="photo-grid">
+        <div class="photo-box downed-photo" id="box-downed_curb" onclick="triggerCamera('input-downed_curb')">
+          <span class="photo-icon">📷</span>
+          <label>1. House # / Curb View</label>
+          <span id="badge-downed_curb" style="display:none;" class="badge badge-downed">Stamped ✓</span>
+          <div id="addr-downed_curb" class="addr-tag"></div>
+          <img id="prev-downed_curb" style="display:none;" />
+          <input type="file" id="input-downed_curb" accept="image/*" onchange="processPhoto(event, 'downed_curb', false, true)">
+        </div>
+        <div class="photo-box downed-photo" id="box-downed_issue" onclick="triggerCamera('input-downed_issue')">
+          <span class="photo-icon">📷</span>
+          <label>2. Issue / Obstruction Proof</label>
+          <span id="badge-downed_issue" style="display:none;" class="badge badge-downed">Stamped ✓</span>
+          <div id="addr-downed_issue" class="addr-tag"></div>
+          <img id="prev-downed_issue" style="display:none;" />
+          <input type="file" id="input-downed_issue" accept="image/*" onchange="processPhoto(event, 'downed_issue', false, true)">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div id="downedStatus" class="status-msg"></div>
+      <button type="button" class="btn btn-downed" onclick="submitDownedJob()">🚨 Dispatch Downed Job Alert</button>
+      <button type="button" class="btn btn-reset" onclick="resetDownedForm()">Clear Downed Form</button>
+    </div>
   </div>
 </div>
-
-<!-- Dedicated Downed Job Modal Form -->
-<div id="downedJobModal" class="modal-backdrop">
-  <div class="modal-box">
-    <div class="modal-header">
-      <span style="font-size: 1.5rem;">🛑</span>
-      <div>
-        <h3>Downed Job / Escalation Notice</h3>
-        <p style="font-size: 0.75rem; color: var(--text-muted); margin: 2px 0 0;">Capture unserviceable proof & report to dispatch</p>
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label for="downedReason">Reason for Downed Job *</label>
-      <select id="downedReason" onchange="checkDownedReason()">
-        <option value="Customer Not Home">Customer Not Home</option>
-        <option value="Refer to Construction">Refer to Construction</option>
-        <option value="Refer to Underground">Refer to Underground</option>
-        <option value="MDU Rewire">MDU Rewire</option>
-        <option value="Other (Need Notes)">Other (Need Notes)</option>
-      </select>
-    </div>
-
-    <div class="form-group">
-      <label for="downedNotes" id="downedNotesLabel">Detailed Explanation *</label>
-      <textarea id="downedNotes" placeholder="Explain what prevented completion (e.g., gate locked, driveway bore required, dog in yard)..."></textarea>
-    </div>
-
-    <div class="card-title" style="margin-top: 14px;">Downed Job Proof Photos *</div>
-    <div class="photo-grid">
-      <!-- Downed Photo 1: House Number / Curb -->
-      <div class="photo-box" id="box-downed_curb" onclick="triggerCamera('input-downed_curb')">
-        <span class="photo-icon">📷</span>
-        <label>1. House # / Curb View</label>
-        <span id="badge-downed_curb" style="display:none;" class="badge">Stamped ✓</span>
-        <div id="addr-downed_curb" class="addr-tag"></div>
-        <img id="prev-downed_curb" style="display:none;" />
-        <input type="file" id="input-downed_curb" accept="image/*" onchange="processPhoto(event, 'downed_curb', false, true)">
-      </div>
-
-      <!-- Downed Photo 2: Issue / Obstruction -->
-      <div class="photo-box" id="box-downed_issue" onclick="triggerCamera('input-downed_issue')">
-        <span class="photo-icon">📷</span>
-        <label>2. Issue / Obstruction Proof</label>
-        <span id="badge-downed_issue" style="display:none;" class="badge">Stamped ✓</span>
-        <div id="addr-downed_issue" class="addr-tag"></div>
-        <img id="prev-downed_issue" style="display:none;" />
-        <input type="file" id="input-downed_issue" accept="image/*" onchange="processPhoto(event, 'downed_issue', false, true)">
-      </div>
-    </div>
-
-    <div id="downedStatus" class="status-msg" style="margin-top: 10px;"></div>
-
-    <button type="button" class="btn btn-downed" onclick="submitDownedJob()" style="margin-top: 14px;">🚨 Dispatch Downed Job Alert</button>
-    <button type="button" class="btn btn-secondary" onclick="closeDownedJobModal()">Cancel & Back</button>
-  </div>
-</div>
-
 <script>
   const GOOGLE_FORM_RESPONSE_URL = "https://docs.google.com/forms/d/e/YOUR_FORM_ID_HERE/formResponse";
-
   const FORM_ENTRY_IDS = {
     qcType: "entry.111111111",
     jobNum: "entry.222222222",
@@ -440,18 +535,17 @@
     state: "entry.666666666",
     notes: "entry.777777777"
   };
-
   const SUPERVISOR_EMAIL = "Donald.boughton@princetown.com";
 
   const PHOTO_SCHEMAS = {
-    "Prince Telecom QC": [
+    "Comcast QC": [
       { id: "tap", label: "1. Tap w/ Drop Tag & Strand Attachment" },
       { id: "bond", label: "2. Bond Block w/ Tags" },
       { id: "house", label: "3. House Attachment Showing Drop Hanger" },
       { id: "side", label: "4. Side of Home Showing All Wire Runs" },
       { id: "bond_attachment", label: "5. Bonding Attachment" }
     ],
-    "Comcast QC": [
+    "Prince Telecom QC": [
       { id: "tap", label: "1. Tap w/ Drop Tag & Strand Attachment" },
       { id: "bond", label: "2. Bond Block w/ Tags" },
       { id: "house", label: "3. House Attachment Showing Drop Hanger" },
@@ -472,101 +566,87 @@
   let activeRequiredPhotos = {};
   const extraPhotos = [];
   let extraCounter = 0;
+  const downedPhotos = { downed_curb: null, downed_issue: null };
 
-  // Dedicated container for Downed Job photos
-  const downedPhotos = {
-    downed_curb: null,
-    downed_issue: null
-  };
+  function navigateHome() { switchView('view-dashboard'); }
+  function openQCView() { switchView('view-qc'); }
+  function openDownedView() { switchView('view-downed'); }
+
+  function switchView(targetId) {
+    document.querySelectorAll('.view-screen').forEach(el => el.classList.remove('view-active'));
+    const target = document.getElementById(targetId);
+    if (target) {
+      target.classList.add('view-active');
+      window.scrollTo(0, 0);
+    }
+  }
+
+  function syncTechNum(val) {
+    document.getElementById('hubTechNum').value = val;
+    document.getElementById('techNum').value = val;
+    document.getElementById('downedTechNum').value = val;
+    localStorage.setItem('qc_tech_num', val);
+  }
+
+  function syncCity(val) {
+    document.getElementById('hubCity').value = val;
+    document.getElementById('city').value = val;
+    document.getElementById('downedCity').value = val;
+    localStorage.setItem('qc_city', val);
+  }
+
+  function syncState(val) {
+    document.getElementById('hubState').value = val;
+    document.getElementById('state').value = val;
+    document.getElementById('downedState').value = val;
+    localStorage.setItem('qc_state', val);
+  }
 
   document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('techNum').value = localStorage.getItem('qc_tech_num') || '';
-    document.getElementById('city').value = localStorage.getItem('qc_city') || '';
-    document.getElementById('state').value = localStorage.getItem('qc_state') || '';
+    syncTechNum(localStorage.getItem('qc_tech_num') || '');
+    syncCity(localStorage.getItem('qc_city') || '');
+    syncState(localStorage.getItem('qc_state') || '');
 
     window.addEventListener('online', updateNetworkStatus);
     window.addEventListener('offline', updateNetworkStatus);
     updateNetworkStatus();
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const mode = (urlParams.get('mode') || '').toLowerCase();
     const select = document.getElementById('qcType');
-
-    if (mode === 'comcast') {
-      select.innerHTML = `
-        <option value="Comcast QC">Comcast QC</option>
-        <option value="Prince Telecom QC">Prince Telecom QC</option>
-      `;
-    } else if (mode === 'gateway') {
-      select.innerHTML = `
-        <option value="Gateway Fiber QC">Gateway Fiber QC</option>
-      `;
-    } else {
-      select.innerHTML = `
-        <option value="Prince Telecom QC">Prince Telecom QC</option>
-        <option value="Comcast QC">Comcast QC</option>
-        <option value="Gateway Fiber QC">Gateway Fiber QC</option>
-      `;
-    }
-
-    const savedType = localStorage.getItem('qc_type');
-    if (savedType && select.querySelector(`option[value="${savedType}"]`)) {
-      select.value = savedType;
-    } else {
-      select.value = select.options[0].value;
-    }
-
+    select.innerHTML = `
+      <option value="Comcast QC">Comcast QC</option>
+      <option value="Prince Telecom QC">Prince Telecom QC</option>
+      <option value="Gateway Fiber QC">Gateway Fiber QC</option>
+    `;
+    select.value = localStorage.getItem('qc_type') || "Comcast QC";
     updateQCType();
-
-    document.getElementById('techNum').addEventListener('input', (e) => localStorage.setItem('qc_tech_num', e.target.value));
-    document.getElementById('city').addEventListener('input', (e) => localStorage.setItem('qc_city', e.target.value));
-    document.getElementById('state').addEventListener('input', (e) => localStorage.setItem('qc_state', e.target.value));
-
-    registerOfflineServiceWorker();
-    syncOfflineQueue();
   });
 
   function updateNetworkStatus() {
     const banner = document.getElementById('offlineBanner');
-    if (navigator.onLine) {
-      banner.style.display = 'none';
-      syncOfflineQueue();
-    } else {
-      banner.style.display = 'block';
-    }
+    banner.style.display = navigator.onLine ? 'none' : 'block';
   }
 
   function updateQCType() {
     const val = document.getElementById('qcType').value;
     document.getElementById('headerTitle').textContent = val;
     localStorage.setItem('qc_type', val);
-
-    const comcastBox = document.getElementById('comcastReminders');
-    if (val === 'Comcast QC') {
-      comcastBox.style.display = 'block';
-    } else {
-      comcastBox.style.display = 'none';
-    }
-
+    document.getElementById('comcastReminders').style.display = (val === 'Comcast QC') ? 'block' : 'none';
     renderRequiredPhotoGrid(val);
   }
 
   function renderRequiredPhotoGrid(qcType) {
-    const schema = PHOTO_SCHEMAS[qcType] || PHOTO_SCHEMAS["Prince Telecom QC"];
+    const schema = PHOTO_SCHEMAS[qcType] || PHOTO_SCHEMAS["Comcast QC"];
     const grid = document.getElementById('requiredPhotosGrid');
     document.getElementById('photoCardTitle').textContent = `Required QC Photos (${schema.length})`;
-
     grid.innerHTML = '';
     activeRequiredPhotos = {};
 
     schema.forEach(item => {
       activeRequiredPhotos[item.id] = null;
-
       const box = document.createElement('div');
       box.className = 'photo-box';
       box.id = `box-${item.id}`;
       box.setAttribute('onclick', `triggerCamera('input-${item.id}')`);
-
       box.innerHTML = `
         <span class="photo-icon">📷</span>
         <label>${item.label}</label>
@@ -575,7 +655,6 @@
         <img id="prev-${item.id}" style="display:none;" />
         <input type="file" id="input-${item.id}" accept="image/*" onchange="processPhoto(event, '${item.id}')">
       `;
-
       grid.appendChild(box);
     });
   }
@@ -585,80 +664,59 @@
     if (input) input.click();
   }
 
-  function getAddressFromGPS() {
+  function getAddressFromGPS(isDowned = false) {
     return new Promise((resolve) => {
-      const userAddr = document.getElementById('address').value.trim();
-      const userCity = document.getElementById('city').value.trim();
-      const userState = document.getElementById('state').value.trim();
+      const addrId = isDowned ? 'downedAddress' : 'address';
+      const cityId = isDowned ? 'downedCity' : 'city';
+      const stateId = isDowned ? 'downedState' : 'state';
+      const userAddr = document.getElementById(addrId).value.trim();
+      const userCity = document.getElementById(cityId).value.trim();
+      const userState = document.getElementById(stateId).value.trim();
 
       if (!navigator.onLine || !("geolocation" in navigator)) {
-        resolve(formatManualAddress(userAddr, userCity, userState) || "Offline (Address Pending)");
+        resolve([userAddr, userCity, userState].filter(Boolean).join(', ') || "Offline (Address Pending)");
         return;
       }
 
       navigator.geolocation.getCurrentPosition(
         async (pos) => {
-          const lat = pos.coords.latitude;
-          const lng = pos.coords.longitude;
-
           try {
-            const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+            const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`);
             const data = await resp.json();
-
             if (data && data.address) {
-              const road = data.address.road || data.address.pedestrian || userAddr;
+              const road = data.address.road || userAddr;
               const houseNum = data.address.house_number || '';
-              const city = data.address.city || data.address.town || data.address.village || userCity;
+              const city = data.address.city || data.address.town || userCity;
               const state = data.address.state || userState;
-
-              const fullStreet = [houseNum, road].filter(Boolean).join(' ');
-              const resolvedStr = [fullStreet, city, state].filter(Boolean).join(', ');
-
-              if (resolvedStr) {
-                resolve(resolvedStr);
-                return;
-              }
+              const resolved = [[houseNum, road].filter(Boolean).join(' '), city, state].filter(Boolean).join(', ');
+              if (resolved) { resolve(resolved); return; }
             }
           } catch (err) {}
-
-          resolve(formatManualAddress(userAddr, userCity, userState) || `GPS: ${lat.toFixed(5)}, ${lng.toFixed(5)}`);
+          resolve([userAddr, userCity, userState].filter(Boolean).join(', ') || `GPS: ${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`);
         },
-        () => resolve(formatManualAddress(userAddr, userCity, userState) || "Location Unavailable"),
-        { enableHighAccuracy: true, timeout: 4000, maximumAge: 0 }
+        () => resolve([userAddr, userCity, userState].filter(Boolean).join(', ') || "Location Unavailable"),
+        { enableHighAccuracy: true, timeout: 4000 }
       );
     });
-  }
-
-  function formatManualAddress(addr, city, state) {
-    return [addr, city, state].filter(Boolean).join(', ');
   }
 
   async function processPhoto(event, key, isExtra = false, isDowned = false) {
     const file = event.target.files[0];
     if (!file) return;
 
-    if (isDowned) {
-      showDownedStatus("Geotagging & stamping downed job photo...", "info");
-    } else {
-      showStatus("Fetching location address & stamping photo...", "info");
-    }
-
-    const locationAddress = await getAddressFromGPS();
+    const locationAddress = await getAddressFromGPS(isDowned);
     const timestamp = new Date().toLocaleString();
-    const techNum = document.getElementById('techNum').value.trim() || 'Tech';
-    const jobNum = document.getElementById('jobNum').value.trim() || 'N/A';
+    const techNum = document.getElementById(isDowned ? 'downedTechNum' : 'techNum').value.trim() || 'Tech';
+    const jobNum = document.getElementById(isDowned ? 'downedJobNum' : 'jobNum').value.trim() || 'N/A';
     const qcType = document.getElementById('qcType').value;
 
     const img = new Image();
     img.src = URL.createObjectURL(file);
-
     img.onload = function() {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
-
       canvas.width = img.width;
       canvas.height = img.height;
-
       ctx.drawImage(img, 0, 0);
 
       const barHeight = Math.max(canvas.height * 0.085, 45);
@@ -667,13 +725,9 @@
 
       ctx.fillStyle = "#ffffff";
       ctx.font = `bold ${Math.max(canvas.height * 0.022, 14)}px sans-serif`;
-      
-      const tagPrefix = isDowned ? "DOWNED JOB" : qcType.toUpperCase();
-      const textLine1 = `${tagPrefix} | JOB: ${jobNum} | TECH: ${techNum} | ${timestamp}`;
-      const textLine2 = `LOCATION: ${locationAddress}`;
-
-      ctx.fillText(textLine1, 15, canvas.height - (barHeight / 2) - 2);
-      ctx.fillText(textLine2, 15, canvas.height - (barHeight / 6));
+      const prefix = isDowned ? "DOWNED JOB" : qcType.toUpperCase();
+      ctx.fillText(`${prefix} | JOB: ${jobNum} | TECH: ${techNum} | ${timestamp}`, 15, canvas.height - (barHeight / 2) - 2);
+      ctx.fillText(`LOCATION: ${locationAddress}`, 15, canvas.height - (barHeight / 6));
 
       canvas.toBlob((blob) => {
         const stampedFile = new File([blob], file.name, { type: 'image/jpeg' });
@@ -686,7 +740,6 @@
           document.getElementById(`badge-${key}`).style.display = 'inline-block';
           document.getElementById(`addr-${key}`).textContent = locationAddress;
           document.getElementById(`box-${key}`).classList.add('has-photo');
-          hideDownedStatus();
         } else if (!isExtra) {
           activeRequiredPhotos[key] = { file: stampedFile, dataUrl: stampedDataUrl };
           document.getElementById(`prev-${key}`).src = stampedDataUrl;
@@ -694,7 +747,6 @@
           document.getElementById(`badge-${key}`).style.display = 'inline-block';
           document.getElementById(`addr-${key}`).textContent = locationAddress;
           document.getElementById(`box-${key}`).classList.add('has-photo');
-          hideStatus();
         } else {
           extraPhotos[key] = { file: stampedFile, dataUrl: stampedDataUrl };
           document.getElementById(`prev-extra-${key}`).src = stampedDataUrl;
@@ -702,7 +754,6 @@
           document.getElementById(`badge-extra-${key}`).style.display = 'inline-block';
           document.getElementById(`addr-extra-${key}`).textContent = locationAddress;
           document.getElementById(`box-extra-${key}`).classList.add('has-photo');
-          hideStatus();
         }
       }, 'image/jpeg', 0.85);
     };
@@ -712,13 +763,11 @@
     extraCounter++;
     const id = extraCounter;
     extraPhotos[id] = null;
-
     const grid = document.getElementById('extraPhotosGrid');
     const box = document.createElement('div');
     box.className = 'photo-box';
     box.id = `box-extra-${id}`;
     box.setAttribute('onclick', `triggerCamera('input-extra-${id}')`);
-
     box.innerHTML = `
       <span class="remove-btn" onclick="event.stopPropagation(); removeExtraPhoto(${id})">&times;</span>
       <span class="photo-icon">📷</span>
@@ -728,7 +777,6 @@
       <img id="prev-extra-${id}" style="display:none;" />
       <input type="file" id="input-extra-${id}" accept="image/*" onchange="processPhoto(event, ${id}, true)">
     `;
-
     grid.appendChild(box);
     updateExtraCount();
   }
@@ -741,11 +789,9 @@
   }
 
   function updateExtraCount() {
-    const validCount = extraPhotos.filter(p => p !== null).length;
-    document.getElementById('extraCount').textContent = `(${validCount})`;
+    document.getElementById('extraCount').textContent = `(${extraPhotos.filter(p => p !== null).length})`;
   }
 
-  /* --- Direct Submission for Standard QC --- */
   async function submitQC() {
     const qcType = document.getElementById('qcType').value;
     const jobNum = document.getElementById('jobNum').value.trim();
@@ -756,285 +802,98 @@
     const notes = document.getElementById('notes').value.trim();
 
     if (!jobNum || !techNum || !address || !city || !state) {
-      showStatus("Please fill in Job Number, Tech Number, Address, City, and State.", "warning");
+      alert("Please fill in Job Number, Tech Number, Address, City, and State.");
       return;
     }
 
-    const schema = PHOTO_SCHEMAS[qcType] || PHOTO_SCHEMAS["Prince Telecom QC"];
-    const missingPhotos = [];
-
-    schema.forEach(item => {
-      if (!activeRequiredPhotos[item.id]) {
-        missingPhotos.push(item.label);
-      }
-    });
-
-    if (missingPhotos.length > 0) {
-      showStatus("Missing required photos: " + missingPhotos.join(", "), "warning");
+    const schema = PHOTO_SCHEMAS[qcType] || PHOTO_SCHEMAS["Comcast QC"];
+    const missing = schema.filter(item => !activeRequiredPhotos[item.id]);
+    if (missing.length > 0) {
+      alert("Missing required photos: " + missing.map(m => m.label).join(", "));
       return;
-    }
-
-    const timestamp = new Date().toLocaleString();
-    const cleanJob = jobNum.replace(/[^a-zA-Z0-9]/g, '_');
-
-    const formDataPayload = {
-      qcType: qcType,
-      jobNum: jobNum,
-      techNum: techNum,
-      address: address,
-      city: city,
-      state: state,
-      notes: notes
-    };
-
-    if (!navigator.onLine) {
-      queueOfflineSubmission(formDataPayload);
-      showStatus("Offline Mode: Saved locally! Will auto-sync when back in service.", "warning");
-    } else {
-      showStatus("Saving inspection data to Google Form & Sheet...", "info");
-      sendToGoogleForm(formDataPayload);
     }
 
     const attachedFiles = [];
     schema.forEach((item, idx) => {
-      const itemFile = activeRequiredPhotos[item.id].file;
-      const cleanName = item.label.replace(/[^a-zA-Z0-9]/g, '_');
-      attachedFiles.push(new File([itemFile], `QC_${idx + 1}_${cleanName}_Job_${cleanJob}.jpg`, { type: 'image/jpeg' }));
+      attachedFiles.push(new File([activeRequiredPhotos[item.id].file], `QC_${idx + 1}_Job_${jobNum}.jpg`, { type: 'image/jpeg' }));
     });
-
-    let extraIndex = 1;
-    extraPhotos.forEach((item) => {
+    extraPhotos.forEach((item, idx) => {
       if (item && item.file) {
-        attachedFiles.push(new File([item.file], `QC_Extra_${extraIndex}_Job_${cleanJob}.jpg`, { type: 'image/jpeg' }));
-        extraIndex++;
+        attachedFiles.push(new File([item.file], `QC_Extra_${idx + 1}_Job_${jobNum}.jpg`, { type: 'image/jpeg' }));
       }
     });
 
-    const extraPhotosCount = attachedFiles.length - schema.length;
-    const emailSubject = `🚨 ${qcType.toUpperCase()} SUBMISSION | Job #${jobNum} | Tech ${techNum} | ${address}, ${city}, ${state}`;
-    
-    let checklistText = "";
-    schema.forEach((item) => {
-      checklistText += `  ✓ ${item.label}\n`;
-    });
-
-    const emailBody = `FIELD QC AUDIT REPORT
-Standard: ${qcType}
-Status: Completed & Verified
-
-JOB DETAILS:
-• Job / Work Order: ${jobNum}
-• Technician ID: ${techNum}
-• Site Address: ${address}, ${city}, ${state}
-• Timestamp: ${timestamp}
-
-PHOTOS ATTACHED (${attachedFiles.length} Total):
-${checklistText}${extraPhotosCount > 0 ? `  + ${extraPhotosCount} Additional Site Photo(s)\n` : ''}
-TECH NOTES:
-${notes ? `"${notes}"` : 'None'}
-
---
-Submitted via Field QC Mobile Inspector`;
+    const emailSubject = `🚨 ${qcType.toUpperCase()} SUBMISSION | Job #${jobNum} | Tech ${techNum} | ${address}`;
+    let listText = schema.map(item => `  ✓ ${item.label}`).join('\n');
+    const emailBody = `FIELD QC AUDIT REPORT\nStandard: ${qcType}\nStatus: Verified\n\nJOB DETAILS:\n• Job: ${jobNum}\n• Tech: ${techNum}\n• Address: ${address}, ${city}, ${state}\n\nPHOTOS ATTACHED (${attachedFiles.length}):\n${listText}\n\nTECH NOTES:\n${notes || 'None'}`;
 
     dispatchPayload(emailSubject, emailBody, attachedFiles);
-  }
-
-  /* --- Downed Job Logic --- */
-  function openDownedJobModal() {
-    const jobNum = document.getElementById('jobNum').value.trim();
-    const techNum = document.getElementById('techNum').value.trim();
-    const address = document.getElementById('address').value.trim();
-
-    if (!jobNum || !techNum || !address) {
-      showStatus("Please enter Job Number, Tech Number, and Address first.", "warning");
-      return;
-    }
-
-    document.getElementById('downedJobModal').style.display = 'flex';
-  }
-
-  function closeDownedJobModal() {
-    document.getElementById('downedJobModal').style.display = 'none';
   }
 
   function checkDownedReason() {
     const reason = document.getElementById('downedReason').value;
     const label = document.getElementById('downedNotesLabel');
-    if (reason === 'Other (Need Notes)') {
-      label.textContent = "Detailed Explanation (REQUIRED for 'Other') *";
-      label.style.color = "var(--danger)";
-    } else {
-      label.textContent = "Detailed Explanation *";
-      label.style.color = "var(--text-muted)";
-    }
+    label.textContent = reason === 'Other (Need Notes)' ? "Detailed Explanation (REQUIRED for 'Other') *" : "Detailed Explanation *";
   }
 
   async function submitDownedJob() {
-    const jobNum = document.getElementById('jobNum').value.trim();
-    const techNum = document.getElementById('techNum').value.trim();
-    const address = document.getElementById('address').value.trim();
-    const city = document.getElementById('city').value.trim();
-    const state = document.getElementById('state').value.trim();
-    const qcType = document.getElementById('qcType').value;
+    const jobNum = document.getElementById('downedJobNum').value.trim();
+    const techNum = document.getElementById('downedTechNum').value.trim();
+    const address = document.getElementById('downedAddress').value.trim();
+    const city = document.getElementById('downedCity').value.trim();
+    const state = document.getElementById('downedState').value.trim();
     const reason = document.getElementById('downedReason').value;
-    const downedNotes = document.getElementById('downedNotes').value.trim();
+    const notes = document.getElementById('downedNotes').value.trim();
 
-    if (reason === 'Other (Need Notes)' && !downedNotes) {
-      showDownedStatus("Notes are strictly required when selecting 'Other'.", "warning");
+    if (!jobNum || !techNum || !address || !city || !state) {
+      alert("Please fill in Tech #, Job #, Address, City, and State.");
       return;
     }
-
+    if (reason === 'Other (Need Notes)' && !notes) {
+      alert("Notes are strictly required when selecting 'Other'.");
+      return;
+    }
     if (!downedPhotos.downed_curb || !downedPhotos.downed_issue) {
-      showDownedStatus("Please snap both proof photos (House # and Issue/Obstruction).", "warning");
+      alert("Please take both proof photos (House # and Issue Proof).");
       return;
-    }
-
-    const timestamp = new Date().toLocaleString();
-    const cleanJob = jobNum.replace(/[^a-zA-Z0-9]/g, '_');
-
-    const formDataPayload = {
-      qcType: `DOWNED JOB: ${reason}`,
-      jobNum: jobNum,
-      techNum: techNum,
-      address: address,
-      city: city,
-      state: state,
-      notes: `[REASON: ${reason}] ${downedNotes}`
-    };
-
-    if (!navigator.onLine) {
-      queueOfflineSubmission(formDataPayload);
-    } else {
-      sendToGoogleForm(formDataPayload);
     }
 
     const attachedFiles = [
-      new File([downedPhotos.downed_curb.file], `DOWNED_1_House_Curb_Job_${cleanJob}.jpg`, { type: 'image/jpeg' }),
-      new File([downedPhotos.downed_issue.file], `DOWNED_2_Issue_Proof_Job_${cleanJob}.jpg`, { type: 'image/jpeg' })
+      new File([downedPhotos.downed_curb.file], `DOWNED_1_House_Job_${jobNum}.jpg`, { type: 'image/jpeg' }),
+      new File([downedPhotos.downed_issue.file], `DOWNED_2_Issue_Job_${jobNum}.jpg`, { type: 'image/jpeg' })
     ];
 
     const emailSubject = `🛑 [DOWNED JOB] ${reason.toUpperCase()} | Job #${jobNum} | Tech ${techNum} | ${address}`;
-    const emailBody = `🚨 DOWNED JOB / ESCALATION NOTICE 🚨
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-STATUS: CANNOT COMPLETE (UNSERVICEABLE)
-STANDARD: ${qcType}
-REASON: ${reason}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    const emailBody = `🚨 DOWNED JOB / ESCALATION NOTICE\nStatus: Unserviceable\nReason: ${reason}\n\nJOB DETAILS:\n• Job: ${jobNum}\n• Tech: ${techNum}\n• Address: ${address}, ${city}, ${state}\n\nEXPLANATION:\n"${notes || 'None provided.'}"\n\nPHOTOS:\n[1] House # Proof\n[2] Obstruction Proof`;
 
-📋 JOB TARGET
-• Work Order #: ${jobNum}
-• Technician ID: ${techNum}
-• Site Address: ${address}, ${city}, ${state}
-• Logged Time: ${timestamp}
-
-📝 TECHNICIAN FIELD EXPLANATION
-"${downedNotes ? downedNotes : 'No additional field remarks provided.'}"
-
-📷 ATTACHED PROOF EVIDENCE (2 PHOTOS)
-  [1] House # / Curb View (Proof on-site)
-  [2] Obstruction / Issue Verification Proof
-
---
-Dispatched via Field QC Mobile Inspector`;
-
-    closeDownedJobModal();
     dispatchPayload(emailSubject, emailBody, attachedFiles);
   }
 
   async function dispatchPayload(subject, body, files) {
     if (navigator.canShare && navigator.canShare({ files: files })) {
       try {
-        await navigator.share({
-          title: subject,
-          text: body,
-          files: files
-        });
-      } catch (err) {
-        if (err.name !== 'AbortError') {
-          fallbackMailto(subject, body);
-        }
-      }
-    } else {
-      fallbackMailto(subject, body);
+        await navigator.share({ title: subject, text: body, files: files });
+        return;
+      } catch (err) {}
     }
-  }
-
-  async function sendToGoogleForm(data) {
-    if (!GOOGLE_FORM_RESPONSE_URL || GOOGLE_FORM_RESPONSE_URL.includes("YOUR_FORM_ID_HERE")) return;
-
-    const formBody = new URLSearchParams();
-    formBody.append(FORM_ENTRY_IDS.qcType, data.qcType);
-    formBody.append(FORM_ENTRY_IDS.jobNum, data.jobNum);
-    formBody.append(FORM_ENTRY_IDS.techNum, data.techNum);
-    formBody.append(FORM_ENTRY_IDS.address, data.address);
-    formBody.append(FORM_ENTRY_IDS.city, data.city);
-    formBody.append(FORM_ENTRY_IDS.state, data.state);
-    formBody.append(FORM_ENTRY_IDS.notes, data.notes);
-
-    try {
-      await fetch(GOOGLE_FORM_RESPONSE_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: formBody.toString()
-      });
-    } catch (err) {
-      queueOfflineSubmission(data);
-    }
-  }
-
-  function queueOfflineSubmission(payload) {
-    const queue = JSON.parse(localStorage.getItem('qc_offline_queue') || '[]');
-    queue.push(payload);
-    localStorage.setItem('qc_offline_queue', JSON.stringify(queue));
-  }
-
-  async function syncOfflineQueue() {
-    if (!navigator.onLine) return;
-    const queue = JSON.parse(localStorage.getItem('qc_offline_queue') || '[]');
-    if (queue.length === 0) return;
-
-    showStatus(`Uploading ${queue.length} offline saved inspections...`, "info");
-
-    for (const item of queue) {
-      await sendToGoogleForm(item);
-    }
-
-    localStorage.removeItem('qc_offline_queue');
-    showStatus("All offline inspections synced successfully!", "info");
-    setTimeout(hideStatus, 3000);
-  }
-
-  function fallbackMailto(subject, body) {
-    const mailtoUrl = `mailto:${SUPERVISOR_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.location.href = mailtoUrl;
+    window.location.href = `mailto:${SUPERVISOR_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   }
 
   function resetForm() {
     document.getElementById('jobNum').value = '';
-    document.getElementById('techNum').value = '';
     document.getElementById('address').value = '';
-    document.getElementById('city').value = '';
-    document.getElementById('state').value = '';
     document.getElementById('notes').value = '';
-
-    localStorage.removeItem('qc_tech_num');
-    localStorage.removeItem('qc_city');
-    localStorage.removeItem('qc_state');
-
-    document.querySelectorAll('input[type="file"]').forEach(input => {
-      input.value = '';
-    });
-
-    const currentQcType = document.getElementById('qcType').value;
-    renderRequiredPhotoGrid(currentQcType);
-
+    renderRequiredPhotoGrid(document.getElementById('qcType').value);
     document.getElementById('extraPhotosGrid').innerHTML = '';
     extraPhotos.length = 0;
     extraCounter = 0;
     updateExtraCount();
+  }
 
-    // Reset downed photos
+  function resetDownedForm() {
+    document.getElementById('downedJobNum').value = '';
+    document.getElementById('downedAddress').value = '';
+    document.getElementById('downedNotes').value = '';
     downedPhotos.downed_curb = null;
     downedPhotos.downed_issue = null;
     ['downed_curb', 'downed_issue'].forEach(k => {
@@ -1047,53 +906,7 @@ Dispatched via Field QC Mobile Inspector`;
       if (a) a.textContent = '';
       if (box) box.classList.remove('has-photo');
     });
-
-    document.getElementById('downedNotes').value = '';
-
-    hideStatus();
-    showStatus("All fields and photos have been completely cleared.", "info");
-    setTimeout(hideStatus, 2500);
-  }
-
-  function showStatus(msg, type) {
-    const el = document.getElementById('status');
-    el.textContent = msg;
-    el.className = `status-msg status-${type}`;
-    el.style.display = 'block';
-  }
-
-  function hideStatus() {
-    document.getElementById('status').style.display = 'none';
-  }
-
-  function showDownedStatus(msg, type) {
-    const el = document.getElementById('downedStatus');
-    el.textContent = msg;
-    el.className = `status-msg status-${type}`;
-    el.style.display = 'block';
-  }
-
-  function hideDownedStatus() {
-    document.getElementById('downedStatus').style.display = 'none';
-  }
-
-  function registerOfflineServiceWorker() {
-    if ('serviceWorker' in navigator) {
-      const swCode = `
-        const CACHE_NAME = 'qc-app-v1';
-        self.addEventListener('install', e => {
-          e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(['./'])));
-        });
-        self.addEventListener('fetch', e => {
-          e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
-        });
-      `;
-      const blob = new Blob([swCode], { type: 'application/javascript' });
-      const swUrl = URL.createObjectURL(blob);
-      navigator.serviceWorker.register(swUrl).catch(() => {});
-    }
   }
 </script>
-
 </body>
 </html>
