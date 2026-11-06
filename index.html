@@ -278,13 +278,15 @@
       { id: "tap", label: "1. Tap" },
       { id: "bond", label: "2. Bond Block w/ Tags" },
       { id: "house", label: "3. House Attachment" },
-      { id: "side", label: "4. Side of House" }
+      { id: "side", label: "4. Side of House" },
+      { id: "bond_attachment", label: "5. Bonding Attachment" }
     ],
     "Comcast QC": [
       { id: "tap", label: "1. Tap" },
       { id: "bond", label: "2. Bond Block w/ Tags" },
       { id: "house", label: "3. House Attachment" },
-      { id: "side", label: "4. Side of House" }
+      { id: "side", label: "4. Side of House" },
+      { id: "bond_attachment", label: "5. Bonding Attachment" }
     ],
     "Gateway Fiber QC": [
       { id: "mst", label: "1. MST" },
@@ -712,9 +714,7 @@ ${notes ? `"${notes}"` : 'No field notes provided for this installation.'}
     window.location.href = mailtoUrl;
   }
 
-  // Wipes all input fields, photo grids, and memory state completely
   function resetForm() {
-    // 1. Wipe all text inputs
     document.getElementById('jobNum').value = '';
     document.getElementById('techNum').value = '';
     document.getElementById('address').value = '';
@@ -722,27 +722,22 @@ ${notes ? `"${notes}"` : 'No field notes provided for this installation.'}
     document.getElementById('state').value = '';
     document.getElementById('notes').value = '';
 
-    // 2. Clear stored input memory
     localStorage.removeItem('qc_tech_num');
     localStorage.removeItem('qc_city');
     localStorage.removeItem('qc_state');
 
-    // 3. Clear all hidden file input buffers
     document.querySelectorAll('input[type="file"]').forEach(input => {
       input.value = '';
     });
 
-    // 4. Re-render the required photo grid and wipe in-memory required photos
     const currentQcType = document.getElementById('qcType').value;
     renderRequiredPhotoGrid(currentQcType);
 
-    // 5. Clear extra photos array and DOM elements
     document.getElementById('extraPhotosGrid').innerHTML = '';
     extraPhotos.length = 0;
     extraCounter = 0;
     updateExtraCount();
 
-    // 6. Reset status indicator
     hideStatus();
     showStatus("All fields and photos have been completely cleared.", "info");
     setTimeout(hideStatus, 2500);
