@@ -455,13 +455,14 @@
       box.id = `box-${item.id}`;
       box.setAttribute('onclick', `triggerCamera('input-${item.id}')`);
 
+      /* Removed capture="environment" so OS allows choosing Camera or Camera Roll */
       box.innerHTML = `
         <span class="photo-icon">📷</span>
         <label>${item.label}</label>
         <span id="badge-${item.id}" style="display:none;" class="badge">Stamped ✓</span>
         <div id="addr-${item.id}" class="addr-tag"></div>
         <img id="prev-${item.id}" style="display:none;" />
-        <input type="file" id="input-${item.id}" accept="image/*" capture="environment" onchange="processPhoto(event, '${item.id}')">
+        <input type="file" id="input-${item.id}" accept="image/*" onchange="processPhoto(event, '${item.id}')">
       `;
 
       grid.appendChild(box);
@@ -594,6 +595,7 @@
     box.id = `box-extra-${id}`;
     box.setAttribute('onclick', `triggerCamera('input-extra-${id}')`);
 
+    /* Removed capture="environment" for extra photos as well */
     box.innerHTML = `
       <span class="remove-btn" onclick="event.stopPropagation(); removeExtraPhoto(${id})">&times;</span>
       <span class="photo-icon">📷</span>
@@ -601,7 +603,7 @@
       <span id="badge-extra-${id}" style="display:none;" class="badge">Stamped ✓</span>
       <div id="addr-extra-${id}" class="addr-tag"></div>
       <img id="prev-extra-${id}" style="display:none;" />
-      <input type="file" id="input-extra-${id}" accept="image/*" capture="environment" onchange="processPhoto(event, ${id}, true)">
+      <input type="file" id="input-extra-${id}" accept="image/*" onchange="processPhoto(event, ${id}, true)">
     `;
 
     grid.appendChild(box);
@@ -620,7 +622,7 @@
     document.getElementById('extraCount').textContent = `(${validCount})`;
   }
 
-  /* --- Direct Submission with Clean Message Look --- */
+  /* --- Direct Submission --- */
   async function submitQC() {
     const qcType = document.getElementById('qcType').value;
     const jobNum = document.getElementById('jobNum').value.trim();
@@ -688,13 +690,11 @@
     const extraPhotosCount = attachedFiles.length - schema.length;
     const emailSubject = `🚨 ${qcType.toUpperCase()} SUBMISSION | Job #${jobNum} | Tech ${techNum} | ${address}, ${city}, ${state}`;
     
-    // Clean bullet list of core items
     let checklistText = "";
     schema.forEach((item) => {
       checklistText += `  ✓ ${item.label}\n`;
     });
 
-    // Refined, clean message layout
     const emailBody = `FIELD QC AUDIT REPORT
 Standard: ${qcType}
 Status: Completed & Verified
