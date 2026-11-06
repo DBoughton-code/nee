@@ -396,7 +396,8 @@
   }
 
   function triggerCamera(inputId) {
-    document.getElementById(inputId).click();
+    const input = document.getElementById(inputId);
+    if (input) input.click();
   }
 
   function getAddressFromGPS() {
@@ -711,25 +712,39 @@ ${notes ? `"${notes}"` : 'No field notes provided for this installation.'}
     window.location.href = mailtoUrl;
   }
 
+  // Wipes all input fields, photo grids, and memory state completely
   function resetForm() {
-    // 1. Clear current job inputs
+    // 1. Wipe all text inputs
     document.getElementById('jobNum').value = '';
+    document.getElementById('techNum').value = '';
     document.getElementById('address').value = '';
+    document.getElementById('city').value = '';
+    document.getElementById('state').value = '';
     document.getElementById('notes').value = '';
-    
-    // 2. Re-render the required photo grid and wipe active required photos
+
+    // 2. Clear stored input memory
+    localStorage.removeItem('qc_tech_num');
+    localStorage.removeItem('qc_city');
+    localStorage.removeItem('qc_state');
+
+    // 3. Clear all hidden file input buffers
+    document.querySelectorAll('input[type="file"]').forEach(input => {
+      input.value = '';
+    });
+
+    // 4. Re-render the required photo grid and wipe in-memory required photos
     const currentQcType = document.getElementById('qcType').value;
     renderRequiredPhotoGrid(currentQcType);
 
-    // 3. Clear extra photos array and DOM slots
+    // 5. Clear extra photos array and DOM elements
     document.getElementById('extraPhotosGrid').innerHTML = '';
     extraPhotos.length = 0;
     extraCounter = 0;
     updateExtraCount();
 
-    // 4. Hide status and provide clean reset feedback
+    // 6. Reset status indicator
     hideStatus();
-    showStatus("Form cleared for new inspection.", "info");
+    showStatus("All fields and photos have been completely cleared.", "info");
     setTimeout(hideStatus, 2500);
   }
 
