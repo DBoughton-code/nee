@@ -429,7 +429,6 @@
     document.getElementById('headerTitle').textContent = val;
     localStorage.setItem('qc_type', val);
 
-    // Show reminder box ONLY for Comcast QC
     const comcastBox = document.getElementById('comcastReminders');
     if (val === 'Comcast QC') {
       comcastBox.style.display = 'block';
@@ -621,7 +620,7 @@
     document.getElementById('extraCount').textContent = `(${validCount})`;
   }
 
-  /* --- Direct Submission --- */
+  /* --- Direct Submission with Clean Message Look --- */
   async function submitQC() {
     const qcType = document.getElementById('qcType').value;
     const jobNum = document.getElementById('jobNum').value.trim();
@@ -689,35 +688,30 @@
     const extraPhotosCount = attachedFiles.length - schema.length;
     const emailSubject = `🚨 ${qcType.toUpperCase()} SUBMISSION | Job #${jobNum} | Tech ${techNum} | ${address}, ${city}, ${state}`;
     
+    // Clean bullet list of core items
     let checklistText = "";
-    schema.forEach((item, idx) => {
-      checklistText += `   ${idx + 1}. ${item.label} (Address Watermarked)\n`;
+    schema.forEach((item) => {
+      checklistText += `  ✓ ${item.label}\n`;
     });
 
-    const emailBody = `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📍 ${qcType.toUpperCase()} FIELD AUDIT REPORT
-STATUS: COMPLETE & VERIFIED
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // Refined, clean message layout
+    const emailBody = `FIELD QC AUDIT REPORT
+Standard: ${qcType}
+Status: Completed & Verified
 
-📋 JOB IDENTIFICATION
-• Job / Work Order #: ${jobNum}
+JOB DETAILS:
+• Job / Work Order: ${jobNum}
 • Technician ID: ${techNum}
-• Inspection Standard: ${qcType}
 • Site Address: ${address}, ${city}, ${state}
-• Submission Time: ${timestamp}
+• Timestamp: ${timestamp}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📷 ATTACHED EVIDENCE SUMMARY (${attachedFiles.length} TOTAL)
-✅ Required Core Photos (${schema.length}):
-${checklistText}
-${extraPhotosCount > 0 ? `➕ Additional Site Photos Attached: ${extraPhotosCount}` : 'ℹ️ Additional Photos: None requested'}
+PHOTOS ATTACHED (${attachedFiles.length} Total):
+${checklistText}${extraPhotosCount > 0 ? `  + ${extraPhotosCount} Additional Site Photo(s)\n` : ''}
+TECH NOTES:
+${notes ? `"${notes}"` : 'None'}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📝 TECHNICIAN FIELD NOTES
-${notes ? `"${notes}"` : 'No field notes provided for this installation.'}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-* Generated automatically via Field QC Mobile Inspector. Submitted to Google Database.`;
+--
+Submitted via Field QC Mobile Inspector`;
 
     if (navigator.canShare && navigator.canShare({ files: attachedFiles })) {
       try {
