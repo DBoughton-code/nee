@@ -20,6 +20,7 @@
       --primary-hover: #2563eb;
       --success: #22c55e;
       --danger: #ef4444;
+      --warning: #f59e0b;
       --input-bg: #0f172a;
       --input-border: #475569;
     }
@@ -75,6 +76,52 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+    }
+
+    /* Comcast Field Reminders Banner */
+    .comcast-reminder-box {
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid #b45309;
+      border-left: 4px solid var(--warning);
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      display: none;
+    }
+
+    .comcast-reminder-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #fcd34d;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .comcast-reminder-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 12px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .comcast-reminder-list li {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .comcast-reminder-list li::before {
+      content: "•";
+      color: var(--warning);
+      font-size: 1.1rem;
+      line-height: 0;
     }
 
     .form-group {
@@ -237,6 +284,23 @@
   <!-- Dynamic QC Photos Container -->
   <div class="card">
     <div class="card-title" id="photoCardTitle">Required QC Photos</div>
+
+    <!-- Comcast-Specific Inline Reminder -->
+    <div id="comcastReminders" class="comcast-reminder-box">
+      <div class="comcast-reminder-title">
+        <span>⚠️</span> Comcast Standard Checklist Reminders:
+      </div>
+      <ul class="comcast-reminder-list">
+        <li>New connectors</li>
+        <li>Drop tag w/ address</li>
+        <li>2 green ground tags</li>
+        <li>Wrench tight connectors</li>
+        <li>Drop hangers used</li>
+        <li>All holes sealed</li>
+        <li style="grid-column: span 2;">House box closed & secured</li>
+      </ul>
+    </div>
+
     <div class="photo-grid" id="requiredPhotosGrid"></div>
   </div>
 
@@ -364,6 +428,14 @@
     const val = document.getElementById('qcType').value;
     document.getElementById('headerTitle').textContent = val;
     localStorage.setItem('qc_type', val);
+
+    // Show reminder box ONLY for Comcast QC
+    const comcastBox = document.getElementById('comcastReminders');
+    if (val === 'Comcast QC') {
+      comcastBox.style.display = 'block';
+    } else {
+      comcastBox.style.display = 'none';
+    }
 
     renderRequiredPhotoGrid(val);
   }
@@ -549,6 +621,7 @@
     document.getElementById('extraCount').textContent = `(${validCount})`;
   }
 
+  /* --- Direct Submission --- */
   async function submitQC() {
     const qcType = document.getElementById('qcType').value;
     const jobNum = document.getElementById('jobNum').value.trim();
