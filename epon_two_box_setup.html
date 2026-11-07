@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EPON Two-Box Setup Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        .stripe-table tbody tr:nth-child(odd) { background-color: #f9fafb; }
+        .section-anchor { scroll-margin-top: 5rem; }
+    </style>
+</head>
+<body class="text-gray-800 antialiased relative">
+
+    <!-- Dark Header -->
+    <header class="bg-gray-900 text-white shadow-md fixed w-full top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <i class="ph ph-hard-drives text-3xl text-blue-400"></i>
+                    <span class="font-bold text-xl tracking-wide">EPON Two-Box Setup</span>
+                </div>
+                <nav class="hidden md:flex space-x-6 text-sm font-medium">
+                    <a href="#overview" class="hover:text-blue-400 transition-colors">Overview</a>
+                    <a href="#devices" class="hover:text-blue-400 transition-colors">Devices</a>
+                    <a href="#installation" class="hover:text-blue-400 transition-colors">Installation</a>
+                    <a href="#activation" class="hover:text-blue-400 transition-colors">Activation</a>
+                    <a href="#troubleshooting" class="hover:text-blue-400 transition-colors">Troubleshooting</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 space-y-12">
+
+        <!-- 1. Overview & Architecture Diagram -->
+        <section id="overview" class="section-anchor">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="p-6 md:p-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <i class="ph ph-projector-screen-chart text-blue-600"></i> Overview & Architecture
+                    </h2>
+                    <p class="text-gray-600 mb-6 leading-relaxed">
+                        This guide provides a comprehensive technical overview for the enhanced Fiber to the Premise (FTTP) service using an EPON with a two-box device solution. This solution replaces the XF3 and consists of an Ethernet EPON Optical Node Unit (ONU) paired with either a Technicolor XB7 or a Sercomm XER10 router.
+                    </p>
+                    <div class="bg-gray-50 p-6 rounded-lg border border-gray-100 flex flex-col md:flex-row items-center justify-center gap-8">
+                        <!-- Abstract Architecture Representation -->
+                        <div class="flex flex-col items-center">
+                            <div class="w-20 h-20 bg-gray-800 rounded-lg flex items-center justify-center text-white shadow-lg relative">
+                                <i class="ph ph-broadcast text-3xl"></i>
+                                <span class="absolute -bottom-6 text-sm font-semibold text-gray-700">Fiber Drop</span>
+                            </div>
+                        </div>
+                        <i class="ph ph-arrow-right text-3xl text-gray-400 rotate-90 md:rotate-0"></i>
+                        <div class="flex flex-col items-center">
+                            <div class="w-20 h-20 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-lg relative">
+                                <i class="ph ph-hard-drives text-3xl"></i>
+                                <span class="absolute -bottom-6 text-sm font-semibold text-gray-700">ONU</span>
+                            </div>
+                        </div>
+                        <i class="ph ph-arrow-right text-3xl text-gray-400 rotate-90 md:rotate-0"></i>
+                        <div class="flex flex-col items-center">
+                            <div class="w-16 h-24 bg-white border-2 border-gray-300 rounded-lg flex items-center justify-center text-gray-700 shadow-lg relative">
+                                <i class="ph ph-router text-3xl"></i>
+                                <span class="absolute -bottom-6 text-sm font-semibold text-gray-700 whitespace-nowrap">XB7 / XER10</span>
+                            </div>
+                        </div>
+                        <i class="ph ph-arrow-right text-3xl text-gray-400 rotate-90 md:rotate-0 hidden lg:block"></i>
+                        <div class="flex-col items-start gap-2 hidden lg:flex">
+                            <div class="flex items-center gap-2"><i class="ph ph-device-mobile text-gray-500"></i> <span class="text-sm">WiFi Devices</span></div>
+                            <div class="flex items-center gap-2"><i class="ph ph-desktop text-gray-500"></i> <span class="text-sm">Wired Ethernet</span></div>
+                            <div class="flex items-center gap-2"><i class="ph ph-television text-gray-500"></i> <span class="text-sm">IP Video (Xi5/Xi6)</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Device Configurations -->
+        <section id="devices" class="section-anchor">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <i class="ph ph-cpu text-blue-600"></i> Device Configurations
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- ONU -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-4">
+                        <i class="ph ph-hard-drives text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Optical Node Unit (ONU)</h3>
+                    <ul class="text-sm text-gray-600 space-y-2 mb-4">
+                        <li><strong>Nokia XF-ONU:</strong> Model NKFN11AEL (Non-BEAD locations)</li>
+                        <li><strong>Sagemcom XF-ONU2:</strong> Model SGFN11BEL (All locations)</li>
+                        <li><strong>Note:</strong> The boot file resides on the ONU, not the gateway.</li>
+                    </ul>
+                </div>
+                <!-- XB7 -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <div class="w-12 h-12 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center mb-4">
+                        <i class="ph ph-router text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Technicolor XB7</h3>
+                    <ul class="text-sm text-gray-600 space-y-2 mb-4">
+                        <li><strong>Model:</strong> CGM4331COM / CGM433COM</li>
+                        <li><strong>Connection:</strong> Use <strong>Port 4</strong> (2.5G WAN/LAN identified by orange marker) to connect to the ONU.</li>
+                        <li><strong>Voice:</strong> Required if the customer has Xfinity Voice service.</li>
+                    </ul>
+                </div>
+                <!-- XER10 -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <div class="w-12 h-12 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center mb-4">
+                        <i class="ph ph-wifi-high text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Sercomm XER10</h3>
+                    <ul class="text-sm text-gray-600 space-y-2 mb-4">
+                        <li><strong>Model:</strong> SCER11BEL (WiFi 7 Tri-band)</li>
+                        <li><strong>Connection:</strong> Use the dedicated <strong>WAN port</strong> (bottom port).</li>
+                        <li><strong>Note:</strong> Voice services are not supported on XER10 at launch. Speeds >1Gig require CAT6 (< 180 ft).</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Installation alerts & reminders -->
+        <section id="installation" class="section-anchor">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <i class="ph ph-warning-circle text-blue-600"></i> Installation Alerts & Reminders
+            </h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Inspect before you connect -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-l-4 border-l-blue-500 border-gray-200">
+                    <h3 class="text-lg font-bold text-gray-900 mb-3">Inspect Before You Connect</h3>
+                    <p class="text-gray-600 text-sm mb-4">Ensure the connector and ONU port are clean, undamaged, and free of debris before provisioning.</p>
+                    <div class="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
+                        <div class="flex-1">
+                            <h4 class="font-bold text-green-700 flex items-center gap-1"><i class="ph ph-check-circle"></i> SC/UPC (Blue)</h4>
+                            <p class="text-xs text-gray-600 mt-1">Flat polish. This is the <strong>required</strong> connector for the ONU.</p>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-bold text-red-700 flex items-center gap-1"><i class="ph ph-x-circle"></i> SC/APC (Green)</h4>
+                            <p class="text-xs text-gray-600 mt-1">Angled polish. <strong>DO NOT</strong> install directly into the ONU. Use a hybrid jumper/coupler if present.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Blue Tags -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-l-4 border-l-blue-800 border-gray-200">
+                    <h3 class="text-lg font-bold text-gray-900 mb-3">Do Not Tamper Tags</h3>
+                    <p class="text-gray-600 text-sm mb-4">Technicians must attach a blue "Do Not Tamper" tag to the fiber cable at the ONU to prevent customers from unplugging or damaging the connection.</p>
+                    <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
+                        <li><strong>Text:</strong> "Property of Comcast. Do not tamper with connections or remove devices."</li>
+                        <li><strong>Placement:</strong> On the fiber connector boot.</li>
+                        <li><strong>Visibility:</strong> Ensure the tag faces outward inside a media distribution panel.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Activation Steps -->
+        <section id="activation" class="section-anchor">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="p-6 md:p-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                        <i class="ph ph-check-square-offset text-blue-600"></i> Activation Steps via Tech360
+                    </h2>
+                    <div class="space-y-6">
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold">1</div>
+                            <div>
+                                <h4 class="font-bold text-gray-900">Power Up the ONU</h4>
+                                <p class="text-sm text-gray-600">Connect the fiber drop securely (listen for the click). Power up the ONU and wait for the registration process to complete (all three LEDs should be solid green).</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold">2</div>
+                            <div>
+                                <h4 class="font-bold text-gray-900">Add Devices in Tech360</h4>
+                                <p class="text-sm text-gray-600">Ensure the ONU and the appropriate gateway (XB7 or XER10) are listed under "Devices to Install". Use the ONU serial number to add it if not present.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold">3</div>
+                            <div>
+                                <h4 class="font-bold text-gray-900">Connect the Ethernet</h4>
+                                <p class="text-sm text-gray-600">Connect the gateway and ONU with a CAT5e/CAT6 Ethernet cable. (Port 4 for XB7, WAN port for XER10).</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold">4</div>
+                            <div>
+                                <h4 class="font-bold text-gray-900">Activate Services</h4>
+                                <p class="text-sm text-gray-600">Initiate the startup sequence in Tech360. <strong>Note:</strong> Be patient. The XB7 may take up to 7-10 minutes to come online (blinking amber to solid white). Do not power cycle during this process.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. Troubleshooting & LED meanings -->
+        <section id="troubleshooting" class="section-anchor">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <i class="ph ph-wrench text-blue-600"></i> Troubleshooting & LED Meanings
+            </h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- ONU LEDs -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="p-4 bg-gray-50 border-b border-gray-200">
+                        <h3 class="font-bold text-gray-800">ONU LED States</h3>
+                    </div>
+                    <div class="p-0 overflow-x-auto">
+                        <table class="w-full text-left text-sm text-gray-700 stripe-table">
+                            <thead>
+                                <tr class="border-b border-gray-200">
+                                    <th class="p-3">Power</th>
+                                    <th class="p-3">PON</th>
+                                    <th class="p-3">Online</th>
+                                    <th class="p-3">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b border-gray-100">
+                                    <td class="p-3 text-green-600 font-bold">Green</td>
+                                    <td class="p-3 text-green-600 font-bold">Green</td>
+                                    <td class="p-3 text-green-600 font-bold">Green</td>
+                                    <td class="p-3">Ready. Registered with OLT.</td>
+                                </tr>
+                                <tr class="border-b border-gray-100">
+                                    <td class="p-3 text-green-600 font-bold">Green</td>
+                                    <td class="p-3 text-green-600 font-bold">Green</td>
+                                    <td class="p-3 text-green-600 font-bold animate-pulse">Blinking</td>
+                                    <td class="p-3">Code download underway.</td>
+                                </tr>
+                                <tr class="border-b border-gray-100">
+                                    <td class="p-3 text-green-600 font-bold">Green</td>
+                                    <td class="p-3 text-gray-400 font-bold">Off</td>
+                                    <td class="p-3 text-gray-400 font-bold">Off</td>
+                                    <td class="p-3">No light from OLT. Check fiber.</td>
+                                </tr>
+                                <tr class="border-b border-gray-100">
+                                    <td class="p-3 text-green-600 font-bold">Green</td>
+                                    <td class="p-3 text-green-600 font-bold">Green</td>
+                                    <td class="p-3 text-gray-400 font-bold">Off / Blink</td>
+                                    <td class="p-3">IP connectivity to OLT interrupted.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Common Issues -->
+                <div class="space-y-4">
+                    <div class="bg-amber-50 p-4 border border-amber-200 rounded-lg">
+                        <h4 class="font-bold text-amber-900 flex items-center gap-2"><i class="ph ph-warning"></i> XER10 Flashing Amber</h4>
+                        <p class="text-sm text-amber-800 mt-2">The device is trying to register. Potential causes: ONU LEDs not locked on green, incorrect firmware on XER10, bad Ethernet cable, or connected to the wrong port.</p>
+                    </div>
+                    <div class="bg-red-50 p-4 border border-red-200 rounded-lg">
+                        <h4 class="font-bold text-red-900 flex items-center gap-2"><i class="ph ph-x-circle"></i> XER10 Solid Red</h4>
+                        <p class="text-sm text-red-800 mt-2">Indicates no internet connectivity. Verify the ONU LEDs are solid green. Test the fiber connector (clean SC/UPC) and ensure the Ethernet is seated properly with a click. Factory reset if necessary.</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 border border-gray-200 rounded-lg">
+                        <h4 class="font-bold text-gray-800 flex items-center gap-2"><i class="ph ph-arrows-clockwise"></i> Reboot Sequences</h4>
+                        <p class="text-sm text-gray-600 mt-2">When swapping devices, always reboot in sequence. The ONU may hold the old router's IP address; rebooting the ONU before connecting the new router should clear it.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-900 text-gray-400 py-6 text-center text-sm mt-12">
+        <p>&copy; 2026 TechOps Internal Resources. For official use only.</p>
+    </footer>
+
+</body>
+</html>
