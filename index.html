@@ -209,39 +209,73 @@
 
     textarea { resize: vertical; min-height: 70px; }
 
-    /* Equipment Counter Component */
+    /* Collapsible Equipment Accordion */
+    details.equip-cat {
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+
+    details.equip-cat summary {
+      padding: 12px 14px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #5eead4;
+      cursor: pointer;
+      user-select: none;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    details.equip-cat summary::-webkit-details-marker { display: none; }
+    details.equip-cat summary::after { content: "▼"; font-size: 0.75rem; color: var(--text-muted); }
+    details.equip-cat[open] summary::after { content: "▲"; }
+
+    .equip-cat-body {
+      padding: 8px 12px 12px 12px;
+      border-top: 1px solid var(--card-border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
     .equip-item-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #0f172a;
-      padding: 10px 12px;
-      border-radius: 8px;
-      border: 1px solid var(--card-border);
-      margin-bottom: 8px;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(51, 65, 85, 0.4);
     }
 
+    .equip-item-row:last-child { border-bottom: none; }
+
     .equip-name {
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       font-weight: 600;
       color: var(--text);
+      max-width: 65%;
+      line-height: 1.2;
     }
 
     .counter-control {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
 
     .counter-btn {
-      width: 32px;
-      height: 32px;
+      width: 30px;
+      height: 30px;
       background: #334155;
       color: #fff;
       border: 1px solid var(--card-border);
       border-radius: 6px;
       font-weight: 800;
-      font-size: 1.1rem;
+      font-size: 1rem;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -312,7 +346,7 @@
     .btn-reset { background-color: #475569; margin-top: 8px; }
     .btn-downed { background-color: var(--danger); margin-top: 8px; }
     .btn-rtm { background-color: var(--purple); margin-top: 8px; }
-    .btn-equip { background-color: var(--teal); color: #042f2e; margin-top: 8px; }
+    .btn-equip { background-color: var(--teal); color: #042f2e; margin-top: 8px; font-weight: 800; }
     input[type="file"] { display: none; }
 
     .status-msg {
@@ -353,7 +387,6 @@
     <div class="card">
       <div class="card-title">Select Job Workflow</div>
       <div class="hub-grid">
-        <!-- 1: Comcast QC -->
         <div class="hub-tile" onclick="openQCView()">
           <div class="hub-tile-left">
             <div class="hub-icon-wrap">📋</div>
@@ -365,7 +398,6 @@
           <span style="font-size: 1.2rem; color: var(--text-muted);">❯</span>
         </div>
 
-        <!-- 2: Downed Job -->
         <div class="hub-tile" onclick="openDownedView()">
           <div class="hub-tile-left">
             <div class="hub-icon-wrap hub-icon-downed">🛑</div>
@@ -377,7 +409,6 @@
           <span style="font-size: 1.2rem; color: var(--text-muted);">❯</span>
         </div>
 
-        <!-- 3: Refer to Maintenance -->
         <div class="hub-tile" onclick="openRTMView()">
           <div class="hub-tile-left">
             <div class="hub-icon-wrap hub-icon-rtm">🔧</div>
@@ -389,13 +420,12 @@
           <span style="font-size: 1.2rem; color: var(--text-muted);">❯</span>
         </div>
 
-        <!-- 4: Equipment Order -->
         <div class="hub-tile" onclick="openEquipView()">
           <div class="hub-tile-left">
             <div class="hub-icon-wrap hub-icon-equip">📦</div>
             <div>
-              <div class="hub-title" style="color: #2dd4bf;">Equipment Order</div>
-              <div class="hub-sub">Order modems, boxes, drops & materials</div>
+              <div class="hub-title" style="color: #2dd4bf;">Weekly Equipment Order</div>
+              <div class="hub-sub">North Haven warehouse, modems, coax & fiber</div>
             </div>
           </div>
           <span style="font-size: 1.2rem; color: var(--text-muted);">❯</span>
@@ -656,7 +686,7 @@
     </div>
   </div>
 
-  <!-- SCREEN 5: EQUIPMENT ORDER -->
+  <!-- SCREEN 5: WEEKLY EQUIPMENT ORDER -->
   <div id="view-equip" class="view-screen">
     <div class="nav-top-bar">
       <button type="button" class="btn-back" onclick="navigateHome()">❮ Main Menu</button>
@@ -664,163 +694,54 @@
     </div>
 
     <div class="header">
-      <h2 style="color: var(--teal);">Equipment Order</h2>
-      <p>Warehouse Request & Field Material Restock</p>
+      <h2 style="color: var(--teal);">Weekly Equipment Order</h2>
+      <p>Please Fill Out By 9:00 AM Monday</p>
     </div>
 
+    <!-- Tech & Location Details -->
     <div class="card">
-      <div class="card-title">Technician & Warehouse Info</div>
+      <div class="card-title">Technician & Pickup Point</div>
+      <div class="form-group">
+        <label for="equipTechName">Tech Name *</label>
+        <input type="text" id="equipTechName" placeholder="e.g. Andre Forbes" oninput="localStorage.setItem('qc_tech_name', this.value)">
+      </div>
       <div class="form-group">
         <label for="equipTechNum">Tech Number *</label>
         <input type="text" id="equipTechNum" placeholder="e.g. T-10492" oninput="syncTechNum(this.value)">
       </div>
       <div class="form-group">
-        <label for="equipTechName">Tech Full Name *</label>
-        <input type="text" id="equipTechName" placeholder="e.g. John Doe">
-      </div>
-      <div class="form-group">
-        <label for="pickupLocation">Pickup / Warehouse Location *</label>
+        <label for="pickupLocation">Pickup Location *</label>
         <select id="pickupLocation">
-          <option value="Hartford Warehouse">Hartford Warehouse</option>
-          <option value="Bloomfield Hub">Bloomfield Hub</option>
-          <option value="Middletown Facility">Middletown Facility</option>
-          <option value="Waterbury Garage">Waterbury Garage</option>
+          <option value="Pick up North haven office after Tuesday">Pick up North haven office after Tuesday</option>
+          <option value="Pickup North Haven after hours box truck">Pickup North Haven after hours box truck</option>
+          <option value="Other must call Ousmane, James, Don to setup">Other must call Ousmane, James, Don to setup</option>
         </select>
       </div>
     </div>
 
-    <!-- Modems & Gateways -->
+    <!-- Equipment Accordions Container -->
     <div class="card">
-      <div class="card-title">Modems, Gateways & Video CPE</div>
-      <div class="equip-item-row">
-        <span class="equip-name">XB7 Wireless Gateway</span>
-        <div class="counter-control">
-          <button type="button" class="counter-btn" onclick="adjustCount('xb7', -1)">-</button>
-          <span class="counter-val" id="cnt_xb7">0</span>
-          <button type="button" class="counter-btn" onclick="adjustCount('xb7', 1)">+</button>
-        </div>
-      </div>
-      <div class="equip-item-row">
-        <span class="equip-name">XB8 WiFi 6E Gateway</span>
-        <div class="counter-control">
-          <button type="button" class="counter-btn" onclick="adjustCount('xb8', -1)">-</button>
-          <span class="counter-val" id="cnt_xb8">0</span>
-          <button type="button" class="counter-btn" onclick="adjustCount('xb8', 1)">+</button>
-        </div>
-      </div>
-      <div class="equip-item-row">
-        <span class="equip-name">Xi6 4K Wireless Box</span>
-        <div class="counter-control">
-          <button type="button" class="counter-btn" onclick="adjustCount('xi6', -1)">-</button>
-          <span class="counter-val" id="cnt_xi6">0</span>
-          <button type="button" class="counter-btn" onclick="adjustCount('xi6', 1)">+</button>
-        </div>
-      </div>
-      <div class="equip-item-row">
-        <span class="equip-name">XiOne 4K Streaming Box</span>
-        <div class="counter-control">
-          <button type="button" class="counter-btn" onclick="adjustCount('xione', -1)">-</button>
-          <span class="counter-val" id="cnt_xione">0</span>
-          <button type="button" class="counter-btn" onclick="adjustCount('xione', 1)">+</button>
-        </div>
-      </div>
-      <div class="equip-item-row">
-        <span class="equip-name">XR15 Voice Remote</span>
-        <div class="counter-control">
-          <button type="button" class="counter-btn" onclick="adjustCount('xr15', -1)">-</button>
-          <span class="counter-val" id="cnt_xr15">0</span>
-          <button type="button" class="counter-btn" onclick="adjustCount('xr15', 1)">+</button>
-        </div>
-      </div>
+      <div class="card-title">Material & Gear Catalog</div>
+      <div id="equipAccordionContainer"></div>
     </div>
 
-    <!-- Drop Cable & Passives -->
+    <!-- Optional Notes -->
     <div class="card">
-      <div class="card-title">Drop Cable, Passives & Hardware</div>
-      <div class="equip-item-row">
-        <span class="equip-name">RG6 Aerial Spool (1000')</span>
-        <div class="counter-control">
-          <button type="button" class="counter-btn" onclick="adjustCount('rg6_aerial', -1)">-</button>
-          <span class="counter-val" id="cnt_rg6_aerial">0</span>
-          <button type="button" class="counter-btn" onclick="adjustCount('rg6_aerial', 1)">+</button>
-        </div>
-      </div>
-      <div class="equip-item-row">
-        <span class="equip-name">RG6 Underground (Flooded)</span>
-        <div class="counter-control">
-          <button type="button" class="counter-btn" onclick="adjustCount('rg6_under', -1)">-</button>
-          <span class="counter-val" id="cnt_rg6_under">0</span>
-          <button type="button" class="counter-btn" onclick="adjustCount('rg6_under', 1)">+</button>
-        </div>
-      </div>
-      <div class="equip-item-row">
-        <span class="equip-name">RG11 Underground Spool</span>
-        <div class="counter-control">
-          <button type="button" class="counter-btn" onclick="adjustCount('rg11', -1)">-</button>
-          <span class="counter-val" id="cnt_rg11">0</span>
-          <button type="button" class="counter-btn" onclick="adjustCount('rg11', 1)">+</button>
-        </div>
-      </div>
-      <div class="equip-item-row">
-        <span class="equip-name">2-Way Balanced Splitters</span>
-        <div class="counter-control">
-          <button type="button" class="counter-btn" onclick="adjustCount('split_2way', -1)">-</button>
-          <span class="counter-val" id="cnt_split_2way">0</span>
-          <button type="button" class="counter-btn" onclick="adjustCount('split_2way', 1)">+</button>
-        </div>
-      </div>
-      <div class="equip-item-row">
-        <span class="equip-name">3-Way Splitters (Bal/Unbal)</span>
-        <div class="counter-control">
-          <button type="button" class="counter-btn" onclick="adjustCount('split_3way', -1)">-</button>
-          <span class="counter-val" id="cnt_split_3way">0</span>
-          <button type="button" class="counter-btn" onclick="adjustCount('split_3way', 1)">+</button>
-        </div>
-      </div>
-      <div class="equip-item-row">
-        <span class="equip-name">Ground Blocks & Dual Tags</span>
-        <div class="counter-control">
-          <button type="button" class="counter-btn" onclick="adjustCount('ground_blocks', -1)">-</button>
-          <span class="counter-val" id="cnt_ground_blocks">0</span>
-          <button type="button" class="counter-btn" onclick="adjustCount('ground_blocks', 1)">+</button>
-        </div>
-      </div>
-      <div class="equip-item-row">
-        <span class="equip-name">Drop Hangers (Bag of 50)</span>
-        <div class="counter-control">
-          <button type="button" class="counter-btn" onclick="adjustCount('drop_hangers', -1)">-</button>
-          <span class="counter-val" id="cnt_drop_hangers">0</span>
-          <button type="button" class="counter-btn" onclick="adjustCount('drop_hangers', 1)">+</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Special Requests -->
-    <div class="card">
-      <div class="card-title">Additional Items / Special Notes</div>
+      <div class="card-title">Special Request Notes</div>
       <div class="form-group">
-        <textarea id="equipNotes" placeholder="Need extra fittings, silicone, drill bits, boots, ladder racks, or custom sizes?..."></textarea>
+        <textarea id="equipNotes" placeholder="Additional items, custom lengths, or setup notes..."></textarea>
       </div>
     </div>
 
     <div class="card">
       <div id="equipStatus" class="status-msg"></div>
       <button type="button" class="btn btn-equip" onclick="submitEquipOrder()">📦 Submit Equipment Order</button>
-      <button type="button" class="btn btn-reset" onclick="resetEquipOrder()">Reset Quantities</button>
+      <button type="button" class="btn btn-reset" onclick="resetEquipOrder()">Reset All Quantities</button>
     </div>
   </div>
 </div>
 <script>
   const GOOGLE_FORM_RESPONSE_URL = "https://docs.google.com/forms/d/e/YOUR_FORM_ID_HERE/formResponse";
-  const FORM_ENTRY_IDS = {
-    qcType: "entry.111111111",
-    jobNum: "entry.222222222",
-    techNum: "entry.333333333",
-    address: "entry.444444444",
-    city: "entry.555555555",
-    state: "entry.666666666",
-    notes: "entry.777777777"
-  };
   const SUPERVISOR_EMAIL = "Donald.boughton@princetown.com";
 
   const COMCAST_PHOTO_SCHEMA = [
@@ -840,36 +761,270 @@
   const rtmExtraPhotos = [];
   let rtmExtraCounter = 0;
 
-  // Equipment Item Inventory State
-  const equipCounts = {
-    xb7: 0,
-    xb8: 0,
-    xi6: 0,
-    xione: 0,
-    xr15: 0,
-    rg6_aerial: 0,
-    rg6_under: 0,
-    rg11: 0,
-    split_2way: 0,
-    split_3way: 0,
-    ground_blocks: 0,
-    drop_hangers: 0
-  };
+  // Complete Catalog mapped from your Google Form
+  const EQUIP_CATALOG = [
+    {
+      category: "CPE - MODEMS",
+      step: 1,
+      items: [
+        { id: "m_xb6", name: "XB6 Modem" },
+        { id: "m_xb7", name: "XB7 Modem" },
+        { id: "m_xb8", name: "XB8 Modem" },
+        { id: "m_xb10", name: "XB10 Modem" },
+        { id: "m_ud4", name: "UD4 Modem" },
+        { id: "m_wifi_ext", name: "WiFi Extender Pro" }
+      ]
+    },
+    {
+      category: "CPE - CABLE BOXES",
+      step: 1,
+      items: [
+        { id: "cb_xg1_moto", name: "XG1 MOTO RED" },
+        { id: "cb_xg1_sa", name: "XG1 SA BLUE" },
+        { id: "cb_xg2_moto", name: "XG2 MOTO RED" },
+        { id: "cb_xg2_sa", name: "XG2 SA BLUE" },
+        { id: "cb_xi6", name: "XI6 Wireless Box" },
+        { id: "cb_xumo", name: "XUMO Box" },
+        { id: "cb_xid", name: "XID Box" }
+      ]
+    },
+    {
+      category: "COAX CABLE & SCREW CLIPS",
+      step: 1,
+      items: [
+        { id: "cx_rg6_aer", name: "RG6 AERIAL" },
+        { id: "cx_rg11_aer", name: "RG11 AERIAL" },
+        { id: "cx_rg6_ug", name: "RG6 UNDERGROUND" },
+        { id: "cx_rg11_ug", name: "RG11 UNDERGROUND" },
+        { id: "cx_rg6_in_wht", name: "RG6 INHOUSE WHITE" },
+        { id: "cx_rg6_in_blk", name: "RG6 IN HOUSE BLACK" },
+        { id: "sc_rg6_wht", name: "A SCREW CLIPS RG6 WHITE BAG" },
+        { id: "sc_rg6_blk", name: "A SCREW CLIPS RG6 BLACK BAG" },
+        { id: "sc_rg11", name: "A SCREW CLIPS RG11" },
+        { id: "sc_gnd_fib", name: "A SCREW CLIPS GROUND/FIBER" }
+      ]
+    },
+    {
+      category: "CONNECTORS",
+      step: 1,
+      items: [
+        { id: "con_in_rg6", name: "INDOOR RG6" },
+        { id: "con_out_rg6", name: "OUTDOOR RG6" },
+        { id: "con_in_59", name: "INDOOR 59" },
+        { id: "con_out_59", name: "OUTDOOR 59" },
+        { id: "con_rg11", name: "RG11 CONNECTORS" },
+        { id: "con_barrels", name: "BARRELS" },
+        { id: "con_term", name: "TERMINATORS" }
+      ]
+    },
+    {
+      category: "GROUND BLOCKS & MOCA",
+      step: 1,
+      items: [
+        { id: "gb_no_moca", name: "BOND BLOCKS NO MOCA (BAGS)" },
+        { id: "gb_moca", name: "BOND BLOCKS WITH MOCA (BAGS)" },
+        { id: "moca_filters", name: "MOCA FILTERS (BAGS)" },
+        { id: "gnd_wire", name: "GROUND WIRE" }
+      ]
+    },
+    {
+      category: "GROUND CLAMPS",
+      step: 5,
+      items: [
+        { id: "gc_meter", name: "METER CLAMP" },
+        { id: "gc_bronze", name: "GROUND CLAMP BRONZE" },
+        { id: "gc_water_pipe", name: "WATER PIPE ZINC CLAMPS" },
+        { id: "gc_strap_cu", name: "GROUND STRAP 12\" COPPER" },
+        { id: "gc_strap_galv", name: "GROUND STRAP 12\" GALVANIZED" },
+        { id: "gc_beam", name: "BEAM CLAMP" },
+        { id: "gc_split_bolt", name: "SPLIT BOLT" }
+      ]
+    },
+    {
+      category: "SPLITTERS & WALL PLATES",
+      step: 5,
+      items: [
+        { id: "sp_2way", name: "2 WAY SPLITTER" },
+        { id: "sp_3way", name: "3 WAY SPLITTER" },
+        { id: "sp_4way", name: "4 WAY SPLITTER" },
+        { id: "sp_8way_moca", name: "8 WAY MOCA SPLITTER" },
+        { id: "wp_white", name: "WALL PLATES WHITE" },
+        { id: "wp_ivory", name: "WALL PLATES IVORY" }
+      ]
+    },
+    {
+      category: "TIE WRAPS & CABLES",
+      step: 5,
+      items: [
+        { id: "tw_8in", name: "TIE WRAPS 8 INCH" },
+        { id: "tw_14in", name: "TIE WRAPS 14 INCH" },
+        { id: "cbl_hdmi", name: "HDMI CABLE" },
+        { id: "cbl_phone", name: "PHONE CABLE" },
+        { id: "cbl_network", name: "NETWORK CABLE" }
+      ]
+    },
+    {
+      category: "DROP SUPPLIES",
+      step: 5,
+      items: [
+        { id: "ds_hanger", name: "COAX DROP HANGER" },
+        { id: "ds_phook", name: "P HOOKS (HOUSE)" },
+        { id: "ds_jhook", name: "J HOOKS (POLE)" },
+        { id: "ds_droptags", name: "DROP TAGS WHITE" },
+        { id: "ds_spanclamp", name: "SPAN CLAMP" }
+      ]
+    },
+    {
+      category: "OTHER MISC SUPPLIES",
+      step: 1,
+      items: [
+        { id: "ot_wht_bush", name: "WHITE BUSHINGS (BAG)" },
+        { id: "ot_blk_bush", name: "BLACK BUSHINGS (BAG)" },
+        { id: "ot_silicone", name: "SILICONE" },
+        { id: "ot_gnd_tags", name: "GROUND TAGS" },
+        { id: "ot_boot_cov", name: "BOOT COVERS" },
+        { id: "ot_house_box", name: "HOUSE BOXS" }
+      ]
+    },
+    {
+      category: "FIBER SUPPLIES",
+      step: 1,
+      items: [
+        { id: "fb_onu", name: "ONU" },
+        { id: "fb_xer10", name: "XER 10" },
+        { id: "fb_xb7_tech", name: "XB7 TECHNICOLOR FIBER JOBS" },
+        { id: "fb_house_box", name: "FIBER HOUSE BOX" },
+        { id: "fb_hb_ext", name: "HOUSE BOX EXTENSION 250FT" },
+        { id: "fb_onu_ps", name: "ONU COAX POWER SUPPLY" },
+        { id: "fb_net_wire", name: "NETWORK WIRE (BOX)" },
+        { id: "fb_net_con", name: "NETWORK CONNECTORS BOX" },
+        { id: "fb_clip_gnd", name: "FIBER CLIP GROUND CLIPS" },
+        { id: "fb_drop_hang", name: "FIBER DROP HANGERS BOX" },
+        { id: "fb_screw_clip", name: "FIBER SCREW CLIP BOX" }
+      ]
+    },
+    {
+      category: "FIBER AERIAL DROPS",
+      step: 1,
+      items: [
+        { id: "fad_100", name: "100 FT FIBER DROP" },
+        { id: "fad_150", name: "150 FT FIBER DROP" },
+        { id: "fad_200", name: "200 FT FIBER DROP" },
+        { id: "fad_250", name: "250 FT FIBER DROP" },
+        { id: "fad_300", name: "300 FT FIBER DROP" },
+        { id: "fad_350", name: "350 FT FIBER DROP" },
+        { id: "fad_400", name: "400 FT FIBER DROP" },
+        { id: "fad_450", name: "450 FT FIBER DROP" },
+        { id: "fad_500", name: "500 FT FIBER DROP" },
+        { id: "fad_550", name: "550 FT FIBER DROP" },
+        { id: "fad_600", name: "600 FT FIBER DROP" }
+      ]
+    }
+  ];
 
-  const equipItemLabels = {
-    xb7: "XB7 Wireless Gateway",
-    xb8: "XB8 WiFi 6E Gateway",
-    xi6: "Xi6 4K Wireless Box",
-    xione: "XiOne 4K Streaming Box",
-    xr15: "XR15 Voice Remote",
-    rg6_aerial: "RG6 Aerial Spool (1000')",
-    rg6_under: "RG6 Underground (Flooded)",
-    rg11: "RG11 Underground Spool",
-    split_2way: "2-Way Balanced Splitters",
-    split_3way: "3-Way Splitters (Bal/Unbal)",
-    ground_blocks: "Ground Blocks & Dual Tags",
-    drop_hangers: "Drop Hangers (Bag of 50)"
-  };
+  const equipCounts = {};
+
+  function buildEquipCatalogUI() {
+    const container = document.getElementById('equipAccordionContainer');
+    container.innerHTML = '';
+
+    EQUIP_CATALOG.forEach((cat, idx) => {
+      const details = document.createElement('details');
+      details.className = 'equip-cat';
+      if (idx === 0) details.open = true;
+
+      const summary = document.createElement('summary');
+      summary.textContent = cat.category;
+      details.appendChild(summary);
+
+      const body = document.createElement('div');
+      body.className = 'equip-cat-body';
+
+      cat.items.forEach(item => {
+        equipCounts[item.id] = 0;
+        const row = document.createElement('div');
+        row.className = 'equip-item-row';
+        row.innerHTML = `
+          <span class="equip-name">${item.name}</span>
+          <div class="counter-control">
+            <button type="button" class="counter-btn" onclick="adjustCount('${item.id}', -${cat.step})">-</button>
+            <span class="counter-val" id="cnt_${item.id}">0</span>
+            <button type="button" class="counter-btn" onclick="adjustCount('${item.id}', ${cat.step})">+</button>
+          </div>
+        `;
+        body.appendChild(row);
+      });
+
+      details.appendChild(body);
+      container.appendChild(details);
+    });
+  }
+
+  function adjustCount(itemId, delta) {
+    equipCounts[itemId] = Math.max(0, (equipCounts[itemId] || 0) + delta);
+    const el = document.getElementById(`cnt_${itemId}`);
+    if (el) el.textContent = equipCounts[itemId];
+  }
+
+  function submitEquipOrder() {
+    const techName = document.getElementById('equipTechName').value.trim();
+    const techNum = document.getElementById('equipTechNum').value.trim();
+    const pickupLoc = document.getElementById('pickupLocation').value;
+    const notes = document.getElementById('equipNotes').value.trim();
+
+    if (!techName || !techNum) {
+      alert("Please enter Tech Name and Tech Number.");
+      return;
+    }
+
+    let manifestLines = [];
+    EQUIP_CATALOG.forEach(cat => {
+      let catLines = [];
+      cat.items.forEach(item => {
+        if (equipCounts[item.id] > 0) {
+          catLines.push(`  • ${item.name}: ${equipCounts[item.id]}`);
+        }
+      });
+      if (catLines.length > 0) {
+        manifestLines.push(`[${cat.category}]\n` + catLines.join('\n'));
+      }
+    });
+
+    if (manifestLines.length === 0 && !notes) {
+      alert("Please select at least one item quantity or enter items in special request notes.");
+      return;
+    }
+
+    const timestamp = new Date().toLocaleString();
+    const emailSubject = `📦 [WEEKLY GEAR ORDER] Tech ${techNum} (${techName}) | ${pickupLoc}`;
+    const emailBody = `WEEKLY EQUIPMENT ORDER MANIFEST
+Due: By 9:00 AM Monday
+Logged: ${timestamp}
+
+TECHNICIAN:
+• Name: ${techName}
+• Tech ID: ${techNum}
+• Pickup: ${pickupLoc}
+
+ORDERED QUANTITIES:
+${manifestLines.length > 0 ? manifestLines.join('\n\n') : 'No catalog items selected (Custom notes only)'}
+
+SPECIAL REQUEST NOTES:
+${notes ? `"${notes}"` : 'None'}
+
+-- Sent via Prince Telecom Field Suite`;
+
+    dispatchPayload(emailSubject, emailBody, []);
+  }
+
+  function resetEquipOrder() {
+    for (const key in equipCounts) {
+      equipCounts[key] = 0;
+      const el = document.getElementById(`cnt_${key}`);
+      if (el) el.textContent = '0';
+    }
+    document.getElementById('equipNotes').value = '';
+  }
 
   function navigateHome() { switchView('view-dashboard'); }
   function openQCView() { switchView('view-qc'); }
@@ -912,12 +1067,16 @@
     syncTechNum(localStorage.getItem('qc_tech_num') || '');
     syncCity(localStorage.getItem('qc_city') || '');
     syncState(localStorage.getItem('qc_state') || '');
+    
+    const savedName = localStorage.getItem('qc_tech_name') || '';
+    if (savedName) document.getElementById('equipTechName').value = savedName;
 
     window.addEventListener('online', updateNetworkStatus);
     window.addEventListener('offline', updateNetworkStatus);
     updateNetworkStatus();
 
     renderRequiredPhotoGrid();
+    buildEquipCatalogUI();
   });
 
   function updateNetworkStatus() {
@@ -1129,51 +1288,6 @@
 
   function updateRtmExtraCount() {
     document.getElementById('rtmExtraCount').textContent = `(${rtmExtraPhotos.filter(p => p !== null).length})`;
-  }
-
-  /* Equipment Counter Logic */
-  function adjustCount(itemKey, delta) {
-    equipCounts[itemKey] = Math.max(0, (equipCounts[itemKey] || 0) + delta);
-    document.getElementById(`cnt_${itemKey}`).textContent = equipCounts[itemKey];
-  }
-
-  async function submitEquipOrder() {
-    const techNum = document.getElementById('equipTechNum').value.trim();
-    const techName = document.getElementById('equipTechName').value.trim();
-    const pickupLoc = document.getElementById('pickupLocation').value;
-    const notes = document.getElementById('equipNotes').value.trim();
-
-    if (!techNum || !techName) {
-      alert("Please provide Tech Number and Tech Full Name.");
-      return;
-    }
-
-    let orderedItems = [];
-    for (const key in equipCounts) {
-      if (equipCounts[key] > 0) {
-        orderedItems.push(`  • ${equipItemLabels[key]}: ${equipCounts[key]}`);
-      }
-    }
-
-    if (orderedItems.length === 0 && !notes) {
-      alert("Please select at least one item quantity or write a custom request in the notes.");
-      return;
-    }
-
-    const timestamp = new Date().toLocaleString();
-    const emailSubject = `📦 [EQUIPMENT ORDER] Tech ${techNum} (${techName}) | ${pickupLoc}`;
-    const emailBody = `EQUIPMENT RESTOCK MANIFEST\nWarehouse: ${pickupLoc}\nTimestamp: ${timestamp}\n\nTECHNICIAN:\n• Tech ID: ${techNum}\n• Tech Name: ${techName}\n\nREQUESTED ITEMS:\n${orderedItems.length > 0 ? orderedItems.join('\n') : '  (None selected - see notes below)'}\n\nSPECIAL NOTES / CUSTOM HARDWARE:\n"${notes || 'None'}"\n\n-- Dispatched via Prince Field Suite`;
-
-    dispatchPayload(emailSubject, emailBody, []);
-  }
-
-  function resetEquipOrder() {
-    for (const key in equipCounts) {
-      equipCounts[key] = 0;
-      const el = document.getElementById(`cnt_${key}`);
-      if (el) el.textContent = '0';
-    }
-    document.getElementById('equipNotes').value = '';
   }
 
   async function submitQC() {
