@@ -21,6 +21,7 @@
       --success: #22c55e;
       --danger: #ef4444;
       --warning: #f59e0b;
+      --purple: #a855f7;
       --input-bg: #0f172a;
       --input-border: #475569;
     }
@@ -102,7 +103,7 @@
     .hub-grid {
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
       margin-top: 4px;
     }
 
@@ -110,7 +111,7 @@
       background: #111827;
       border: 1.5px solid var(--card-border);
       border-radius: 12px;
-      padding: 20px 16px;
+      padding: 18px 16px;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -124,9 +125,9 @@
     }
 
     .hub-icon-wrap {
-      font-size: 2rem;
-      width: 50px;
-      height: 50px;
+      font-size: 1.8rem;
+      width: 48px;
+      height: 48px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -134,21 +135,11 @@
       background: rgba(59, 130, 246, 0.12);
     }
 
-    .hub-icon-downed {
-      background: rgba(239, 68, 68, 0.15);
-    }
+    .hub-icon-downed { background: rgba(239, 68, 68, 0.15); }
+    .hub-icon-rtm { background: rgba(168, 85, 247, 0.15); }
 
-    .hub-title {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--text);
-    }
-
-    .hub-sub {
-      font-size: 0.82rem;
-      color: var(--text-muted);
-      margin-top: 2px;
-    }
+    .hub-title { font-size: 1.05rem; font-weight: 700; color: var(--text); }
+    .hub-sub { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
 
     .comcast-reminder-box {
       background: rgba(245, 158, 11, 0.08);
@@ -237,22 +228,16 @@
       position: relative;
     }
 
-    .photo-box.has-photo {
-      border-style: solid;
-      border-color: var(--success);
-      background: #064e3b22;
-    }
-
-    .photo-box.downed-photo.has-photo {
-      border-color: var(--danger);
-      background: rgba(239, 68, 68, 0.12);
-    }
+    .photo-box.has-photo { border-style: solid; border-color: var(--success); background: #064e3b22; }
+    .photo-box.downed-photo.has-photo { border-color: var(--danger); background: rgba(239, 68, 68, 0.12); }
+    .photo-box.rtm-photo.has-photo { border-color: var(--purple); background: rgba(168, 85, 247, 0.12); }
 
     .photo-box label { cursor: pointer; font-size: 0.8rem; font-weight: 600; color: var(--text); }
     .photo-box img { max-width: 100%; max-height: 90px; border-radius: 6px; margin-top: 6px; object-fit: cover; }
     .photo-icon { font-size: 1.5rem; margin-bottom: 4px; }
     .badge { font-size: 0.7rem; background: var(--success); color: white; padding: 2px 6px; border-radius: 10px; margin-top: 4px; }
     .badge-downed { background: var(--danger); }
+    .badge-rtm { background: var(--purple); }
     .addr-tag { font-size: 0.65rem; color: #4ade80; margin-top: 4px; font-weight: 600; line-height: 1.2; }
 
     .btn {
@@ -275,6 +260,7 @@
     .btn-secondary { background-color: #334155; color: var(--text); padding: 10px; font-size: 0.9rem; }
     .btn-reset { background-color: #475569; margin-top: 8px; }
     .btn-downed { background-color: var(--danger); margin-top: 8px; }
+    .btn-rtm { background-color: var(--purple); margin-top: 8px; }
     input[type="file"] { display: none; }
 
     .status-msg {
@@ -308,7 +294,7 @@
 <div class="container">
   <div id="offlineBanner" class="offline-banner">⚠️ Working Offline - Jobs Will Auto-Sync When Online</div>
 
-  <!-- SCREEN 1: MAIN MENU (Cleaned - Profile Removed) -->
+  <!-- SCREEN 1: MAIN MENU -->
   <div id="view-dashboard" class="view-screen view-active">
     <div class="header">
       <h2>Prince Telecom Field Suite</h2>
@@ -324,7 +310,7 @@
             <div class="hub-icon-wrap">📋</div>
             <div>
               <div class="hub-title">Comcast Job QC</div>
-              <div class="hub-sub">Required 5-point geotagged photo audit</div>
+              <div class="hub-sub">5-point geotagged installation audit</div>
             </div>
           </div>
           <span style="font-size: 1.2rem; color: var(--text-muted);">❯</span>
@@ -337,6 +323,18 @@
             <div>
               <div class="hub-title" style="color: #f87171;">Downed Job Report</div>
               <div class="hub-sub">Customer not home, referrals & rewires</div>
+            </div>
+          </div>
+          <span style="font-size: 1.2rem; color: var(--text-muted);">❯</span>
+        </div>
+
+        <!-- Choice 3: Refer to Maintenance (RTM) -->
+        <div class="hub-tile" onclick="openRTMView()">
+          <div class="hub-tile-left">
+            <div class="hub-icon-wrap hub-icon-rtm">🔧</div>
+            <div>
+              <div class="hub-title" style="color: #c084fc;">Refer to Maintenance</div>
+              <div class="hub-sub">RTM SA, bucket assists & damaged plant</div>
             </div>
           </div>
           <span style="font-size: 1.2rem; color: var(--text-muted);">❯</span>
@@ -485,7 +483,7 @@
           <span id="badge-downed_curb" style="display:none;" class="badge badge-downed">Stamped ✓</span>
           <div id="addr-downed_curb" class="addr-tag"></div>
           <img id="prev-downed_curb" style="display:none;" />
-          <input type="file" id="input-downed_curb" accept="image/*" onchange="processPhoto(event, 'downed_curb', false, true)">
+          <input type="file" id="input-downed_curb" accept="image/*" onchange="processPhoto(event, 'downed_curb', false, 'downed')">
         </div>
         <div class="photo-box downed-photo" id="box-downed_issue" onclick="triggerCamera('input-downed_issue')">
           <span class="photo-icon">📷</span>
@@ -493,7 +491,7 @@
           <span id="badge-downed_issue" style="display:none;" class="badge badge-downed">Stamped ✓</span>
           <div id="addr-downed_issue" class="addr-tag"></div>
           <img id="prev-downed_issue" style="display:none;" />
-          <input type="file" id="input-downed_issue" accept="image/*" onchange="processPhoto(event, 'downed_issue', false, true)">
+          <input type="file" id="input-downed_issue" accept="image/*" onchange="processPhoto(event, 'downed_issue', false, 'downed')">
         </div>
       </div>
     </div>
@@ -502,6 +500,102 @@
       <div id="downedStatus" class="status-msg"></div>
       <button type="button" class="btn btn-downed" onclick="submitDownedJob()">🚨 Dispatch Downed Job Alert</button>
       <button type="button" class="btn btn-reset" onclick="resetDownedForm()">Clear Downed Form</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 4: REFER TO MAINTENANCE (RTM) -->
+  <div id="view-rtm" class="view-screen">
+    <div class="nav-top-bar">
+      <button type="button" class="btn-back" onclick="navigateHome()">❮ Main Menu</button>
+      <span style="font-size: 0.8rem; font-weight: 700; color: var(--purple);">RTM ESCALATION MODE</span>
+    </div>
+
+    <div class="header">
+      <h2 style="color: var(--purple);">Refer to Maintenance</h2>
+      <p>Report Tap Levels, Plant Damage & Bucket Requests</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Site & Tech Information</div>
+      <div class="form-group">
+        <label for="rtmTechNum">Tech Number *</label>
+        <input type="text" id="rtmTechNum" placeholder="e.g. T-10492" oninput="syncTechNum(this.value)">
+      </div>
+      <div class="form-group">
+        <label for="rtmJobNum">Job Number *</label>
+        <input type="text" id="rtmJobNum" placeholder="e.g. WO-982341">
+      </div>
+      <div class="form-group">
+        <label for="rtmAddress">Street Address *</label>
+        <input type="text" id="rtmAddress" placeholder="e.g. 123 Main St">
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="rtmCity">City *</label>
+          <input type="text" id="rtmCity" placeholder="Hartford" oninput="syncCity(this.value)">
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="rtmState">State *</label>
+          <input type="text" id="rtmState" placeholder="CT" oninput="syncState(this.value)">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Maintenance Request Category</div>
+      <div class="form-group">
+        <label for="rtmReason">Referral Type *</label>
+        <select id="rtmReason">
+          <option value="rtm SA">rtm SA</option>
+          <option value="Bucket truck assist">Bucket truck assist</option>
+          <option value="refer to supervisor for damaged plant that isn't affecting service">refer to supervisor for damaged plant that isn't affecting service</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="rtmNotes">Detailed Issue Description *</label>
+        <textarea id="rtmNotes" placeholder="Describe tap condition, port status, low/high carrier levels, physical plant damage, or ladder limitations..."></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Photo Evidence</div>
+      <div class="photo-grid">
+        <!-- Mandatory Meter Screenshot -->
+        <div class="photo-box rtm-photo" id="box-rtm_levels" onclick="triggerCamera('input-rtm_levels')">
+          <span class="photo-icon">📱</span>
+          <label>1. Meter Levels @ Tap *</label>
+          <span id="badge-rtm_levels" style="display:none;" class="badge badge-rtm">Stamped ✓</span>
+          <div id="addr-rtm_levels" class="addr-tag"></div>
+          <img id="prev-rtm_levels" style="display:none;" />
+          <input type="file" id="input-rtm_levels" accept="image/*" onchange="processPhoto(event, 'rtm_levels', false, 'rtm')">
+        </div>
+
+        <!-- Optional Tap Issue Photo -->
+        <div class="photo-box rtm-photo" id="box-rtm_tap" onclick="triggerCamera('input-rtm_tap')">
+          <span class="photo-icon">📷</span>
+          <label>2. Tap Issue Photo (Optional)</label>
+          <span id="badge-rtm_tap" style="display:none;" class="badge badge-rtm">Stamped ✓</span>
+          <div id="addr-rtm_tap" class="addr-tag"></div>
+          <img id="prev-rtm_tap" style="display:none;" />
+          <input type="file" id="input-rtm_tap" accept="image/*" onchange="processPhoto(event, 'rtm_tap', false, 'rtm')">
+        </div>
+      </div>
+    </div>
+
+    <!-- Optional Extra Photos for RTM -->
+    <div class="card">
+      <div class="card-title">
+        <span>Additional Plant / Span Photos</span>
+        <span id="rtmExtraCount" style="font-size:0.8rem; color:var(--text-muted);">(0)</span>
+      </div>
+      <div class="photo-grid" id="rtmExtraPhotosGrid"></div>
+      <button type="button" class="btn btn-secondary" onclick="addRtmExtraPhotoSlot()" style="margin-top: 12px;">➕ Add Additional RTM Photo</button>
+    </div>
+
+    <div class="card">
+      <div id="rtmStatus" class="status-msg"></div>
+      <button type="button" class="btn btn-rtm" onclick="submitRTMJob()">🔧 Dispatch Maintenance Referral</button>
+      <button type="button" class="btn btn-reset" onclick="resetRTMForm()">Clear RTM Form</button>
     </div>
   </div>
 </div>
@@ -518,7 +612,6 @@
   };
   const SUPERVISOR_EMAIL = "Donald.boughton@princetown.com";
 
-  // Exclusively Comcast QC Schema
   const COMCAST_PHOTO_SCHEMA = [
     { id: "tap", label: "1. Tap w/ Drop Tag & Strand Attachment" },
     { id: "bond", label: "2. Bond Block w/ Tags" },
@@ -530,11 +623,16 @@
   let activeRequiredPhotos = {};
   const extraPhotos = [];
   let extraCounter = 0;
+
   const downedPhotos = { downed_curb: null, downed_issue: null };
+  const rtmPhotos = { rtm_levels: null, rtm_tap: null };
+  const rtmExtraPhotos = [];
+  let rtmExtraCounter = 0;
 
   function navigateHome() { switchView('view-dashboard'); }
   function openQCView() { switchView('view-qc'); }
   function openDownedView() { switchView('view-downed'); }
+  function openRTMView() { switchView('view-rtm'); }
 
   function switchView(targetId) {
     document.querySelectorAll('.view-screen').forEach(el => el.classList.remove('view-active'));
@@ -548,18 +646,21 @@
   function syncTechNum(val) {
     document.getElementById('techNum').value = val;
     document.getElementById('downedTechNum').value = val;
+    document.getElementById('rtmTechNum').value = val;
     localStorage.setItem('qc_tech_num', val);
   }
 
   function syncCity(val) {
     document.getElementById('city').value = val;
     document.getElementById('downedCity').value = val;
+    document.getElementById('rtmCity').value = val;
     localStorage.setItem('qc_city', val);
   }
 
   function syncState(val) {
     document.getElementById('state').value = val;
     document.getElementById('downedState').value = val;
+    document.getElementById('rtmState').value = val;
     localStorage.setItem('qc_state', val);
   }
 
@@ -608,11 +709,12 @@
     if (input) input.click();
   }
 
-  function getAddressFromGPS(isDowned = false) {
+  function getAddressFromGPS(mode = 'qc') {
     return new Promise((resolve) => {
-      const addrId = isDowned ? 'downedAddress' : 'address';
-      const cityId = isDowned ? 'downedCity' : 'city';
-      const stateId = isDowned ? 'downedState' : 'state';
+      let addrId = 'address', cityId = 'city', stateId = 'state';
+      if (mode === 'downed') { addrId = 'downedAddress'; cityId = 'downedCity'; stateId = 'downedState'; }
+      if (mode === 'rtm') { addrId = 'rtmAddress'; cityId = 'rtmCity'; stateId = 'rtmState'; }
+
       const userAddr = document.getElementById(addrId).value.trim();
       const userCity = document.getElementById(cityId).value.trim();
       const userState = document.getElementById(stateId).value.trim();
@@ -644,14 +746,22 @@
     });
   }
 
-  async function processPhoto(event, key, isExtra = false, isDowned = false) {
+  async function processPhoto(event, key, isExtra = false, mode = 'qc') {
     const file = event.target.files[0];
     if (!file) return;
 
-    const locationAddress = await getAddressFromGPS(isDowned);
+    const locationAddress = await getAddressFromGPS(mode);
     const timestamp = new Date().toLocaleString();
-    const techNum = document.getElementById(isDowned ? 'downedTechNum' : 'techNum').value.trim() || 'Tech';
-    const jobNum = document.getElementById(isDowned ? 'downedJobNum' : 'jobNum').value.trim() || 'N/A';
+
+    let techNum = document.getElementById('techNum').value.trim() || 'Tech';
+    let jobNum = document.getElementById('jobNum').value.trim() || 'N/A';
+    if (mode === 'downed') {
+      techNum = document.getElementById('downedTechNum').value.trim() || 'Tech';
+      jobNum = document.getElementById('downedJobNum').value.trim() || 'N/A';
+    } else if (mode === 'rtm') {
+      techNum = document.getElementById('rtmTechNum').value.trim() || 'Tech';
+      jobNum = document.getElementById('rtmJobNum').value.trim() || 'N/A';
+    }
 
     const img = new Image();
     img.src = URL.createObjectURL(file);
@@ -663,12 +773,22 @@
       ctx.drawImage(img, 0, 0);
 
       const barHeight = Math.max(canvas.height * 0.085, 45);
-      ctx.fillStyle = isDowned ? "rgba(185, 28, 28, 0.88)" : "rgba(15, 23, 42, 0.85)";
+      if (mode === 'downed') {
+        ctx.fillStyle = "rgba(185, 28, 28, 0.88)";
+      } else if (mode === 'rtm') {
+        ctx.fillStyle = "rgba(147, 51, 234, 0.88)";
+      } else {
+        ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
+      }
       ctx.fillRect(0, canvas.height - barHeight, canvas.width, barHeight);
 
       ctx.fillStyle = "#ffffff";
       ctx.font = `bold ${Math.max(canvas.height * 0.022, 14)}px sans-serif`;
-      const prefix = isDowned ? "DOWNED JOB" : "COMCAST QC";
+      
+      let prefix = "COMCAST QC";
+      if (mode === 'downed') prefix = "DOWNED JOB";
+      if (mode === 'rtm') prefix = "REFER TO MAINT";
+
       ctx.fillText(`${prefix} | JOB: ${jobNum} | TECH: ${techNum} | ${timestamp}`, 15, canvas.height - (barHeight / 2) - 2);
       ctx.fillText(`LOCATION: ${locationAddress}`, 15, canvas.height - (barHeight / 6));
 
@@ -676,28 +796,27 @@
         const stampedFile = new File([blob], file.name, { type: 'image/jpeg' });
         const stampedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
 
-        if (isDowned) {
+        if (mode === 'downed') {
           downedPhotos[key] = { file: stampedFile, dataUrl: stampedDataUrl };
-          document.getElementById(`prev-${key}`).src = stampedDataUrl;
-          document.getElementById(`prev-${key}`).style.display = 'block';
-          document.getElementById(`badge-${key}`).style.display = 'inline-block';
-          document.getElementById(`addr-${key}`).textContent = locationAddress;
-          document.getElementById(`box-${key}`).classList.add('has-photo');
+        } else if (mode === 'rtm' && !isExtra) {
+          rtmPhotos[key] = { file: stampedFile, dataUrl: stampedDataUrl };
+        } else if (mode === 'rtm' && isExtra) {
+          rtmExtraPhotos[key] = { file: stampedFile, dataUrl: stampedDataUrl };
         } else if (!isExtra) {
           activeRequiredPhotos[key] = { file: stampedFile, dataUrl: stampedDataUrl };
-          document.getElementById(`prev-${key}`).src = stampedDataUrl;
-          document.getElementById(`prev-${key}`).style.display = 'block';
-          document.getElementById(`badge-${key}`).style.display = 'inline-block';
-          document.getElementById(`addr-${key}`).textContent = locationAddress;
-          document.getElementById(`box-${key}`).classList.add('has-photo');
         } else {
           extraPhotos[key] = { file: stampedFile, dataUrl: stampedDataUrl };
-          document.getElementById(`prev-extra-${key}`).src = stampedDataUrl;
-          document.getElementById(`prev-extra-${key}`).style.display = 'block';
-          document.getElementById(`badge-extra-${key}`).style.display = 'inline-block';
-          document.getElementById(`addr-extra-${key}`).textContent = locationAddress;
-          document.getElementById(`box-extra-${key}`).classList.add('has-photo');
         }
+
+        const prevEl = document.getElementById(`prev-${key}`);
+        const badgeEl = document.getElementById(`badge-${key}`);
+        const addrEl = document.getElementById(`addr-${key}`);
+        const boxEl = document.getElementById(`box-${key}`);
+
+        if (prevEl) { prevEl.src = stampedDataUrl; prevEl.style.display = 'block'; }
+        if (badgeEl) badgeEl.style.display = 'inline-block';
+        if (addrEl) addrEl.textContent = locationAddress;
+        if (boxEl) boxEl.classList.add('has-photo');
       }, 'image/jpeg', 0.85);
     };
   }
@@ -718,7 +837,7 @@
       <span id="badge-extra-${id}" style="display:none;" class="badge">Stamped ✓</span>
       <div id="addr-extra-${id}" class="addr-tag"></div>
       <img id="prev-extra-${id}" style="display:none;" />
-      <input type="file" id="input-extra-${id}" accept="image/*" onchange="processPhoto(event, ${id}, true)">
+      <input type="file" id="input-extra-${id}" accept="image/*" onchange="processPhoto(event, ${id}, true, 'qc')">
     `;
     grid.appendChild(box);
     updateExtraCount();
@@ -733,6 +852,39 @@
 
   function updateExtraCount() {
     document.getElementById('extraCount').textContent = `(${extraPhotos.filter(p => p !== null).length})`;
+  }
+
+  function addRtmExtraPhotoSlot() {
+    rtmExtraCounter++;
+    const id = rtmExtraCounter;
+    rtmExtraPhotos[id] = null;
+    const grid = document.getElementById('rtmExtraPhotosGrid');
+    const box = document.createElement('div');
+    box.className = 'photo-box rtm-photo';
+    box.id = `box-rtm-extra-${id}`;
+    box.setAttribute('onclick', `triggerCamera('input-rtm-extra-${id}')`);
+    box.innerHTML = `
+      <span class="remove-btn" onclick="event.stopPropagation(); removeRtmExtraPhoto(${id})">&times;</span>
+      <span class="photo-icon">📷</span>
+      <label>RTM Extra #${id}</label>
+      <span id="badge-rtm-extra-${id}" style="display:none;" class="badge badge-rtm">Stamped ✓</span>
+      <div id="addr-rtm-extra-${id}" class="addr-tag"></div>
+      <img id="prev-rtm-extra-${id}" style="display:none;" />
+      <input type="file" id="input-rtm-extra-${id}" accept="image/*" onchange="processPhoto(event, ${id}, true, 'rtm')">
+    `;
+    grid.appendChild(box);
+    updateRtmExtraCount();
+  }
+
+  function removeRtmExtraPhoto(id) {
+    rtmExtraPhotos[id] = null;
+    const box = document.getElementById(`box-rtm-extra-${id}`);
+    if (box) box.remove();
+    updateRtmExtraCount();
+  }
+
+  function updateRtmExtraCount() {
+    document.getElementById('rtmExtraCount').textContent = `(${rtmExtraPhotos.filter(p => p !== null).length})`;
   }
 
   async function submitQC() {
@@ -810,6 +962,48 @@
     dispatchPayload(emailSubject, emailBody, attachedFiles);
   }
 
+  async function submitRTMJob() {
+    const jobNum = document.getElementById('rtmJobNum').value.trim();
+    const techNum = document.getElementById('rtmTechNum').value.trim();
+    const address = document.getElementById('rtmAddress').value.trim();
+    const city = document.getElementById('rtmCity').value.trim();
+    const state = document.getElementById('rtmState').value.trim();
+    const reason = document.getElementById('rtmReason').value;
+    const notes = document.getElementById('rtmNotes').value.trim();
+
+    if (!jobNum || !techNum || !address || !city || !state) {
+      alert("Please fill in Tech #, Job #, Address, City, and State.");
+      return;
+    }
+    if (!notes) {
+      alert("Please describe the plant issue or reason for maintenance referral.");
+      return;
+    }
+    if (!rtmPhotos.rtm_levels) {
+      alert("Mandatory: Please attach a screenshot of the RF meter levels at the tap.");
+      return;
+    }
+
+    const attachedFiles = [
+      new File([rtmPhotos.rtm_levels.file], `RTM_Tap_Levels_Screenshot_Job_${jobNum}.jpg`, { type: 'image/jpeg' })
+    ];
+
+    if (rtmPhotos.rtm_tap && rtmPhotos.rtm_tap.file) {
+      attachedFiles.push(new File([rtmPhotos.rtm_tap.file], `RTM_Tap_Physical_Issue_Job_${jobNum}.jpg`, { type: 'image/jpeg' }));
+    }
+
+    rtmExtraPhotos.forEach((item, idx) => {
+      if (item && item.file) {
+        attachedFiles.push(new File([item.file], `RTM_Extra_${idx + 1}_Job_${jobNum}.jpg`, { type: 'image/jpeg' }));
+      }
+    });
+
+    const emailSubject = `🔧 [RTM REFERRAL] ${reason.toUpperCase()} | Job #${jobNum} | Tech ${techNum} | ${address}`;
+    const emailBody = `🔧 REFER TO MAINTENANCE (RTM) NOTICE\nCategory: ${reason}\n\nJOB DETAILS:\n• Work Order: ${jobNum}\n• Tech ID: ${techNum}\n• Site Address: ${address}, ${city}, ${state}\n\nISSUE DESCRIPTION & LEVELS:\n"${notes}"\n\nEVIDENCE ATTACHED (${attachedFiles.length} Total):\n✓ Meter Levels at Tap Screenshot (Mandatory)\n${rtmPhotos.rtm_tap ? '✓ Tap Issue Photo (Attached)\n' : ''}${attachedFiles.length > 2 ? `+ Additional Plant Photos (${attachedFiles.length - 2})\n` : ''}\n-- Dispatched via Prince Field Suite`;
+
+    dispatchPayload(emailSubject, emailBody, attachedFiles);
+  }
+
   async function dispatchPayload(subject, body, files) {
     if (navigator.canShare && navigator.canShare({ files: files })) {
       try {
@@ -848,7 +1042,29 @@
       if (box) box.classList.remove('has-photo');
     });
   }
+
+  function resetRTMForm() {
+    document.getElementById('rtmJobNum').value = '';
+    document.getElementById('rtmAddress').value = '';
+    document.getElementById('rtmNotes').value = '';
+    document.getElementById('rtmReason').selectedIndex = 0;
+    rtmPhotos.rtm_levels = null;
+    rtmPhotos.rtm_tap = null;
+    ['rtm_levels', 'rtm_tap'].forEach(k => {
+      const p = document.getElementById(`prev-${k}`);
+      const b = document.getElementById(`badge-${k}`);
+      const a = document.getElementById(`addr-${k}`);
+      const box = document.getElementById(`box-${k}`);
+      if (p) p.style.display = 'none';
+      if (b) b.style.display = 'none';
+      if (a) a.textContent = '';
+      if (box) box.classList.remove('has-photo');
+    });
+    document.getElementById('rtmExtraPhotosGrid').innerHTML = '';
+    rtmExtraPhotos.length = 0;
+    rtmExtraCounter = 0;
+    updateRtmExtraCount();
+  }
 </script>
 </body>
 </html>
-
