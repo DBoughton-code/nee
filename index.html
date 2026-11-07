@@ -243,7 +243,6 @@
       gap: 12px;
     }
 
-    /* Slider-Based Equipment Row */
     .equip-item-row {
       display: flex;
       flex-direction: column;
@@ -285,7 +284,6 @@
       color: #fff;
     }
 
-    /* Range Slider Styling */
     input[type="range"].equip-slider {
       -webkit-appearance: none;
       width: 100%;
@@ -308,6 +306,20 @@
       border: 2px solid #fff;
       box-shadow: 0 0 4px rgba(0,0,0,0.5);
     }
+
+    /* Contacts Tag Box for SMS */
+    .sms-contact-box {
+      background: rgba(20, 184, 166, 0.08);
+      border: 1px solid #14b8a6;
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      font-size: 0.82rem;
+      color: #ccfbf1;
+      line-height: 1.4;
+    }
+
+    .sms-contact-box strong { color: #5eead4; }
 
     .photo-grid {
       display: grid;
@@ -704,7 +716,7 @@
     </div>
   </div>
 
-  <!-- SCREEN 5: WEEKLY EQUIPMENT ORDER (WITH SLIDERS & TEXT OPTION) -->
+  <!-- SCREEN 5: WEEKLY EQUIPMENT ORDER (WITH SLIDERS & 3-NUM SMS GROUP) -->
   <div id="view-equip" class="view-screen">
     <div class="nav-top-bar">
       <button type="button" class="btn-back" onclick="navigateHome()">❮ Main Menu</button>
@@ -713,7 +725,7 @@
 
     <div class="header">
       <h2 style="color: var(--teal);">Weekly Equipment Order</h2>
-      <p>Please Fill Out By 9:00 AM Monday</p>
+      <p>Please Fill Out By 9:00 AM Monday[span_0](start_span)[span_0](end_span)</p>
     </div>
 
     <!-- Tech & Location Details -->
@@ -735,9 +747,18 @@
           <option value="Other must call Ousmane, James, Don to setup">Other must call Ousmane, James, Don to setup</option>
         </select>
       </div>
+
+      <!-- SMS Recipients Default Notice -->
+      <div class="sms-contact-box">
+        📲 <strong>SMS Order Recipients (Defaulted):</strong><br>
+        • Ousmane: (508) 221-2243<br>
+        • James: (302) 679-5985<br>
+        • Don: (774) 635-9784
+      </div>
+
       <div class="form-group">
-        <label for="warehousePhone">Supervisor / Warehouse SMS # (Optional)</label>
-        <input type="tel" id="warehousePhone" placeholder="e.g. 8605551234 (Leave blank to choose in Messages)">
+        <label for="warehousePhone">Additional Phone / Custom Recipient (Optional)</label>
+        <input type="tel" id="warehousePhone" placeholder="Add extra # if needed">
       </div>
     </div>
 
@@ -757,7 +778,7 @@
 
     <div class="card">
       <!-- Direct SMS and Email Buttons -->
-      <button type="button" class="btn btn-sms" onclick="sendEquipText()">📱 Text Order (SMS)</button>
+      <button type="button" class="btn btn-sms" onclick="sendEquipText()">📱 Text Order (Ousmane, James & Don)</button>
       <button type="button" class="btn btn-equip" onclick="submitEquipOrder()">📧 Email / Database Dispatch</button>
       <button type="button" class="btn btn-reset" onclick="resetEquipOrder()">Reset All Quantities</button>
     </div>
@@ -766,6 +787,13 @@
 <script>
   const GOOGLE_FORM_RESPONSE_URL = "https://docs.google.com/forms/d/e/YOUR_FORM_ID_HERE/formResponse";
   const SUPERVISOR_EMAIL = "Donald.boughton@princetown.com";
+
+  // Defaulted SMS recipients: Ousmane, James, and Don
+  const DEFAULT_SMS_NUMBERS = [
+    "5082212243", // Ousmane
+    "3026795985", // James
+    "7746359784"  // Don
+  ];
 
   const COMCAST_PHOTO_SCHEMA = [
     { id: "tap", label: "1. Tap w/ Drop Tag & Strand Attachment" },
@@ -1011,7 +1039,7 @@
     }
   }
 
-  // Compile the text body for both text/SMS and email
+  // Compile the manifest text
   function buildEquipOrderPayload() {
     const techName = document.getElementById('equipTechName').value.trim();
     const techNum = document.getElementById('equipTechNum').value.trim();
@@ -1063,17 +1091,24 @@ ${notes ? `"${notes}"` : 'None'}
     return { subject, body, techNum, techName, pickupLoc };
   }
 
-  // 1. Direct SMS Text Option
+  // 1. Direct SMS Text Option (Defaulted to Ousmane, James, and Don)
   function sendEquipText() {
     const payload = buildEquipOrderPayload();
     if (!payload) return;
 
-    const phone = document.getElementById('warehousePhone').value.trim();
+    const extraPhone = document.getElementById('warehousePhone').value.trim();
+    let recipients = [...DEFAULT_SMS_NUMBERS];
+    if (extraPhone) {
+      recipients.push(extraPhone.replace(/[^0-9]/g, ''));
+    }
+
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    const delim = isIOS ? '&' : '?';
-    const target = phone ? `sms:${phone}${delim}` : `sms:${delim}`;
-    
-    window.location.href = `${target}body=${encodeURIComponent(payload.body)}`;
+    // iOS uses commas for multiple numbers; Android/others use semicolons
+    const numberDelim = isIOS ? ',' : ';';
+    const queryDelim = isIOS ? '&' : '?';
+
+    const numbersString = recipients.join(numberDelim);
+    window.location.href = `sms:${numbersString}${queryDelim}body=${encodeURIComponent(payload.body)}`;
   }
 
   // 2. Email / Standard Dispatch Option
