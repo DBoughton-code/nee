@@ -209,117 +209,6 @@
 
     textarea { resize: vertical; min-height: 70px; }
 
-    details.equip-cat {
-      background: #0f172a;
-      border: 1px solid var(--card-border);
-      border-radius: 8px;
-      margin-bottom: 10px;
-      overflow: hidden;
-    }
-
-    details.equip-cat summary {
-      padding: 12px 14px;
-      font-size: 0.92rem;
-      font-weight: 700;
-      color: #5eead4;
-      cursor: pointer;
-      user-select: none;
-      list-style: none;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    details.equip-cat summary::-webkit-details-marker { display: none; }
-    details.equip-cat summary::after { content: "▼"; font-size: 0.75rem; color: var(--text-muted); }
-    details.equip-cat[open] summary::after { content: "▲"; }
-
-    .equip-cat-body {
-      padding: 8px 12px 14px 12px;
-      border-top: 1px solid var(--card-border);
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .equip-item-row {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid rgba(51, 65, 85, 0.4);
-    }
-
-    .equip-item-row:last-child { border-bottom: none; padding-bottom: 0; }
-
-    .equip-label-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .equip-name {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--text);
-      line-height: 1.2;
-    }
-
-    .counter-val {
-      font-size: 0.95rem;
-      font-weight: 800;
-      color: #5eead4;
-      background: #1e293b;
-      padding: 2px 8px;
-      border-radius: 6px;
-      border: 1px solid var(--card-border);
-      min-width: 20px;
-      text-align: center;
-    }
-
-    .counter-val.is-selected {
-      background: rgba(20, 184, 166, 0.25);
-      border-color: var(--teal);
-      color: #fff;
-    }
-
-    input[type="range"].equip-slider {
-      -webkit-appearance: none;
-      width: 100%;
-      height: 6px;
-      background: #334155;
-      border-radius: 4px;
-      outline: none;
-      padding: 0;
-      margin: 4px 0;
-    }
-
-    input[type="range"].equip-slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: var(--teal);
-      cursor: pointer;
-      border: 2px solid #fff;
-      box-shadow: 0 0 4px rgba(0,0,0,0.5);
-    }
-
-    .sms-contact-box {
-      background: rgba(245, 158, 11, 0.08);
-      border: 1px solid #b45309;
-      border-left: 4px solid var(--warning);
-      border-radius: 8px;
-      padding: 12px;
-      margin-bottom: 12px;
-      font-size: 0.84rem;
-      color: #fef08a;
-      line-height: 1.45;
-    }
-
-    .sms-contact-box strong { color: #fde047; }
-
     .photo-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -374,7 +263,6 @@
     .btn-reset { background-color: #475569; margin-top: 8px; }
     .btn-downed { background-color: var(--danger); margin-top: 8px; }
     .btn-rtm { background-color: var(--purple); margin-top: 8px; }
-    .btn-sms { background-color: #059669; color: #fff; margin-top: 8px; font-weight: 800; }
     input[type="file"] { display: none; }
 
     .status-msg {
@@ -385,8 +273,6 @@
       margin-top: 8px;
       display: none;
     }
-
-    .status-info { background: #075985; color: #e0f2fe; }
 
     .remove-btn {
       position: absolute;
@@ -450,15 +336,16 @@
           <span style="font-size: 1.2rem; color: var(--text-muted);">❯</span>
         </div>
 
-        <div class="hub-tile" onclick="openEquipView()">
+        <!-- Weekly Equipment Order: Launches official Google Form -->
+        <div class="hub-tile" onclick="openGoogleForm()">
           <div class="hub-tile-left">
             <div class="hub-icon-wrap hub-icon-equip">📦</div>
             <div>
               <div class="hub-title" style="color: #2dd4bf;">Weekly Equipment Order</div>
-              <div class="hub-sub">North Haven warehouse, modems, coax & fiber</div>
+              <div class="hub-sub">Open Official Google Form (Due 9 AM Mon)</div>
             </div>
           </div>
-          <span style="font-size: 1.2rem; color: var(--text-muted);">❯</span>
+          <span style="font-size: 1.2rem; color: var(--text-muted);">↗</span>
         </div>
       </div>
     </div>
@@ -712,73 +599,16 @@
       <button type="button" class="btn btn-reset" onclick="resetRTMForm()">Clear RTM Form</button>
     </div>
   </div>
-
-  <!-- SCREEN 5: WEEKLY EQUIPMENT ORDER -->
-  <div id="view-equip" class="view-screen">
-    <div class="nav-top-bar">
-      <button type="button" class="btn-back" onclick="navigateHome()">❮ Main Menu</button>
-    </div>
-
-    <div class="header">
-      <h2 style="color: var(--teal);">Weekly Equipment Order</h2>
-      <p>Please Fill Out By 9:00 AM Monday[span_0](start_span)[span_0](end_span)</p>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Technician & Pickup Point</div>
-      <div class="form-group">
-        <label for="equipTechName">Tech Name *</label>
-        <input type="text" id="equipTechName" placeholder="e.g. Andre Forbes" oninput="localStorage.setItem('qc_tech_name', this.value)">
-      </div>
-      <div class="form-group">
-        <label for="equipTechNum">Tech Number *</label>
-        <input type="text" id="equipTechNum" placeholder="e.g. T-10492" oninput="syncTechNum(this.value)">
-      </div>
-      <div class="form-group">
-        <label for="pickupLocation">Pickup Location *</label>
-        <select id="pickupLocation">
-          <option value="Pick up North haven office after Tuesday">Pick up North haven office after Tuesday</option>
-          <option value="Pickup North Haven after hours box truck">Pickup North Haven after hours box truck</option>
-          <option value="Other must call Ousmane, James, Don to setup">Other must call Ousmane, James, Don to setup</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Material Catalog (Slide to Select)</div>
-      <div id="equipAccordionContainer"></div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Special Request Notes</div>
-      <div class="form-group">
-        <textarea id="equipNotes" placeholder="Additional items, custom lengths, or setup notes..."></textarea>
-      </div>
-    </div>
-
-    <!-- Dispatch Card with Instructions and One-Tap Blank SMS Launcher -->
-    <div class="card">
-      <div class="card-title">Dispatch Equipment Manifest</div>
-      
-      <div class="sms-contact-box">
-        ⚠️ <strong>REQUIRED RECIPIENTS:</strong><br>
-        Messages will open with a blank recipient bar and your order automatically copied.<br><br>
-        <strong>Add all 3 supervisors or select your existing group thread:</strong><br>
-        • Ousmane (508-221-2243)<br>
-        • James (302-679-5985)<br>
-        • Don (774-635-9784)<br><br>
-        <em>Then tap the text field, select <strong>Paste</strong>, and hit Send.</em>
-      </div>
-
-      <button type="button" class="btn btn-sms" onclick="openBlankSmsAndCopy()">📱 Open Text & Copy Order (Paste to All 3)</button>
-      <button type="button" class="btn btn-reset" onclick="resetEquipOrder()">Reset All Quantities</button>
-
-      <div id="equipStatus" class="status-msg"></div>
-    </div>
-  </div>
 </div>
+
 <script>
+  // Direct link to your live Weekly Equipment Order Google Form
+  const GOOGLE_FORM_VIEW_URL = "https://docs.google.com/forms/d/e/1FAIpQLSf5QkuPSaumLkF33HvlreQeTCHY5hV6Q98cswc03EbFiEo0dQ/viewform?usp=header";
   const SUPERVISOR_EMAIL = "Donald.boughton@princetown.com";
+
+  function openGoogleForm() {
+    window.open(GOOGLE_FORM_VIEW_URL, '_blank');
+  }
 
   const COMCAST_PHOTO_SCHEMA = [
     { id: "tap", label: "1. Tap w/ Drop Tag & Strand Attachment" },
@@ -797,329 +627,10 @@
   const rtmExtraPhotos = [];
   let rtmExtraCounter = 0;
 
-  const EQUIP_CATALOG = [
-    {
-      category: "CPE - MODEMS",
-      step: 1,
-      max: 14,
-      items: [
-        { id: "m_xb6", name: "XB6 Modem" },
-        { id: "m_xb7", name: "XB7 Modem" },
-        { id: "m_xb8", name: "XB8 Modem" },
-        { id: "m_xb10", name: "XB10 Modem" },
-        { id: "m_ud4", name: "UD4 Modem" },
-        { id: "m_wifi_ext", name: "WiFi Extender Pro" }
-      ]
-    },
-    {
-      category: "CPE - CABLE BOXES",
-      step: 1,
-      max: 14,
-      items: [
-        { id: "cb_xg1_moto", name: "XG1 MOTO RED" },
-        { id: "cb_xg1_sa", name: "XG1 SA BLUE" },
-        { id: "cb_xg2_moto", name: "XG2 MOTO RED" },
-        { id: "cb_xg2_sa", name: "XG2 SA BLUE" },
-        { id: "cb_xi6", name: "XI6 Wireless Box" },
-        { id: "cb_xumo", name: "XUMO Box" },
-        { id: "cb_xid", name: "XID Box" }
-      ]
-    },
-    {
-      category: "COAX CABLE & SCREW CLIPS",
-      step: 1,
-      max: 5,
-      items: [
-        { id: "cx_rg6_aer", name: "RG6 AERIAL" },
-        { id: "cx_rg11_aer", name: "RG11 AERIAL" },
-        { id: "cx_rg6_ug", name: "RG6 UNDERGROUND" },
-        { id: "cx_rg11_ug", name: "RG11 UNDERGROUND" },
-        { id: "cx_rg6_in_wht", name: "RG6 INHOUSE WHITE" },
-        { id: "cx_rg6_in_blk", name: "RG6 IN HOUSE BLACK" },
-        { id: "sc_rg6_wht", name: "A SCREW CLIPS RG6 WHITE BAG" },
-        { id: "sc_rg6_blk", name: "A SCREW CLIPS RG6 BLACK BAG" },
-        { id: "sc_rg11", name: "A SCREW CLIPS RG11" },
-        { id: "sc_gnd_fib", name: "A SCREW CLIPS GROUND/FIBER" }
-      ]
-    },
-    {
-      category: "CONNECTORS",
-      step: 1,
-      max: 4,
-      items: [
-        { id: "con_in_rg6", name: "INDOOR RG6" },
-        { id: "con_out_rg6", name: "OUTDOOR RG6" },
-        { id: "con_in_59", name: "INDOOR 59" },
-        { id: "con_out_59", name: "OUTDOOR 59" },
-        { id: "con_rg11", name: "RG11 CONNECTORS" },
-        { id: "con_barrels", name: "BARRELS" },
-        { id: "con_term", name: "TERMINATORS" }
-      ]
-    },
-    {
-      category: "GROUND BLOCKS & MOCA",
-      step: 1,
-      max: 4,
-      items: [
-        { id: "gb_no_moca", name: "BOND BLOCKS NO MOCA (BAGS)" },
-        { id: "gb_moca", name: "BOND BLOCKS WITH MOCA (BAGS)" },
-        { id: "moca_filters", name: "MOCA FILTERS (BAGS)" },
-        { id: "gnd_wire", name: "GROUND WIRE" }
-      ]
-    },
-    {
-      category: "GROUND CLAMPS",
-      step: 5,
-      max: 20,
-      items: [
-        { id: "gc_meter", name: "METER CLAMP" },
-        { id: "gc_bronze", name: "GROUND CLAMP BRONZE" },
-        { id: "gc_water_pipe", name: "WATER PIPE ZINC CLAMPS" },
-        { id: "gc_strap_cu", name: "GROUND STRAP 12\" COPPER" },
-        { id: "gc_strap_galv", name: "GROUND STRAP 12\" GALVANIZED" },
-        { id: "gc_beam", name: "BEAM CLAMP" },
-        { id: "gc_split_bolt", name: "SPLIT BOLT" }
-      ]
-    },
-    {
-      category: "SPLITTERS & WALL PLATES",
-      step: 5,
-      max: 20,
-      items: [
-        { id: "sp_2way", name: "2 WAY SPLITTER" },
-        { id: "sp_3way", name: "3 WAY SPLITTER" },
-        { id: "sp_4way", name: "4 WAY SPLITTER" },
-        { id: "sp_8way_moca", name: "8 WAY MOCA SPLITTER" },
-        { id: "wp_white", name: "WALL PLATES WHITE" },
-        { id: "wp_ivory", name: "WALL PLATES IVORY" }
-      ]
-    },
-    {
-      category: "TIE WRAPS & CABLES",
-      step: 2,
-      max: 20,
-      items: [
-        { id: "tw_8in", name: "TIE WRAPS 8 INCH" },
-        { id: "tw_14in", name: "TIE WRAPS 14 INCH" },
-        { id: "cbl_hdmi", name: "HDMI CABLE" },
-        { id: "cbl_phone", name: "PHONE CABLE" },
-        { id: "cbl_network", name: "NETWORK CABLE" }
-      ]
-    },
-    {
-      category: "DROP SUPPLIES",
-      step: 5,
-      max: 20,
-      items: [
-        { id: "ds_hanger", name: "COAX DROP HANGER" },
-        { id: "ds_phook", name: "P HOOKS (HOUSE)" },
-        { id: "ds_jhook", name: "J HOOKS (POLE)" },
-        { id: "ds_droptags", name: "DROP TAGS WHITE" },
-        { id: "ds_spanclamp", name: "SPAN CLAMP" }
-      ]
-    },
-    {
-      category: "OTHER MISC SUPPLIES",
-      step: 1,
-      max: 5,
-      items: [
-        { id: "ot_wht_bush", name: "WHITE BUSHINGS (BAG)" },
-        { id: "ot_blk_bush", name: "BLACK BUSHINGS (BAG)" },
-        { id: "ot_silicone", name: "SILICONE" },
-        { id: "ot_gnd_tags", name: "GROUND TAGS" },
-        { id: "ot_boot_cov", name: "BOOT COVERS" },
-        { id: "ot_house_box", name: "HOUSE BOXS" }
-      ]
-    },
-    {
-      category: "FIBER SUPPLIES",
-      step: 1,
-      max: 10,
-      items: [
-        { id: "fb_onu", name: "ONU" },
-        { id: "fb_xer10", name: "XER 10" },
-        { id: "fb_xb7_tech", name: "XB7 TECHNICOLOR FIBER JOBS" },
-        { id: "fb_house_box", name: "FIBER HOUSE BOX" },
-        { id: "fb_hb_ext", name: "HOUSE BOX EXTENSION 250FT" },
-        { id: "fb_onu_ps", name: "ONU COAX POWER SUPPLY" },
-        { id: "fb_net_wire", name: "NETWORK WIRE (BOX)" },
-        { id: "fb_net_con", name: "NETWORK CONNECTORS BOX" },
-        { id: "fb_clip_gnd", name: "FIBER CLIP GROUND CLIPS" },
-        { id: "fb_drop_hang", name: "FIBER DROP HANGERS BOX" },
-        { id: "fb_screw_clip", name: "FIBER SCREW CLIP BOX" }
-      ]
-    },
-    {
-      category: "FIBER AERIAL DROPS",
-      step: 1,
-      max: 10,
-      items: [
-        { id: "fad_100", name: "100 FT FIBER DROP" },
-        { id: "fad_150", name: "150 FT FIBER DROP" },
-        { id: "fad_200", name: "200 FT FIBER DROP" },
-        { id: "fad_250", name: "250 FT FIBER DROP" },
-        { id: "fad_300", name: "300 FT FIBER DROP" },
-        { id: "fad_350", name: "350 FT FIBER DROP" },
-        { id: "fad_400", name: "400 FT FIBER DROP" },
-        { id: "fad_450", name: "450 FT FIBER DROP" },
-        { id: "fad_500", name: "500 FT FIBER DROP" },
-        { id: "fad_550", name: "550 FT FIBER DROP" },
-        { id: "fad_600", name: "600 FT FIBER DROP" }
-      ]
-    }
-  ];
-
-  const equipCounts = {};
-
-  function buildEquipCatalogUI() {
-    const container = document.getElementById('equipAccordionContainer');
-    container.innerHTML = '';
-
-    EQUIP_CATALOG.forEach((cat, idx) => {
-      const details = document.createElement('details');
-      details.className = 'equip-cat';
-      if (idx === 0) details.open = true;
-
-      const summary = document.createElement('summary');
-      summary.textContent = cat.category;
-      details.appendChild(summary);
-
-      const body = document.createElement('div');
-      body.className = 'equip-cat-body';
-
-      cat.items.forEach(item => {
-        equipCounts[item.id] = 0;
-        const row = document.createElement('div');
-        row.className = 'equip-item-row';
-        row.innerHTML = `
-          <div class="equip-label-bar">
-            <span class="equip-name">${item.name}</span>
-            <span class="counter-val" id="cnt_${item.id}">0</span>
-          </div>
-          <input type="range" class="equip-slider" id="slider_${item.id}"
-            min="0" max="${cat.max}" step="${cat.step}" value="0"
-            oninput="handleSliderChange('${item.id}', this.value)">
-        `;
-        body.appendChild(row);
-      });
-
-      details.appendChild(body);
-      container.appendChild(details);
-    });
-  }
-
-  function handleSliderChange(itemId, val) {
-    const num = parseInt(val, 10);
-    equipCounts[itemId] = num;
-    const badge = document.getElementById(`cnt_${itemId}`);
-    if (badge) {
-      badge.textContent = num;
-      if (num > 0) {
-        badge.classList.add('is-selected');
-      } else {
-        badge.classList.remove('is-selected');
-      }
-    }
-  }
-
-  function buildEquipOrderPayload() {
-    const techName = document.getElementById('equipTechName').value.trim();
-    const techNum = document.getElementById('equipTechNum').value.trim();
-    const pickupLoc = document.getElementById('pickupLocation').value;
-    const notes = document.getElementById('equipNotes').value.trim();
-
-    if (!techName || !techNum) {
-      alert("Please enter Tech Name and Tech Number.");
-      return null;
-    }
-
-    let manifestLines = [];
-    EQUIP_CATALOG.forEach(cat => {
-      let catLines = [];
-      cat.items.forEach(item => {
-        if (equipCounts[item.id] > 0) {
-          catLines.push(`  • ${item.name}: ${equipCounts[item.id]}`);
-        }
-      });
-      if (catLines.length > 0) {
-        manifestLines.push(`[${cat.category}]\n` + catLines.join('\n'));
-      }
-    });
-
-    if (manifestLines.length === 0 && !notes) {
-      alert("Please select at least one item quantity or enter items in special request notes.");
-      return null;
-    }
-
-    const timestamp = new Date().toLocaleString();
-    const body = `WEEKLY EQUIPMENT ORDER\nDue: 9:00 AM Monday\nTime: ${timestamp}\n\nTECHNICIAN:\n• Name: ${techName}\n• Tech ID: ${techNum}\n• Pickup: ${pickupLoc}\n\nORDERED ITEMS:\n${manifestLines.length > 0 ? manifestLines.join('\n\n') : 'Custom notes only'}\n\nNOTES:\n${notes ? `"${notes}"` : 'None'}`;
-
-    return { body };
-  }
-
-  // Copies the full order manifest to clipboard and opens blank SMS compose
-  async function openBlankSmsAndCopy() {
-    const payload = buildEquipOrderPayload();
-    if (!payload) return;
-
-    if (navigator.clipboard && window.isSecureContext) {
-      try {
-        await navigator.clipboard.writeText(payload.body);
-      } catch (err) {
-        fallbackCopyText(payload.body);
-      }
-    } else {
-      fallbackCopyText(payload.body);
-    }
-
-    const statusEl = document.getElementById('equipStatus');
-    if (statusEl) {
-      statusEl.textContent = "✅ Order copied! Messages is opening. Select Ousmane, James, and Don and tap Paste.";
-      statusEl.className = "status-msg status-info";
-      statusEl.style.display = "block";
-    }
-
-    setTimeout(() => {
-      window.location.href = "sms:&body=";
-    }, 450);
-  }
-
-  function fallbackCopyText(textToCopy) {
-    const tempArea = document.createElement("textarea");
-    tempArea.value = textToCopy;
-    tempArea.style.position = "fixed";
-    tempArea.style.left = "-9999px";
-    tempArea.style.top = "0";
-    tempArea.setAttribute("readonly", "");
-    document.body.appendChild(tempArea);
-    tempArea.focus();
-    tempArea.select();
-    tempArea.setSelectionRange(0, 99999);
-    document.execCommand("copy");
-    document.body.removeChild(tempArea);
-  }
-
-  function resetEquipOrder() {
-    for (const key in equipCounts) {
-      equipCounts[key] = 0;
-      const slider = document.getElementById(`slider_${key}`);
-      const badge = document.getElementById(`cnt_${key}`);
-      if (slider) slider.value = 0;
-      if (badge) {
-        badge.textContent = '0';
-        badge.classList.remove('is-selected');
-      }
-    }
-    document.getElementById('equipNotes').value = '';
-    const statusEl = document.getElementById('equipStatus');
-    if (statusEl) statusEl.style.display = 'none';
-  }
-
   function navigateHome() { switchView('view-dashboard'); }
   function openQCView() { switchView('view-qc'); }
   function openDownedView() { switchView('view-downed'); }
   function openRTMView() { switchView('view-rtm'); }
-  function openEquipView() { switchView('view-equip'); }
 
   function switchView(targetId) {
     document.querySelectorAll('.view-screen').forEach(el => el.classList.remove('view-active'));
@@ -1134,7 +645,6 @@
     document.getElementById('techNum').value = val;
     document.getElementById('downedTechNum').value = val;
     document.getElementById('rtmTechNum').value = val;
-    document.getElementById('equipTechNum').value = val;
     localStorage.setItem('qc_tech_num', val);
   }
 
@@ -1156,16 +666,12 @@
     syncTechNum(localStorage.getItem('qc_tech_num') || '');
     syncCity(localStorage.getItem('qc_city') || '');
     syncState(localStorage.getItem('qc_state') || '');
-    
-    const savedName = localStorage.getItem('qc_tech_name') || '';
-    if (savedName) document.getElementById('equipTechName').value = savedName;
 
     window.addEventListener('online', updateNetworkStatus);
     window.addEventListener('offline', updateNetworkStatus);
     updateNetworkStatus();
 
     renderRequiredPhotoGrid();
-    buildEquipCatalogUI();
   });
 
   function updateNetworkStatus() {
