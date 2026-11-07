@@ -1,956 +1,380 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Xfinity Splitter Topology Optimizer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xfinity Splitter Topology Optimizer (No-Cascade Engine)</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            rfDark: {
-              base: '#080d1a',
-              card: '#0f172a',
-              cardSub: '#151f36',
-              input: '#090e1a',
-              border: '#1e293b',
-              accent: '#38bdf8'
-            },
-            oes: {
-              red: '#ef4444',
-              yellow: '#f59e0b',
-              green: '#10b981',
-              blue: '#0284c7'
-            }
-          },
-          fontFamily: {
-            mono: ['JetBrains Mono', 'ui-monospace', 'Menlo', 'monospace'],
-            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif']
-          }
-        }
-      }
-    }
-  </script>
   <style>
-    input[type=number]::-webkit-inner-spin-button, 
-    input[type=number]::-webkit-outer-spin-button { 
-      -webkit-appearance: none; 
-      margin: 0; 
-    }
-    input[type=number] {
-      -moz-appearance: textfield;
-      font-size: 16px;
-    }
-    .touch-btn:active {
-      transform: scale(0.97);
-    }
-    .wire-line {
-      stroke-dasharray: 4;
-      animation: dash 20s linear infinite;
-    }
-    @keyframes dash {
-      to {
-        stroke-dashoffset: -100;
-      }
-    }
+    body { background-color: #0b0f17; color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    .card { background: #131c2e; border: 1px solid #1e293b; border-radius: 12px; }
   </style>
 </head>
-<body class="bg-rfDark-base text-slate-100 font-sans min-h-screen pb-20 selection:bg-sky-400 selection:text-slate-950">
+<body class="p-4 max-w-4xl mx-auto pb-16">
 
-  <!-- ================= TOP STICKY BAR ================= -->
-  <header class="sticky top-0 z-30 bg-rfDark-base/95 backdrop-blur-md border-b border-rfDark-border px-4 py-3 shadow-lg">
-    <div class="max-w-xl mx-auto flex items-center justify-between">
-      <div class="flex items-center gap-2.5">
-        <button onclick="window.location.href='index.html'" class="h-9 w-9 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center hover:bg-slate-700 transition" title="Back to Hub">
-          <svg class="w-5 h-5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
-          </svg>
-        </button>
-        <div>
-          <h1 class="text-xs font-black font-mono tracking-tight text-white flex items-center gap-1.5">
-            XFINITY TOPOLOGY OPTIMIZER
-            <span class="text-[9px] bg-sky-950 text-sky-300 border border-sky-700/80 px-1.5 py-0.5 rounded font-mono font-bold">PHT DOCSIS 3.1</span>
-          </h1>
-          <p class="text-[10px] text-slate-400">Prevent Tx Compression (&gt;48 dBmV) &amp; Rx Falloff</p>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-2">
-        <button id="copyPlanBtn" class="touch-btn px-2.5 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-mono font-bold flex items-center gap-1 shadow-md shadow-sky-500/20 transition">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
-          </svg>
-          <span class="hidden sm:inline">Copy Plan</span>
-          <span class="sm:hidden">Copy</span>
-        </button>
-        <button id="resetBtn" class="touch-btn px-2 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-[11px] font-mono text-slate-300 hover:text-white transition">
-          Reset
-        </button>
-      </div>
+  <!-- Header -->
+  <header class="flex items-center justify-between border-b border-slate-800 pb-4 mb-6">
+    <div>
+      <h1 class="text-xl font-black text-cyan-400 tracking-wider">XFINITY TOPOLOGY OPTIMIZER</h1>
+      <p class="text-xs text-slate-400">Single-Point Demarc Architecture • Zero Cascades</p>
     </div>
+    <span class="px-3 py-1 bg-emerald-950 text-emerald-400 border border-emerald-800 text-xs font-bold rounded-full">MoCA 2.0/2.5 Compliant</span>
   </header>
 
-  <!-- ================= TOAST NOTIFICATION ================= -->
-  <div id="toast" class="fixed top-14 left-1/2 transform -translate-x-1/2 z-50 pointer-events-none opacity-0 transition-all duration-300">
-    <div class="bg-slate-900 border border-sky-400 text-sky-300 px-3.5 py-2 rounded-xl shadow-2xl text-xs font-mono flex items-center gap-2">
-      <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-      <span>Wiring plan copied to clipboard for job notes!</span>
+  <!-- Input Section -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+    <!-- Tap & Drop Controls -->
+    <div class="card p-4">
+      <h2 class="text-sm font-bold text-slate-300 uppercase mb-3 flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-cyan-400"></span> Tap & Drop Input
+      </h2>
+      <div class="grid grid-cols-2 gap-3 mb-3">
+        <div>
+          <label class="text-xs text-slate-400 block mb-1">Tap 1 GHz Rx (dBmV)</label>
+          <input type="number" id="tapDs" value="15.0" step="0.5" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-cyan-300 font-bold text-center" oninput="calculate()">
+        </div>
+        <div>
+          <label class="text-xs text-slate-400 block mb-1">Tap US Tx (dBmV)</label>
+          <input type="number" id="tapTx" value="38.0" step="0.5" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-amber-300 font-bold text-center" oninput="calculate()">
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="text-xs text-slate-400 block mb-1">Drop Cable Type</label>
+          <select id="dropType" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-200 text-sm font-semibold" onchange="calculate()">
+            <option value="rg6">Series 6 (RG6)</option>
+            <option value="rg11">Series 11 (RG11)</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs text-slate-400 block mb-1">Drop Length: <span id="dropLenVal" class="text-cyan-400 font-bold">100</span> ft</label>
+          <input type="range" id="dropLen" min="20" max="300" step="5" value="100" class="w-full accent-cyan-400 cursor-pointer" oninput="updateDropLen(this.value)">
+        </div>
+      </div>
+      <div id="dropAlert" class="hidden mt-2 p-2 bg-red-950/80 border border-red-700 text-red-300 text-xs rounded">
+        ⚠️ <strong>OES Standard Violation:</strong> RG6 cannot exceed 150 ft. Must use RG11/QR-320 for 151'–300'.
+      </div>
+    </div>
+
+    <!-- Home Devices & Inside Wiring -->
+    <div class="card p-4">
+      <h2 class="text-sm font-bold text-slate-300 uppercase mb-3 flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-amber-400"></span> Premise Devices
+      </h2>
+      <div class="grid grid-cols-2 gap-3 mb-3">
+        <div>
+          <label class="text-xs text-slate-400 block mb-1">DOCSIS Gateway (Modem)</label>
+          <input type="text" value="1 Gateway" disabled class="w-full bg-slate-900 border border-slate-800 rounded p-2 text-slate-400 font-bold text-center cursor-not-allowed">
+        </div>
+        <div>
+          <label class="text-xs text-slate-400 block mb-1">TV Outlets / STBs</label>
+          <div class="flex items-center gap-2">
+            <button onclick="adjustTvs(-1)" class="w-8 h-8 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded">-</button>
+            <input type="number" id="tvCount" value="2" min="0" max="7" class="w-full bg-slate-900 border border-slate-700 rounded p-1 text-emerald-300 font-bold text-center" readonly>
+            <button onclick="adjustTvs(1)" class="w-8 h-8 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded">+</button>
+          </div>
+        </div>
+      </div>
+      <div>
+        <label class="text-xs text-slate-400 block mb-1">Avg Inside Cable Run: <span id="insideLenVal" class="text-amber-400 font-bold">50</span> ft</label>
+        <input type="range" id="insideLen" min="15" max="150" step="5" value="50" class="w-full accent-amber-400 cursor-pointer" oninput="updateInsideLen(this.value)">
+      </div>
     </div>
   </div>
 
-  <main class="max-w-xl mx-auto px-3.5 pt-3.5 space-y-3.5">
+  <!-- Recommended Topology Banner -->
+  <div id="recCard" class="card p-5 mb-6 border-cyan-500/50 bg-gradient-to-r from-cyan-950/40 to-slate-900">
+    <div class="flex items-center justify-between mb-2">
+      <span class="text-xs font-black tracking-widest text-cyan-400 uppercase bg-cyan-950 px-2 py-0.5 rounded border border-cyan-800">Field Recommended Architecture</span>
+      <span id="phtStatus" class="text-xs font-bold px-2 py-0.5 rounded bg-emerald-950 border border-emerald-700 text-emerald-300">PHT PASSING</span>
+    </div>
+    <h3 id="recTitle" class="text-lg font-bold text-white mb-1">Evaluating...</h3>
+    <p id="recDesc" class="text-xs text-slate-300 mb-4">Clean single-point demarc design protects return levels and MoCA throughput.</p>
 
-    <!-- ================= PRESET SELECTOR ================= -->
-    <section class="bg-rfDark-card border border-rfDark-border rounded-2xl p-3 shadow-md">
-      <div class="flex items-center justify-between mb-2">
-        <span class="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider">Quick Device Setup</span>
-        <span class="text-[9px] font-mono text-sky-400">1 Gateway + Up to 4 STBs</span>
+    <!-- Telemetry Badges -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+      <div class="bg-slate-900/80 p-2.5 rounded border border-slate-800">
+        <span class="text-[10px] text-slate-400 block uppercase font-semibold">Modem 1 GHz Rx</span>
+        <span id="modemRx" class="text-lg font-black text-cyan-400">0.0 dBmV</span>
+        <span class="text-[10px] text-slate-500 block">Target: 0.0 (-8 to +8)</span>
       </div>
-      <div class="grid grid-cols-4 gap-1.5">
-        <button type="button" class="preset-btn touch-btn py-1.5 px-1 rounded-xl border border-rfDark-border bg-rfDark-input text-center text-xs font-mono transition" data-tvs="1">
-          <div class="font-bold text-white text-[11px]">1 Modem</div>
-          <div class="text-[9px] text-slate-400">+ 1 TV</div>
-        </button>
-        <button type="button" class="preset-btn touch-btn py-1.5 px-1 rounded-xl border border-sky-500 bg-sky-950/60 text-center text-xs font-mono font-bold text-sky-300 transition" data-tvs="2">
-          <div class="font-bold text-white text-[11px]">1 Modem</div>
-          <div class="text-[9px] text-sky-300">+ 2 TVs</div>
-        </button>
-        <button type="button" class="preset-btn touch-btn py-1.5 px-1 rounded-xl border border-rfDark-border bg-rfDark-input text-center text-xs font-mono transition" data-tvs="3">
-          <div class="font-bold text-white text-[11px]">1 Modem</div>
-          <div class="text-[9px] text-slate-400">+ 3 TVs</div>
-        </button>
-        <button type="button" class="preset-btn touch-btn py-1.5 px-1 rounded-xl border border-rfDark-border bg-rfDark-input text-center text-xs font-mono transition" data-tvs="4">
-          <div class="font-bold text-white text-[11px]">1 Modem</div>
-          <div class="text-[9px] text-slate-400">+ 4 TVs</div>
-        </button>
+      <div class="bg-slate-900/80 p-2.5 rounded border border-slate-800">
+        <span class="text-[10px] text-slate-400 block uppercase font-semibold">Modem US Tx</span>
+        <span id="modemTx" class="text-lg font-black text-emerald-400">0.0 dBmV</span>
+        <span class="text-[10px] text-slate-500 block">Ceiling: 48.0 dBmV</span>
       </div>
-    </section>
-
-    <!-- ================= 150FT RG6 OES VIOLATION WARNING ================= -->
-    <div id="oesDistanceAlert" class="hidden rounded-xl border border-rose-500/80 bg-rose-950/80 p-3 shadow-lg flex items-start gap-2.5">
-      <div class="text-rose-400 pt-0.5">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+      <div class="bg-slate-900/80 p-2.5 rounded border border-slate-800">
+        <span class="text-[10px] text-slate-400 block uppercase font-semibold">STB 1 GHz Rx</span>
+        <span id="stbRx" class="text-lg font-black text-cyan-400">0.0 dBmV</span>
+        <span class="text-[10px] text-slate-500 block">Safe: -8 to +8</span>
       </div>
-      <div>
-        <h4 class="text-xs font-mono font-bold text-rose-200 uppercase tracking-wide">OES Drop Standard Violation</h4>
-        <p class="text-[11px] text-rose-300 mt-0.5 leading-snug">
-          Drop length exceeds 150 ft on Series 6. OES mandates <strong>Series 11 or QR-320</strong> for spans of 151' to 300' to preserve downstream SNR and avoid high-frequency roll-off.
-        </p>
+      <div class="bg-slate-900/80 p-2.5 rounded border border-slate-800">
+        <span class="text-[10px] text-slate-400 block uppercase font-semibold">Max System Tilt</span>
+        <span id="cableTilt" class="text-lg font-black text-indigo-400">0.0 dB</span>
+        <span class="text-[10px] text-slate-500 block">Limit: &le; 8.0 dB</span>
       </div>
     </div>
+  </div>
 
-    <!-- ================= TOP WINNER RECOMMENDATION ================= -->
-    <section id="winnerCard" class="bg-gradient-to-b from-slate-900 to-rfDark-card border-2 border-emerald-500 rounded-2xl p-4 shadow-2xl relative overflow-hidden transition-all duration-300">
-      
-      <div class="flex items-center justify-between pb-2.5 border-b border-rfDark-border mb-3">
-        <div class="flex items-center gap-2">
-          <span class="flex h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span class="text-[10px] font-mono font-black text-emerald-400 uppercase tracking-wider">RECOMMENDED BEST TOPOLOGY</span>
-        </div>
-        <span id="winnerBadge" class="text-[10px] font-mono font-black px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-700">
-          PHT CERTIFIED PASS
-        </span>
-      </div>
+  <!-- Single-Point Options Comparison -->
+  <div class="card p-4 mb-6">
+    <div class="flex items-center justify-between mb-3">
+      <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Demarc Topology Evaluation</h3>
+      <span class="text-[11px] text-slate-500">Ranked by lowest return penalty</span>
+    </div>
+    <div id="topologiesList" class="space-y-2"></div>
+  </div>
 
-      <!-- Winner Headline -->
-      <div class="mb-3">
-        <h2 id="winnerTitle" class="text-base font-mono font-black text-white flex items-center gap-1.5">
-          Asymmetrical 3-Way (Hot Leg to Gateway)
-        </h2>
-        <p id="winnerDescription" class="text-[11px] text-slate-300 mt-1 leading-snug">
-          Protects modem return transmit from exceeding safe ceiling, while keeping all TV set-top boxes comfortably within the -8.0 to +8.0 dBmV window.
-        </p>
-      </div>
+  <!-- MoCA & Craftsmanship Warning Notice -->
+  <div class="p-3 bg-amber-950/30 border border-amber-800/60 rounded-xl text-xs text-amber-200/90 mb-6 flex items-start gap-2">
+    <span class="text-base">🛡️</span>
+    <div>
+      <strong>OES & MoCA Standard:</strong> Never daisy-chain or cascade splitters inside the house box. Cascading causes high port-to-port MoCA isolation loss, creates impedance reflections, and drives return transmit power into warning levels (> 48.0 dBmV). Always run home-runs to a single approved splitter and terminate all unused ports with 75Ω locking terminators.
+    </div>
+  </div>
 
-      <!-- Quick Metrics Grid -->
-      <div class="grid grid-cols-2 gap-2 mb-3">
-        <!-- Modem Telemetry -->
-        <div class="bg-rfDark-input border border-rfDark-border rounded-xl p-2.5">
-          <div class="flex justify-between items-center mb-0.5">
-            <span class="text-[9px] font-mono font-bold text-sky-400 uppercase">GATEWAY MODEM</span>
-            <span id="winnerModemPht" class="text-[8px] font-mono font-bold px-1 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">OPTIMAL</span>
-          </div>
-          <div class="flex items-baseline justify-between">
-            <div class="text-sm font-mono font-black text-white">
-              <span id="winnerModemRx">+1.0</span> <span class="text-[9px] font-normal text-slate-400">dBmV Rx</span>
-            </div>
-            <div class="text-sm font-mono font-black text-emerald-300">
-              <span id="winnerModemTx">44.0</span> <span class="text-[9px] font-normal text-slate-400">dBmV Tx</span>
-            </div>
-          </div>
-          <div class="w-full bg-slate-800 h-1 rounded-full mt-2 overflow-hidden">
-            <div id="winnerModemBar" class="h-full bg-emerald-400" style="width: 53%;"></div>
-          </div>
-        </div>
+  <!-- Copy Button -->
+  <button onclick="copyJobNote()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-black py-3 rounded-xl transition duration-150 flex items-center justify-center gap-2">
+    📋 Copy Wiring Plan to Job Notes
+  </button>
+  <div id="copyToast" class="hidden text-center text-xs text-emerald-400 mt-2 font-bold">✓ Copied summary to clipboard!</div>
 
-        <!-- TV Worst-Case Telemetry -->
-        <div class="bg-rfDark-input border border-rfDark-border rounded-xl p-2.5">
-          <div class="flex justify-between items-center mb-0.5">
-            <span class="text-[9px] font-mono font-bold text-amber-400 uppercase">WORST-CASE TV</span>
-            <span id="winnerTvPht" class="text-[8px] font-mono font-bold px-1 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">SAFE</span>
-          </div>
-          <div class="flex items-baseline justify-between">
-            <div class="text-sm font-mono font-black text-white">
-              <span id="winnerTvRx">-2.5</span> <span class="text-[9px] font-normal text-slate-400">dBmV Rx</span>
-            </div>
-            <div class="text-sm font-mono font-black text-sky-300">
-              <span id="winnerTvTx">47.5</span> <span class="text-[9px] font-normal text-slate-400">dBmV Tx</span>
-            </div>
-          </div>
-          <div class="text-[9px] font-mono text-slate-400 mt-1">
-            Worst Drop: <span id="worstTvName" class="text-slate-200">Basement (75')</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Interactive SVG Schematic Diagram -->
-      <div class="bg-rfDark-input border border-rfDark-border/90 rounded-xl p-3">
-        <div class="flex justify-between items-center mb-2">
-          <span class="text-[9px] font-mono font-bold uppercase tracking-wider text-slate-400">PHYSICAL WIRING SCHEMATIC &amp; PORT ASSIGNMENT</span>
-          <span id="schematicLabel" class="text-[9px] font-mono text-sky-400 font-bold">Unbalanced 3-Way</span>
-        </div>
-
-        <div id="schematicContainer" class="w-full flex justify-center py-1">
-          <!-- Rendered via JS -->
-        </div>
-
-        <div id="portInstructions" class="mt-2 text-[10px] font-mono text-slate-300 bg-slate-900/80 p-2 rounded-lg border border-slate-800 leading-snug">
-          <!-- Populated via JS -->
-        </div>
-      </div>
-
-    </section>
-
-    <!-- ================= TOPOLOGY COMPARISON MATRIX ================= -->
-    <section class="bg-rfDark-card border border-rfDark-border rounded-2xl p-4 shadow-lg space-y-3">
-      <div class="flex justify-between items-center">
-        <h3 class="text-xs font-mono font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
-          <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-          Topology Architecture Shootout
-        </h3>
-        <span class="text-[9px] font-mono text-slate-400">Target Rx: 0.0 | Max Tx: 48.0</span>
-      </div>
-
-      <div id="topologyCardsContainer" class="space-y-2">
-        <!-- Rendered dynamically -->
-      </div>
-    </section>
-
-    <!-- ================= PARAMETER ADJUSTMENTS ACCORDION ================= -->
-    <section class="bg-rfDark-card border border-rfDark-border rounded-2xl p-4 shadow-lg space-y-4">
-      
-      <!-- 1. TAP RF LEVELS -->
-      <div>
-        <label class="text-[11px] font-mono font-bold text-slate-300 uppercase tracking-wider block mb-2">
-          1. Starting Tap Levels
-        </label>
-        <div class="grid grid-cols-2 gap-2">
-          <div class="bg-rfDark-input border border-rfDark-border rounded-xl p-2.5">
-            <span class="text-[9px] font-mono text-sky-400 font-bold block mb-1">Tap Downstream (1 GHz Rx)</span>
-            <div class="flex items-center gap-1">
-              <button type="button" class="touch-btn h-8 w-8 rounded bg-slate-800 text-slate-200 font-bold text-sm" onclick="adjustTap('rx', -1)">-</button>
-              <input type="number" id="tapRxInput" step="0.5" value="15.0" class="w-full bg-transparent text-center font-mono font-black text-white text-sm focus:outline-none">
-              <button type="button" class="touch-btn h-8 w-8 rounded bg-slate-800 text-slate-200 font-bold text-sm" onclick="adjustTap('rx', 1)">+</button>
-            </div>
-            <span class="text-[8px] font-mono text-slate-500 block text-center mt-1">Typical: +10.0 to +18.0 dBmV</span>
-          </div>
-
-          <div class="bg-rfDark-input border border-rfDark-border rounded-xl p-2.5">
-            <span class="text-[9px] font-mono text-emerald-400 font-bold block mb-1">Tap Upstream (55 MHz Tx)</span>
-            <div class="flex items-center gap-1">
-              <button type="button" class="touch-btn h-8 w-8 rounded bg-slate-800 text-slate-200 font-bold text-sm" onclick="adjustTap('tx', -1)">-</button>
-              <input type="number" id="tapTxInput" step="0.5" value="38.0" class="w-full bg-transparent text-center font-mono font-black text-white text-sm focus:outline-none">
-              <button type="button" class="touch-btn h-8 w-8 rounded bg-slate-800 text-slate-200 font-bold text-sm" onclick="adjustTap('tx', 1)">+</button>
-            </div>
-            <span class="text-[8px] font-mono text-slate-500 block text-center mt-1">Typical: 35.0 to 40.0 dBmV</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- 2. DROP CABLE & LENGTH -->
-      <div class="border-t border-rfDark-border/80 pt-3">
-        <div class="flex justify-between items-center mb-2">
-          <label class="text-[11px] font-mono font-bold text-slate-300 uppercase tracking-wider">
-            2. Drop Cable Sizing
-          </label>
-          <span id="dropLossDisplay" class="text-[10px] font-mono text-sky-300">1G: -6.0 dB | 55M: -1.6 dB</span>
-        </div>
-
-        <div class="grid grid-cols-2 gap-2 mb-2">
-          <button type="button" id="typeRg6Btn" class="touch-btn py-2 px-3 rounded-xl border border-sky-400 bg-sky-950/60 text-xs font-mono font-bold text-white transition flex justify-between items-center">
-            <span>Series 6 (RG6)</span>
-            <span class="text-[9px] text-sky-400 font-normal">&le; 150'</span>
-          </button>
-          <button type="button" id="typeRg11Btn" class="touch-btn py-2 px-3 rounded-xl border border-rfDark-border bg-rfDark-input text-xs font-mono font-bold text-slate-400 transition flex justify-between items-center">
-            <span>Series 11 (RG11)</span>
-            <span class="text-[9px] text-slate-500 font-normal">151' - 300'</span>
-          </button>
-        </div>
-
-        <div class="bg-rfDark-input border border-rfDark-border rounded-xl p-2.5">
-          <div class="flex justify-between items-center mb-1 text-xs font-mono">
-            <span class="text-slate-400">Drop Distance:</span>
-            <div class="flex items-center gap-1.5 font-bold text-white">
-              <span id="dropLenDisplay" class="text-base text-sky-400">100</span>
-              <span class="text-xs text-slate-400">ft</span>
-            </div>
-          </div>
-          <input type="range" id="dropRange" min="10" max="300" step="10" value="100" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-sky-400">
-        </div>
-      </div>
-
-      <!-- 3. CONNECTED DEVICES & INSIDE FOOTAGE -->
-      <div class="border-t border-rfDark-border/80 pt-3">
-        <div class="flex justify-between items-center mb-2">
-          <label class="text-[11px] font-mono font-bold text-slate-300 uppercase tracking-wider">
-            3. Inside Cable Footages (RG6 ~3 dB / 50')
-          </label>
-          <span class="text-[9px] font-mono text-slate-400">Adjust per room run</span>
-        </div>
-
-        <div class="space-y-2">
-          <!-- Gateway Modem Run -->
-          <div class="bg-rfDark-input border border-sky-800/80 rounded-xl p-2.5 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <div class="w-2.5 h-2.5 rounded-full bg-sky-400"></div>
-              <div>
-                <span class="text-xs font-mono font-bold text-white block">DOCSIS 3.1 Gateway</span>
-                <span class="text-[9px] font-mono text-slate-400">Primary Internet Outlet</span>
-              </div>
-            </div>
-            <div class="flex items-center gap-1.5 font-mono">
-              <input type="number" id="modemLenInput" value="50" min="5" max="250" class="w-16 bg-slate-900 border border-slate-700 rounded px-2 py-1 text-center text-xs font-bold text-sky-300">
-              <span class="text-xs text-slate-400">ft</span>
-            </div>
-          </div>
-
-          <!-- TV Set-Top Boxes Container -->
-          <div id="tvRunsContainer" class="space-y-2">
-            <!-- Dynamic TV items rendered via JS -->
-          </div>
-        </div>
-      </div>
-
-    </section>
-
-    <!-- ================= RULES CHEAT SHEET ================= -->
-    <footer class="bg-rfDark-card/50 border border-rfDark-border/60 rounded-xl p-3 text-[10px] font-mono text-slate-400 space-y-1">
-      <div class="font-bold text-slate-300">OES Splitter Topology Rules:</div>
-      <div>&bull; <strong>Modem Priority:</strong> Dedicate direct leg or lowest loss port to modem to prevent Tx &gt; 48 dBmV.</div>
-      <div>&bull; <strong>Cascading Rule:</strong> When cascading, place Modem on 1st 2-way leg (-4.5 dB), and TVs on secondary leg.</div>
-      <div>&bull; <strong>Passive Limits:</strong> 2-Way (-4.5dB) &bull; 3-Way Hot (-5.0dB) / Weak (-8.5dB) &bull; 4-Way (-7.0dB).</div>
-    </footer>
-
-  </main>
-
-  <!-- ================= APPLICATION ENGINE ================= -->
   <script>
-    const state = {
-      tapRx: 15.0,
-      tapTx: 38.0,
-      cableType: 'rg6',
-      dropLen: 100,
-      modemLen: 50,
-      tvCount: 2,
-      tvRuns: [
-        { name: 'Living Room TV', len: 25 },
-        { name: 'Master Bed TV', len: 45 },
-        { name: 'Guest Room TV', len: 60 },
-        { name: 'Basement TV', len: 75 }
-      ]
-    };
+    function updateDropLen(val) {
+      document.getElementById('dropLenVal').innerText = val;
+      calculate();
+    }
 
-    const tapRxInput = document.getElementById('tapRxInput');
-    const tapTxInput = document.getElementById('tapTxInput');
-    const dropRange = document.getElementById('dropRange');
-    const dropLenDisplay = document.getElementById('dropLenDisplay');
-    const dropLossDisplay = document.getElementById('dropLossDisplay');
-    const oesDistanceAlert = document.getElementById('oesDistanceAlert');
-    const typeRg6Btn = document.getElementById('typeRg6Btn');
-    const typeRg11Btn = document.getElementById('typeRg11Btn');
-    const modemLenInput = document.getElementById('modemLenInput');
-    const tvRunsContainer = document.getElementById('tvRunsContainer');
-    const topologyCardsContainer = document.getElementById('topologyCardsContainer');
-    const presetBtns = document.querySelectorAll('.preset-btn');
+    function updateInsideLen(val) {
+      document.getElementById('insideLenVal').innerText = val;
+      calculate();
+    }
 
-    const winnerCard = document.getElementById('winnerCard');
-    const winnerBadge = document.getElementById('winnerBadge');
-    const winnerTitle = document.getElementById('winnerTitle');
-    const winnerDescription = document.getElementById('winnerDescription');
-    const winnerModemRx = document.getElementById('winnerModemRx');
-    const winnerModemTx = document.getElementById('winnerModemTx');
-    const winnerModemPht = document.getElementById('winnerModemPht');
-    const winnerModemBar = document.getElementById('winnerModemBar');
-    const winnerTvRx = document.getElementById('winnerTvRx');
-    const winnerTvTx = document.getElementById('winnerTvTx');
-    const winnerTvPht = document.getElementById('winnerTvPht');
-    const worstTvName = document.getElementById('worstTvName');
-    const schematicLabel = document.getElementById('schematicLabel');
-    const schematicContainer = document.getElementById('schematicContainer');
-    const portInstructions = document.getElementById('portInstructions');
+    function adjustTvs(delta) {
+      const el = document.getElementById('tvCount');
+      let val = parseInt(el.value, 10) + delta;
+      if (val < 0) val = 0;
+      if (val > 7) val = 7;
+      el.value = val;
+      calculate();
+    }
 
-    window.adjustTap = function(key, delta) {
-      if (key === 'rx') {
-        state.tapRx = Number((state.tapRx + delta).toFixed(1));
-        tapRxInput.value = state.tapRx.toFixed(1);
+    function calculate() {
+      const tapDs = parseFloat(document.getElementById('tapDs').value) || 0;
+      const tapTx = parseFloat(document.getElementById('tapTx').value) || 0;
+      const dropType = document.getElementById('dropType').value;
+      const dropLen = parseFloat(document.getElementById('dropLen').value);
+      const insideLen = parseFloat(document.getElementById('insideLen').value);
+      const tvs = parseInt(document.getElementById('tvCount').value, 10);
+
+      // OES Rule: Series 6 max 150 ft
+      const dropAlert = document.getElementById('dropAlert');
+      if (dropType === 'rg6' && dropLen > 150) {
+        dropAlert.classList.remove('hidden');
       } else {
-        state.tapTx = Number((state.tapTx + delta).toFixed(1));
-        tapTxInput.value = state.tapTx.toFixed(1);
-      }
-      runOptimizer();
-    };
-
-    function renderTvInputs() {
-      tvRunsContainer.innerHTML = '';
-      for (let i = 0; i < state.tvCount; i++) {
-        const tv = state.tvRuns[i];
-        const row = document.createElement('div');
-        row.className = 'bg-rfDark-input border border-rfDark-border rounded-xl p-2.5 flex items-center justify-between';
-        row.innerHTML = `
-          <div class="flex items-center gap-2">
-            <div class="w-2.5 h-2.5 rounded-full bg-slate-500"></div>
-            <div>
-              <span class="text-xs font-mono font-bold text-slate-200 block">${tv.name}</span>
-              <span class="text-[9px] font-mono text-slate-400">STB Outlet #${i + 1}</span>
-            </div>
-          </div>
-          <div class="flex items-center gap-1.5 font-mono">
-            <input type="number" min="5" max="250" value="${tv.len}" data-index="${i}" class="tv-len-input w-16 bg-slate-900 border border-slate-700 rounded px-2 py-1 text-center text-xs font-bold text-slate-300">
-            <span class="text-xs text-slate-400">ft</span>
-          </div>
-        `;
-        tvRunsContainer.appendChild(row);
+        dropAlert.classList.add('hidden');
       }
 
-      document.querySelectorAll('.tv-len-input').forEach(input => {
-        input.addEventListener('input', (e) => {
-          const idx = parseInt(e.target.dataset.index, 10);
-          state.tvRuns[idx].len = parseInt(e.target.value, 10) || 10;
-          runOptimizer();
+      // Attenuation Rates
+      const dropDsRate = dropType === 'rg6' ? 0.060 : 0.038; // per ft at 1 GHz
+      const dropUsRate = dropType === 'rg6' ? 0.016 : 0.010; // per ft at 55 MHz
+      const insideDsRate = 0.060; // 3.0 dB / 50 ft
+      const insideUsRate = 0.015;
+
+      const dropLossDs = dropLen * dropDsRate;
+      const dropLossUs = dropLen * dropUsRate;
+      const insideLossDs = insideLen * insideDsRate;
+      const insideLossUs = insideLen * insideUsRate;
+
+      const totalOutlets = tvs + 1; // 1 gateway + TVs
+
+      // Candidate Topologies (All Single-Demarc Options)
+      const candidates = [];
+
+      if (totalOutlets === 1) {
+        candidates.push({
+          name: "Direct Barrel (0 dB Insertion Loss)",
+          desc: "Dedicated drop-to-modem home-run through PoE ground block. Zero passive split loss.",
+          modemLossDs: 0.0,
+          modemLossUs: 0.0,
+          stbLossDs: 0.0,
+          portsNeeded: 1,
+          isCascade: false
         });
-      });
-    }
-
-    function getDropLosses() {
-      const dropHighRate = (state.cableType === 'rg6') ? 0.060 : 0.038;
-      const dropLowRate = (state.cableType === 'rg6') ? 0.016 : 0.010;
-      return {
-        high: Number((state.dropLen * dropHighRate).toFixed(1)),
-        low: Number((state.dropLen * dropLowRate).toFixed(1))
-      };
-    }
-
-    function getInsideLosses(feet) {
-      return {
-        high: Number((feet * 0.060).toFixed(1)),
-        low: Number((feet * 0.016).toFixed(1))
-      };
-    }
-
-    function evaluateTopology(id, title, desc, splitConfig, schematicType) {
-      const dropLoss = getDropLosses();
-      const modemInside = getInsideLosses(state.modemLen);
-
-      const modemDsLoss = Number((dropLoss.high + splitConfig.modemSplitLoss + modemInside.high).toFixed(1));
-      const modemUsLoss = Number((dropLoss.low + splitConfig.modemSplitLoss + modemInside.low).toFixed(1));
-      const modemRx = Number((state.tapRx - modemDsLoss).toFixed(1));
-      const modemTx = Number((state.tapTx + modemUsLoss).toFixed(1));
-
-      const tvResults = [];
-      for (let i = 0; i < state.tvCount; i++) {
-        const tv = state.tvRuns[i];
-        const tvInside = getInsideLosses(tv.len);
-        const tvPortLoss = (typeof splitConfig.tvSplitLoss === 'function') 
-          ? splitConfig.tvSplitLoss(i) 
-          : splitConfig.tvSplitLoss;
-
-        const tvDsLoss = Number((dropLoss.high + tvPortLoss + tvInside.high).toFixed(1));
-        const tvUsLoss = Number((dropLoss.low + tvPortLoss + tvInside.low).toFixed(1));
-        const tvRx = Number((state.tapRx - tvDsLoss).toFixed(1));
-        const tvTx = Number((state.tapTx + tvUsLoss).toFixed(1));
-
-        tvResults.push({
-          name: tv.name,
-          len: tv.len,
-          rx: tvRx,
-          tx: tvTx,
-          portLoss: tvPortLoss
+      } else if (totalOutlets === 2) {
+        candidates.push({
+          name: "Single Balanced 2-Way Splitter (-4.5 dB)",
+          desc: "Port 1: DOCSIS Gateway | Port 2: TV STB. Perfectly balanced downstream & return.",
+          modemLossDs: 4.5,
+          modemLossUs: 4.5,
+          stbLossDs: 4.5,
+          portsNeeded: 2,
+          isCascade: false
+        });
+      } else if (totalOutlets === 3) {
+        candidates.push({
+          name: "Unbalanced 3-Way (Gateway on Hot Leg)",
+          desc: "-5.0 dB port to Gateway (protects return Tx); -8.5 dB ports to STBs.",
+          modemLossDs: 5.0,
+          modemLossUs: 5.0,
+          stbLossDs: 8.5,
+          portsNeeded: 3,
+          isCascade: false
+        });
+        candidates.push({
+          name: "Balanced 4-Way (1 Port Terminated)",
+          desc: "All active ports -7.0 dB loss. 4th unused port must be terminated with 75Ω.",
+          modemLossDs: 7.0,
+          modemLossUs: 7.0,
+          stbLossDs: 7.0,
+          portsNeeded: 4,
+          isCascade: false
+        });
+      } else if (totalOutlets === 4) {
+        candidates.push({
+          name: "Single Balanced 4-Way Splitter (-7.0 dB)",
+          desc: "All 4 outlets receive equal -7.0 dB loss. Full MoCA interconnectivity.",
+          modemLossDs: 7.0,
+          modemLossUs: 7.0,
+          stbLossDs: 7.0,
+          portsNeeded: 4,
+          isCascade: false
+        });
+      } else {
+        // 5 to 8 Outlets
+        candidates.push({
+          name: "Single Balanced 8-Way Splitter (-11.0 dB)",
+          desc: `All ${totalOutlets} outlets fed from one demarc splitter. Unused ports (${8 - totalOutlets}) capped with 75Ω terminators.`,
+          modemLossDs: 11.0,
+          modemLossUs: 11.0,
+          stbLossDs: 11.0,
+          portsNeeded: 8,
+          isCascade: false
+        });
+        candidates.push({
+          name: "Zero-Loss Active Drop Amplifier (MoCA Bypass)",
+          desc: "Unity-gain downstream & active return. Recommended if 8-Way drives Tx > 48.0 dBmV.",
+          modemLossDs: 0.0,
+          modemLossUs: 0.0,
+          stbLossDs: 0.0,
+          portsNeeded: 8,
+          isCascade: false
         });
       }
 
-      let worstTv = tvResults[0];
-      tvResults.forEach(t => {
-        if (t.rx < worstTv.rx || t.tx > worstTv.tx) {
-          worstTv = t;
+      // Add a cascaded option ONLY as an explicit "Not Recommended" comparison item for > 2 outlets
+      if (totalOutlets >= 3) {
+        candidates.push({
+          name: "Cascaded Splitter (⚠️ Anti-Pattern / Avoid)",
+          desc: "2-Way feeding another splitter. Causes high MoCA PHY loss, micro-reflections & return squeeze.",
+          modemLossDs: 4.5,
+          modemLossUs: 4.5,
+          stbLossDs: 11.5,
+          portsNeeded: totalOutlets,
+          isCascade: true
+        });
+      }
+
+      // Evaluate & Score Topologies
+      let bestConfig = null;
+      let lowestPenalty = 999999;
+      const evaluated = [];
+
+      candidates.forEach(cfg => {
+        const mRx = tapDs - dropLossDs - cfg.modemLossDs - insideLossDs;
+        const mTx = tapTx + dropLossUs + cfg.modemLossUs + insideLossUs;
+        const sRx = totalOutlets > 1 ? (tapDs - dropLossDs - cfg.stbLossDs - insideLossDs) : null;
+        const tilt = (dropLossDs + insideLossDs) - (dropLossUs + insideLossUs);
+
+        // Scoring algorithm:
+        // 1. Cascades get huge penalty to prevent being recommended
+        let penalty = cfg.isCascade ? 500 : 0;
+
+        // 2. Heavy penalties for pushing Tx above 48 dBmV
+        if (mTx > 48.0) penalty += (mTx - 48.0) * 15;
+        if (mTx > 53.0) penalty += 500; // Hard fail
+
+        // 3. Distance from ideal 0.0 dBmV Rx
+        penalty += Math.abs(mRx - 0.0) * 2;
+
+        // 4. STB Rx outside safe envelope (-8 to +8)
+        if (sRx !== null && (sRx < -8.0 || sRx > 8.0)) penalty += 50;
+
+        const res = { ...cfg, mRx, mTx, sRx, tilt, penalty };
+        evaluated.push(res);
+
+        if (penalty < lowestPenalty) {
+          lowestPenalty = penalty;
+          bestConfig = res;
         }
       });
 
-      const modemRxFail = (modemRx < -15.0 || modemRx > 15.0);
-      const modemTxFail = (modemTx < 35.0 || modemTx > 53.0);
-      const modemTxWarn = (modemTx > 48.0 && modemTx <= 53.0);
-      const tvRxFail = tvResults.some(t => t.rx < -15.0 || t.rx > 15.0);
-      const tvRxWarn = tvResults.some(t => t.rx < -8.0 || t.rx > 8.0);
+      // Update Recommended Banner
+      document.getElementById('recTitle').innerText = bestConfig.name;
+      document.getElementById('recDesc').innerText = bestConfig.desc;
+      document.getElementById('modemRx').innerText = (bestConfig.mRx > 0 ? '+' : '') + bestConfig.mRx.toFixed(1) + ' dBmV';
+      document.getElementById('modemTx').innerText = bestConfig.mTx.toFixed(1) + ' dBmV';
+      document.getElementById('stbRx').innerText = bestConfig.sRx !== null ? ((bestConfig.sRx > 0 ? '+' : '') + bestConfig.sRx.toFixed(1) + ' dBmV') : 'N/A';
+      document.getElementById('cableTilt').innerText = bestConfig.tilt.toFixed(1) + ' dB';
 
-      let phtVerdict = 'PASS';
-      let score = 100;
-
-      score -= Math.abs(modemRx - 0.0) * 3;
-      if (modemTx > 42.0) score -= (modemTx - 42.0) * 4;
-      if (modemTxWarn) score -= 30;
-      if (modemTxFail || modemRxFail || tvRxFail) {
-        score -= 100;
-        phtVerdict = 'FAIL';
-      } else if (tvRxWarn || modemTxWarn) {
-        phtVerdict = 'WARN';
-      }
-
-      return {
-        id,
-        title,
-        desc,
-        splitConfig,
-        schematicType,
-        modemRx,
-        modemTx,
-        tvResults,
-        worstTv,
-        phtVerdict,
-        score
-      };
-    }
-
-    function runOptimizer() {
-      const isOesViolation = (state.cableType === 'rg6' && state.dropLen > 150);
-      if (isOesViolation) {
-        oesDistanceAlert.classList.remove('hidden');
+      const statusBadge = document.getElementById('phtStatus');
+      if (bestConfig.mTx <= 48.0 && bestConfig.mRx >= -8.0 && bestConfig.mRx <= 8.0 && (bestConfig.sRx === null || (bestConfig.sRx >= -8.0 && bestConfig.sRx <= 8.0))) {
+        statusBadge.className = 'text-xs font-bold px-2 py-0.5 rounded bg-emerald-950 border border-emerald-700 text-emerald-300';
+        statusBadge.innerText = 'PHT OPTIMAL PASS';
       } else {
-        oesDistanceAlert.classList.add('hidden');
+        statusBadge.className = 'text-xs font-bold px-2 py-0.5 rounded bg-amber-950 border border-amber-700 text-amber-300';
+        statusBadge.innerText = 'MARGINAL (CHECK LEVELS)';
       }
 
-      dropLenDisplay.textContent = state.dropLen;
-      const dropLosses = getDropLosses();
-      dropLossDisplay.textContent = `1G: -${dropLosses.high} dB | 55M: -${dropLosses.low} dB`;
+      // Render Comparison List
+      const listContainer = document.getElementById('topologiesList');
+      listContainer.innerHTML = '';
+      evaluated.forEach(item => {
+        const isOptimal = item === bestConfig;
+        const row = document.createElement('div');
+        row.className = `p-3 rounded-lg border text-xs flex items-center justify-between ${
+          item.isCascade 
+            ? 'bg-red-950/20 border-red-900/60 opacity-70' 
+            : isOptimal 
+              ? 'bg-cyan-950/30 border-cyan-700' 
+              : 'bg-slate-900/70 border-slate-800'
+        }`;
 
-      const topologies = [];
-
-      if (state.tvCount === 1) {
-        topologies.push(evaluateTopology(
-          'balanced_2way',
-          'Balanced 2-Way Splitter',
-          '1 input, 2 equal ports (-4.5 dB). Ideal for single TV + Gateway setup.',
-          { modemSplitLoss: 4.5, tvSplitLoss: 4.5, label: '2-Way (-4.5 dB each)' },
-          '2way'
-        ));
-      } else if (state.tvCount === 2) {
-        topologies.push(evaluateTopology(
-          'balanced_4way',
-          'Standard 4-Way Splitter (Balanced)',
-          'All ports equal -7.0 dB loss. Terminates 1 unused port.',
-          { modemSplitLoss: 7.0, tvSplitLoss: 7.0, label: '4-Way (-7.0 dB each)' },
-          '4way'
-        ));
-
-        topologies.push(evaluateTopology(
-          'unbalanced_3way',
-          'Asymmetrical 3-Way (Hot Leg to Modem)',
-          'Modem takes low-loss -5.0 dB Hot Leg; 2 TVs share the -8.5 dB legs.',
-          { 
-            modemSplitLoss: 5.0, 
-            tvSplitLoss: (idx) => 8.5, 
-            label: '3-Way (Hot: -5.0 dB, STBs: -8.5 dB)' 
-          },
-          '3way_hot'
-        ));
-
-        topologies.push(evaluateTopology(
-          'cascade_2w_2w',
-          'Cascaded: Demarc 2-Way ➡️ Secondary 2-Way',
-          'Demarc 2-way feeds Gateway (-4.5 dB); 2nd leg feeds indoor 2-way (-9.0 dB) for TVs.',
-          { 
-            modemSplitLoss: 4.5, 
-            tvSplitLoss: 9.0, 
-            label: '1st 2-Way (-4.5dB) ➡️ 2nd 2-Way (-9.0dB)' 
-          },
-          'cascade_2_2'
-        ));
-      } else if (state.tvCount === 3) {
-        topologies.push(evaluateTopology(
-          'balanced_4way',
-          'Standard 4-Way Splitter (Balanced)',
-          'Direct 4-way splitter giving -7.0 dB to modem and all 3 TVs.',
-          { modemSplitLoss: 7.0, tvSplitLoss: 7.0, label: '4-Way (-7.0 dB each)' },
-          '4way'
-        ));
-
-        topologies.push(evaluateTopology(
-          'cascade_2w_3w',
-          'Cascaded: Demarc 2-Way ➡️ Indoor 3-Way',
-          'Primary 2-way protects Modem (-4.5 dB); secondary leg feeds indoor 3-way (-11.5 dB/-13 dB) for TVs.',
-          { 
-            modemSplitLoss: 4.5, 
-            tvSplitLoss: (idx) => (idx === 0 ? 9.5 : 13.0), 
-            label: '1st 2-Way (-4.5dB) ➡️ 3-Way' 
-          },
-          'cascade_2_3'
-        ));
-
-        topologies.push(evaluateTopology(
-          'unbalanced_3way_cascaded',
-          '3-Way Splitter with 1 Sub-Split',
-          'Hot leg (-5.0dB) to Modem; Weak leg 1 to TV1 (-8.5dB); Weak leg 2 to 2-way for TV2 & TV3 (-13.0dB).',
-          { 
-            modemSplitLoss: 5.0, 
-            tvSplitLoss: (idx) => (idx === 0 ? 8.5 : 13.0), 
-            label: '3-Way Hot (-5.0dB) + Sub-Split' 
-          },
-          '3way_sub'
-        ));
-      } else if (state.tvCount === 4) {
-        topologies.push(evaluateTopology(
-          'cascade_2w_4w',
-          'Cascaded: Demarc 2-Way ➡️ Indoor 4-Way',
-          'Demarc 2-Way gives Gateway optimal -4.5 dB leg; 2nd leg feeds 4-Way (-11.5 dB) for all 4 TVs.',
-          { 
-            modemSplitLoss: 4.5, 
-            tvSplitLoss: 11.5, 
-            label: '1st 2-Way (-4.5dB) ➡️ 4-Way (-11.5dB)' 
-          },
-          'cascade_2_4'
-        ));
-
-        topologies.push(evaluateTopology(
-          'balanced_8way',
-          'Direct 8-Way Splitter (Balanced)',
-          'All devices receive -11.0 dB. 3 unused ports terminated.',
-          { modemSplitLoss: 11.0, tvSplitLoss: 11.0, label: '8-Way (-11.0 dB each)' },
-          '8way'
-        ));
-
-        topologies.push(evaluateTopology(
-          'unbalanced_3w_cascade',
-          'Asymmetrical 3-Way + Cascaded 3-Way',
-          'Demarc 3-Way Hot Leg to Modem (-5.0 dB); Leg 2 to TV1; Leg 3 cascades to 3-way for TVs 2, 3, 4.',
-          { 
-            modemSplitLoss: 5.0, 
-            tvSplitLoss: (idx) => (idx === 0 ? 8.5 : 14.5), 
-            label: '3-Way (-5.0dB) + Sub-Cascade' 
-          },
-          '3way_cascade'
-        ));
-      }
-
-      topologies.sort((a, b) => b.score - a.score);
-      const winner = topologies[0];
-
-      renderWinnerCard(winner);
-      renderShootoutList(topologies, winner.id);
-    }
-
-    function renderWinnerCard(winner) {
-      winnerTitle.textContent = winner.title;
-      winnerDescription.textContent = winner.desc;
-
-      winnerModemRx.textContent = `${winner.modemRx > 0 ? '+' : ''}${winner.modemRx.toFixed(1)}`;
-      winnerModemTx.textContent = winner.modemTx.toFixed(1);
-
-      const modemPercent = Math.min(100, Math.max(0, ((winner.modemRx + 15) / 30) * 100));
-      winnerModemBar.style.width = `${modemPercent}%`;
-
-      if (winner.modemTx > 53.0 || winner.modemRx < -15.0 || winner.modemRx > 15.0) {
-        winnerModemPht.className = 'text-[8px] font-mono font-bold px-1 rounded bg-rose-950 text-rose-300 border border-rose-800';
-        winnerModemPht.textContent = 'HARD FAIL';
-        winnerModemBar.className = 'h-full bg-rose-500';
-      } else if (winner.modemTx > 48.0) {
-        winnerModemPht.className = 'text-[8px] font-mono font-bold px-1 rounded bg-amber-950 text-amber-300 border border-amber-800';
-        winnerModemPht.textContent = 'TX WARN';
-        winnerModemBar.className = 'h-full bg-amber-400';
-      } else {
-        winnerModemPht.className = 'text-[8px] font-mono font-bold px-1 rounded bg-emerald-950 text-emerald-300 border border-emerald-800';
-        winnerModemPht.textContent = 'OPTIMAL';
-        winnerModemBar.className = 'h-full bg-emerald-400';
-      }
-
-      winnerTvRx.textContent = `${winner.worstTv.rx > 0 ? '+' : ''}${winner.worstTv.rx.toFixed(1)}`;
-      winnerTvTx.textContent = winner.worstTv.tx.toFixed(1);
-      worstTvName.textContent = `${winner.worstTv.name} (${winner.worstTv.len}')`;
-
-      if (winner.worstTv.rx < -15.0 || winner.worstTv.rx > 15.0) {
-        winnerTvPht.className = 'text-[8px] font-mono font-bold px-1 rounded bg-rose-950 text-rose-300 border border-rose-800';
-        winnerTvPht.textContent = 'HARD FAIL';
-      } else if (winner.worstTv.rx < -8.0 || winner.worstTv.rx > 8.0) {
-        winnerTvPht.className = 'text-[8px] font-mono font-bold px-1 rounded bg-amber-950 text-amber-300 border border-amber-800';
-        winnerTvPht.textContent = 'MARGINAL';
-      } else {
-        winnerTvPht.className = 'text-[8px] font-mono font-bold px-1 rounded bg-emerald-950 text-emerald-300 border border-emerald-800';
-        winnerTvPht.textContent = 'SAFE';
-      }
-
-      if (winner.phtVerdict === 'PASS') {
-        winnerBadge.className = 'text-[10px] font-mono font-black px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-700';
-        winnerBadge.textContent = 'PHT CERTIFIED PASS';
-        winnerCard.className = 'bg-gradient-to-b from-slate-900 to-rfDark-card border-2 border-emerald-500 rounded-2xl p-4 shadow-2xl relative overflow-hidden transition-all duration-300';
-      } else if (winner.phtVerdict === 'WARN') {
-        winnerBadge.className = 'text-[10px] font-mono font-black px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-700';
-        winnerBadge.textContent = 'PHT MARGINAL';
-        winnerCard.className = 'bg-gradient-to-b from-slate-900 to-rfDark-card border-2 border-amber-500 rounded-2xl p-4 shadow-2xl relative overflow-hidden transition-all duration-300';
-      } else {
-        winnerBadge.className = 'text-[10px] font-mono font-black px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-700';
-        winnerBadge.textContent = 'NO PASSING PASSIVE TOPOLOGY';
-        winnerCard.className = 'bg-gradient-to-b from-slate-900 to-rfDark-card border-2 border-rose-600 rounded-2xl p-4 shadow-2xl relative overflow-hidden transition-all duration-300';
-      }
-
-      renderSchematic(winner);
-    }
-
-    function renderSchematic(winner) {
-      schematicLabel.textContent = winner.splitConfig.label;
-
-      if (winner.schematicType === '2way') {
-        schematicContainer.innerHTML = `
-          <svg viewBox="0 0 320 90" class="w-full max-w-sm h-auto text-xs font-mono">
-            <path d="M 10 45 L 80 45" stroke="#38bdf8" stroke-width="3" fill="none" class="wire-line"/>
-            <text x="10" y="38" fill="#38bdf8" font-size="8" font-weight="bold">DROP (${state.dropLen}')</text>
-            <rect x="80" y="20" width="80" height="50" rx="6" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
-            <text x="120" y="42" fill="#fff" font-size="9" font-weight="bold" text-anchor="middle">2-WAY</text>
-            <text x="120" y="55" fill="#94a3b8" font-size="8" text-anchor="middle">-4.5 dB</text>
-            <path d="M 160 35 L 230 20" stroke="#10b981" stroke-width="2.5" fill="none"/>
-            <rect x="230" y="8" width="80" height="24" rx="4" fill="#064e3b" stroke="#10b981"/>
-            <text x="270" y="24" fill="#6ee7b7" font-size="8" font-weight="bold" text-anchor="middle">GATEWAY</text>
-            <path d="M 160 55 L 230 70" stroke="#f59e0b" stroke-width="2.5" fill="none"/>
-            <rect x="230" y="58" width="80" height="24" rx="4" fill="#1e293b" stroke="#f59e0b"/>
-            <text x="270" y="74" fill="#fcd34d" font-size="8" font-weight="bold" text-anchor="middle">TV 1 (${state.tvRuns[0].len}')</text>
-          </svg>
-        `;
-        portInstructions.innerHTML = `
-          <strong>Port Connections:</strong><br>
-          &bull; <strong>Port 1 (-4.5 dB):</strong> Gateway (${state.modemLen}' RG6) &rarr; <span class="text-emerald-400 font-bold">${winner.modemRx} dBmV Rx / ${winner.modemTx} dBmV Tx</span><br>
-          &bull; <strong>Port 2 (-4.5 dB):</strong> ${state.tvRuns[0].name} (${state.tvRuns[0].len}') &rarr; <span class="text-amber-400 font-bold">${winner.worstTv.rx} dBmV Rx</span>
-        `;
-      } else if (winner.schematicType === '3way_hot') {
-        schematicContainer.innerHTML = `
-          <svg viewBox="0 0 340 110" class="w-full max-w-md h-auto text-xs font-mono">
-            <path d="M 10 55 L 75 55" stroke="#38bdf8" stroke-width="3" fill="none" class="wire-line"/>
-            <text x="10" y="47" fill="#38bdf8" font-size="8" font-weight="bold">DROP (${state.dropLen}')</text>
-            <rect x="75" y="25" width="80" height="60" rx="6" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
-            <text x="115" y="48" fill="#fff" font-size="9" font-weight="bold" text-anchor="middle">3-WAY UNBAL</text>
-            <text x="115" y="62" fill="#38bdf8" font-size="8" text-anchor="middle">Hot + 2 Weak</text>
-            <path d="M 155 35 L 235 20" stroke="#10b981" stroke-width="2.5" fill="none"/>
-            <rect x="235" y="8" width="95" height="22" rx="4" fill="#064e3b" stroke="#10b981"/>
-            <text x="282" y="23" fill="#6ee7b7" font-size="8" font-weight="bold" text-anchor="middle">GATEWAY (-5.0dB)</text>
-            <path d="M 155 55 L 235 55" stroke="#f59e0b" stroke-width="2.5" fill="none"/>
-            <rect x="235" y="44" width="95" height="22" rx="4" fill="#1e293b" stroke="#f59e0b"/>
-            <text x="282" y="59" fill="#fcd34d" font-size="8" text-anchor="middle">TV 1 (-8.5dB)</text>
-            <path d="M 155 75 L 235 90" stroke="#f59e0b" stroke-width="2.5" fill="none"/>
-            <rect x="235" y="79" width="95" height="22" rx="4" fill="#1e293b" stroke="#f59e0b"/>
-            <text x="282" y="94" fill="#fcd34d" font-size="8" text-anchor="middle">TV 2 (-8.5dB)</text>
-          </svg>
-        `;
-        portInstructions.innerHTML = `
-          <strong>Port Connections:</strong><br>
-          &bull; <strong>HOT LEG (-5.0 dB):</strong> Connect Gateway (${state.modemLen}' run). Delivers <span class="text-emerald-400 font-bold">${winner.modemRx} dBmV Rx / ${winner.modemTx} dBmV Tx</span>.<br>
-          &bull; <strong>WEAK LEGS (-8.5 dB):</strong> Connect ${state.tvRuns[0].name} and ${state.tvRuns[1].name}.
-        `;
-      } else if (winner.schematicType.startsWith('cascade')) {
-        schematicContainer.innerHTML = `
-          <svg viewBox="0 0 350 115" class="w-full max-w-md h-auto text-xs font-mono">
-            <path d="M 10 40 L 60 40" stroke="#38bdf8" stroke-width="3" fill="none" class="wire-line"/>
-            <text x="10" y="32" fill="#38bdf8" font-size="7" font-weight="bold">DROP</text>
-            <rect x="60" y="20" width="60" height="40" rx="4" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
-            <text x="90" y="38" fill="#fff" font-size="8" font-weight="bold" text-anchor="middle">2-WAY #1</text>
-            <text x="90" y="50" fill="#94a3b8" font-size="7" text-anchor="middle">Demarc</text>
-            <path d="M 120 30 L 220 15" stroke="#10b981" stroke-width="2.5" fill="none"/>
-            <rect x="220" y="6" width="120" height="20" rx="4" fill="#064e3b" stroke="#10b981"/>
-            <text x="280" y="20" fill="#6ee7b7" font-size="8" font-weight="bold" text-anchor="middle">GATEWAY (-4.5dB)</text>
-            <path d="M 120 50 L 160 75" stroke="#38bdf8" stroke-width="2" fill="none"/>
-            <rect x="160" y="60" width="65" height="45" rx="4" fill="#1e293b" stroke="#64748b"/>
-            <text x="192" y="78" fill="#fff" font-size="8" font-weight="bold" text-anchor="middle">INDOOR</text>
-            <text x="192" y="92" fill="#94a3b8" font-size="7" text-anchor="middle">TV Splitter</text>
-            <path d="M 225 75 L 260 65" stroke="#f59e0b" stroke-width="2" fill="none"/>
-            <path d="M 225 88 L 260 95" stroke="#f59e0b" stroke-width="2" fill="none"/>
-            <rect x="260" y="55" width="80" height="18" rx="3" fill="#1e293b" stroke="#f59e0b"/>
-            <text x="300" y="68" fill="#fcd34d" font-size="7" text-anchor="middle">TVs (-9 to -11.5dB)</text>
-          </svg>
-        `;
-        portInstructions.innerHTML = `
-          <strong>Port Connections:</strong><br>
-          &bull; <strong>Demarc 2-Way Leg 1 (-4.5 dB):</strong> Dedicated Gateway run &rarr; <span class="text-emerald-400 font-bold">${winner.modemRx} dBmV Rx / ${winner.modemTx} dBmV Tx</span>.<br>
-          &bull; <strong>Demarc 2-Way Leg 2:</strong> Feeds secondary indoor splitter for all TV outlets.
-        `;
-      } else {
-        schematicContainer.innerHTML = `
-          <svg viewBox="0 0 340 100" class="w-full max-w-md h-auto text-xs font-mono">
-            <path d="M 10 50 L 80 50" stroke="#38bdf8" stroke-width="3" fill="none" class="wire-line"/>
-            <text x="10" y="42" fill="#38bdf8" font-size="8" font-weight="bold">DROP (${state.dropLen}')</text>
-            <rect x="80" y="20" width="85" height="60" rx="6" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
-            <text x="122" y="45" fill="#fff" font-size="9" font-weight="bold" text-anchor="middle">BALANCED</text>
-            <text x="122" y="60" fill="#94a3b8" font-size="8" text-anchor="middle">${winner.splitConfig.label}</text>
-            <path d="M 165 35 L 225 20" stroke="#10b981" stroke-width="2.5" fill="none"/>
-            <rect x="225" y="8" width="105" height="22" rx="4" fill="#064e3b" stroke="#10b981"/>
-            <text x="277" y="23" fill="#6ee7b7" font-size="8" font-weight="bold" text-anchor="middle">GATEWAY (Port 1)</text>
-            <path d="M 165 65 L 225 75" stroke="#f59e0b" stroke-width="2" fill="none"/>
-            <rect x="225" y="65" width="105" height="22" rx="4" fill="#1e293b" stroke="#f59e0b"/>
-            <text x="277" y="80" fill="#fcd34d" font-size="8" text-anchor="middle">TVs (Ports 2-4)</text>
-          </svg>
-        `;
-        portInstructions.innerHTML = `
-          <strong>Port Connections:</strong><br>
-          &bull; <strong>Port 1:</strong> Gateway (${state.modemLen}') &rarr; <span class="text-emerald-400 font-bold">${winner.modemRx} dBmV Rx / ${winner.modemTx} dBmV Tx</span>.<br>
-          &bull; <strong>Ports 2+:</strong> Connect remaining TV outlets. Terminate any unused ports with locking 75&Omega; terminators.
-        `;
-      }
-    }
-
-    function renderShootoutList(topologies, winnerId) {
-      topologyCardsContainer.innerHTML = '';
-      topologies.forEach((topo) => {
-        const isWinner = (topo.id === winnerId);
-        const card = document.createElement('div');
-        card.className = `p-3 rounded-xl border ${isWinner ? 'border-emerald-500/80 bg-emerald-950/20' : 'border-rfDark-border bg-rfDark-input'} transition`;
-
-        let badgeClass = 'bg-emerald-950 text-emerald-300 border-emerald-800';
-        if (topo.phtVerdict === 'WARN') badgeClass = 'bg-amber-950 text-amber-300 border-amber-800';
-        if (topo.phtVerdict === 'FAIL') badgeClass = 'bg-rose-950 text-rose-300 border-rose-800';
-
-        card.innerHTML = `
-          <div class="flex items-center justify-between mb-1.5">
-            <div class="flex items-center gap-1.5">
-              ${isWinner ? '<span class="text-[9px] bg-emerald-500 text-slate-950 px-1.5 py-0.2 rounded font-mono font-black">TOP PICK</span>' : ''}
-              <span class="text-xs font-mono font-bold text-white">${topo.title}</span>
+        row.innerHTML = `
+          <div class="pr-2">
+            <div class="font-bold flex items-center gap-1.5 ${item.isCascade ? 'text-red-300 line-through' : isOptimal ? 'text-cyan-300' : 'text-slate-300'}">
+              ${isOptimal ? '⭐ ' : ''}${item.name}
             </div>
-            <span class="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded border ${badgeClass}">
-              ${topo.phtVerdict}
-            </span>
+            <div class="text-[11px] text-slate-400">${item.desc}</div>
           </div>
-
-          <div class="grid grid-cols-2 gap-2 text-[10px] font-mono mt-2 bg-slate-900/60 p-2 rounded-lg border border-slate-800/80">
-            <div>
-              <span class="text-slate-400 block font-bold">Gateway Modem:</span>
-              <div class="text-white">Rx: <span class="${topo.modemRx < -8 || topo.modemRx > 8 ? 'text-amber-400 font-bold' : 'text-emerald-400'}">${topo.modemRx > 0 ? '+' : ''}${topo.modemRx} dBmV</span></div>
-              <div class="text-white">Tx: <span class="${topo.modemTx > 48 ? 'text-rose-400 font-bold' : 'text-emerald-400'}">${topo.modemTx} dBmV</span></div>
-            </div>
-            <div class="border-l border-slate-800 pl-2">
-              <span class="text-slate-400 block font-bold">Worst TV (${topo.worstTv.len}'):</span>
-              <div class="text-white">Rx: <span class="${topo.worstTv.rx < -8 || topo.worstTv.rx > 8 ? 'text-amber-400 font-bold' : 'text-slate-200'}">${topo.worstTv.rx > 0 ? '+' : ''}${topo.worstTv.rx} dBmV</span></div>
-              <div class="text-white">Tx: <span class="${topo.worstTv.tx > 48 ? 'text-rose-400 font-bold' : 'text-slate-200'}">${topo.worstTv.tx} dBmV</span></div>
-            </div>
+          <div class="text-right whitespace-nowrap pl-2">
+            <span class="font-mono font-bold ${item.mRx >= -8 && item.mRx <= 8 ? 'text-emerald-400' : 'text-amber-400'}">${(item.mRx > 0 ? '+' : '') + item.mRx.toFixed(1)} Rx</span>
+            <span class="text-slate-600 mx-1">|</span>
+            <span class="font-mono font-bold ${item.mTx <= 48 ? 'text-emerald-400' : 'text-red-400'}">${item.mTx.toFixed(1)} Tx</span>
           </div>
         `;
-        topologyCardsContainer.appendChild(card);
+        listContainer.appendChild(row);
       });
     }
 
-    tapRxInput.addEventListener('input', (e) => {
-      state.tapRx = parseFloat(e.target.value) || 0;
-      runOptimizer();
-    });
+    function copyJobNote() {
+      const dropType = document.getElementById('dropType').value.toUpperCase();
+      const dropLen = document.getElementById('dropLen').value;
+      const rec = document.getElementById('recTitle').innerText;
+      const mRx = document.getElementById('modemRx').innerText;
+      const mTx = document.getElementById('modemTx').innerText;
+      const sRx = document.getElementById('stbRx').innerText;
+      const tilt = document.getElementById('cableTilt').innerText;
 
-    tapTxInput.addEventListener('input', (e) => {
-      state.tapTx = parseFloat(e.target.value) || 0;
-      runOptimizer();
-    });
-
-    dropRange.addEventListener('input', (e) => {
-      state.dropLen = parseInt(e.target.value, 10);
-      runOptimizer();
-    });
-
-    modemLenInput.addEventListener('input', (e) => {
-      state.modemLen = parseInt(e.target.value, 10) || 10;
-      runOptimizer();
-    });
-
-    typeRg6Btn.addEventListener('click', () => {
-      state.cableType = 'rg6';
-      typeRg6Btn.className = 'touch-btn py-2 px-3 rounded-xl border border-sky-400 bg-sky-950/60 text-xs font-mono font-bold text-white transition flex justify-between items-center';
-      typeRg6Btn.querySelector('span:last-child').className = 'text-[9px] text-sky-400 font-normal';
-      typeRg11Btn.className = 'touch-btn py-2 px-3 rounded-xl border border-rfDark-border bg-rfDark-input text-xs font-mono font-bold text-slate-400 transition flex justify-between items-center';
-      typeRg11Btn.querySelector('span:last-child').className = 'text-[9px] text-slate-500 font-normal';
-      runOptimizer();
-    });
-
-    typeRg11Btn.addEventListener('click', () => {
-      state.cableType = 'rg11';
-      typeRg11Btn.className = 'touch-btn py-2 px-3 rounded-xl border border-sky-400 bg-sky-950/60 text-xs font-mono font-bold text-white transition flex justify-between items-center';
-      typeRg11Btn.querySelector('span:last-child').className = 'text-[9px] text-sky-400 font-normal';
-      typeRg6Btn.className = 'touch-btn py-2 px-3 rounded-xl border border-rfDark-border bg-rfDark-input text-xs font-mono font-bold text-slate-400 transition flex justify-between items-center';
-      typeRg6Btn.querySelector('span:last-child').className = 'text-[9px] text-slate-500 font-normal';
-      runOptimizer();
-    });
-
-    presetBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        presetBtns.forEach(b => {
-          b.className = 'preset-btn touch-btn py-1.5 px-1 rounded-xl border border-rfDark-border bg-rfDark-input text-center text-xs font-mono transition';
-          b.querySelector('div:last-child').className = 'text-[9px] text-slate-400';
-        });
-        btn.className = 'preset-btn touch-btn py-1.5 px-1 rounded-xl border border-sky-500 bg-sky-950/60 text-center text-xs font-mono font-bold text-sky-300 transition';
-        btn.querySelector('div:last-child').className = 'text-[9px] text-sky-300';
-
-        state.tvCount = parseInt(btn.dataset.tvs, 10);
-        renderTvInputs();
-        runOptimizer();
+      const note = `[XFINITY FIELD TOPOLOGY] Drop: ${dropLen}ft ${dropType} | Topology: ${rec} | Est Gateway: ${mRx} / ${mTx} | Est STB: ${sRx} | Coax Tilt: ${tilt} | MoCA: Single-Demarc Pass`;
+      navigator.clipboard.writeText(note).then(() => {
+        const toast = document.getElementById('copyToast');
+        toast.classList.remove('hidden');
+        setTimeout(() => toast.classList.add('hidden'), 3000);
       });
-    });
+    }
 
-    document.getElementById('resetBtn').addEventListener('click', () => {
-      state.tapRx = 15.0;
-      state.tapTx = 38.0;
-      state.cableType = 'rg6';
-      state.dropLen = 100;
-      state.modemLen = 50;
-      state.tvCount = 2;
-      state.tvRuns = [
-        { name: 'Living Room TV', len: 25 },
-        { name: 'Master Bed TV', len: 45 },
-        { name: 'Guest Room TV', len: 60 },
-        { name: 'Basement TV', len: 75 }
-      ];
-
-      tapRxInput.value = '15.0';
-      tapTxInput.value = '38.0';
-      dropRange.value = 100;
-      modemLenInput.value = 50;
-      typeRg6Btn.click();
-      presetBtns[1].click();
-    });
-
-    document.getElementById('copyPlanBtn').addEventListener('click', () => {
-      const dropLosses = getDropLosses();
-      const planText = [
-        `[XFINITY SPLITTER TOPOLOGY PLAN]`,
-        `Tap: 1G Rx +${state.tapRx} dBmV | US Tx ${state.tapTx} dBmV`,
-        `Drop: ${state.dropLen}' ${state.cableType.toUpperCase()} (1G -${dropLosses.high}dB / US -${dropLosses.low}dB)`,
-        `Recommended Architecture: ${winnerTitle.textContent}`,
-        `Gateway (${state.modemLen}' RG6): Predicted Rx ${winnerModemRx.textContent} dBmV | Tx ${winnerModemTx.textContent} dBmV (${winnerModemPht.textContent})`,
-        `TV Outlets (${state.tvCount} total): Worst Rx ${winnerTvRx.textContent} dBmV | Tx ${winnerTvTx.textContent} dBmV at ${worstTvName.textContent}`,
-        `PHT Status: ${winnerBadge.textContent}`
-      ].join(' | ');
-
-      const textarea = document.createElement('textarea');
-      textarea.value = planText;
-      textarea.style.position = 'fixed';
-      textarea.style.opacity = '0';
-      document.body.appendChild(textarea);
-      textarea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textarea);
-
-      const toast = document.getElementById('toast');
-      toast.classList.remove('opacity-0');
-      toast.classList.add('opacity-100');
-      setTimeout(() => {
-        toast.classList.remove('opacity-100');
-        toast.classList.add('opacity-0');
-      }, 2400);
-    });
-
-    window.onload = function() {
-      renderTvInputs();
-      runOptimizer();
-    };
+    window.onload = calculate;
   </script>
 </body>
 </html>
