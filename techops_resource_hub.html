@@ -3,19 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TechOps Resource Hub</title>
+    <title>TechOps Technical Resource Center</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome CDN -->
+    <!-- FontAwesome 6 CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Inter Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 antialiased min-h-screen flex flex-col selection:bg-blue-600 selection:text-white">
 
-    <!-- Top Navigation Bar -->
+    <!-- Top Navigation Header -->
     <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 sticky top-0 z-50 shadow-lg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
@@ -24,31 +29,31 @@
                         <i class="fa-solid fa-layer-group text-lg"></i>
                     </div>
                     <div>
-                        <span class="font-bold text-lg text-white tracking-tight block leading-tight">TechOps Hub</span>
-                        <span class="text-xs text-blue-400 font-medium">Standards & Procedures</span>
+                        <span class="font-bold text-lg text-white tracking-tight block leading-tight">TechOps Resource Center</span>
+                        <span class="text-xs text-blue-400 font-medium">Standards, Workflows & Diagnostics</span>
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
                     <span class="hidden sm:inline-flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs px-2.5 py-1 rounded-full font-medium">
                         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                        Internal Docs Active
+                        10 Documents Active
                     </span>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- Hero Header -->
+    <!-- Hero Section -->
     <section class="bg-gradient-to-b from-slate-900 to-slate-950 border-b border-slate-800/80 pt-12 pb-10 px-4 sm:px-6">
         <div class="max-w-4xl mx-auto text-center space-y-4">
             <div class="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/25 px-3 py-1 rounded-full text-blue-400 text-xs font-semibold uppercase tracking-wider">
-                <i class="fa-solid fa-book-bookmark"></i> Standard Operating Library
+                <i class="fa-solid fa-book-bookmark"></i> Technical Operations Repository
             </div>
             <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight">
                 Field Operations Technical Library
             </h1>
             <p class="text-slate-400 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
-                Direct access to high-performance web guides and official raw PDF documentation for EPON deployments, Premise Health Testing, and OES specifications.
+                Direct access to interactive web guides and source PDF specifications. PDF documents now open in a separate tab so your navigation stays intact.
             </p>
 
             <!-- Search and Filter Bar -->
@@ -58,15 +63,15 @@
                     <input 
                         type="text" 
                         id="searchInput" 
-                        placeholder="Search by doc ID, title, or keyword (e.g. EPON, PHT, MoCA, OES)..."
-                        class="w-full bg-slate-900/90 text-white placeholder-slate-500 text-sm rounded-xl pl-11 pr-4 py-3 border border-slate-700/80 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all shadow-inner"
+                        placeholder="Search by code (e.g. HOW21267, POL2166), topic, or keyword..."
+                        class="w-full bg-slate-900/90 text-white placeholder-slate-500 text-sm rounded-xl pl-11 pr-4 py-3.5 border border-slate-700/80 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all shadow-inner"
                     />
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Main Content Area -->
+    <!-- Main Content Grid -->
     <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
         
         <div class="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -74,17 +79,17 @@
                 <h2 class="text-xl font-bold text-white flex items-center gap-2">
                     <i class="fa-regular fa-folder-open text-blue-500"></i> Document Repository
                 </h2>
-                <p class="text-xs text-slate-400 mt-0.5">Click "Web Guide" for interactive view or "Download PDF" for the original file.</p>
+                <p class="text-xs text-slate-400 mt-0.5">Choose <strong>Web Guide</strong> for mobile-optimized reading or <strong>Open PDF</strong> to view the original PDF in a new tab.</p>
             </div>
-            <div id="resultCount" class="text-xs font-medium text-slate-400 bg-slate-900 border border-slate-800 px-3 py-1 rounded-lg">
+            <div id="resultCount" class="text-xs font-medium text-slate-400 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-lg">
                 Showing 10 documents
             </div>
         </div>
 
-        <!-- Grid Cards Container -->
+        <!-- Cards Container -->
         <div id="cardsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-            <!-- Card 1: EPON Two-Box -->
+            <!-- Card 1: EPON Two-Box Setup -->
             <div class="doc-card flex flex-col bg-slate-900/90 rounded-2xl border border-slate-800 p-5 shadow-sm hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/5 transition-all group" data-keywords="epon optical node unit onu xb7 xer10 technicolor sercomm fiber fttp how21267">
                 <div class="flex items-start justify-between mb-3">
                     <div class="w-11 h-11 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-xl flex items-center justify-center text-lg">
@@ -98,19 +103,19 @@
                     EPON Two-Box Setup (ONU & Router)
                 </h3>
                 <p class="text-xs text-slate-400 flex-1 leading-relaxed mb-4">
-                    Enhanced FTTP with Nokia NKFN11AEL or Sagemcom SGFN11BEL ONU paired with Technicolor XB7 or Sercomm XER10.
+                    Enhanced FTTP with Nokia NKFN11AEL or Sagemcom SGFN11BEL ONU paired with Technicolor XB7 or Sercomm XER10 router.
                 </p>
                 <div class="grid grid-cols-2 gap-2 mt-auto pt-3 border-t border-slate-800/80">
                     <a href="epon_setup.html" class="inline-flex items-center justify-center gap-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold py-2 px-3 rounded-lg transition-colors shadow-sm">
                         <i class="fa-regular fa-window-maximize"></i> Web Guide
                     </a>
-                    <a href="Celestial _ Install and troubleshoot the Ethernet Passive Optical Network (EPON) two-box (Optical Node Unit (ONU) and XB7 or XER10) set-up for residential.pdf" download class="inline-flex items-center justify-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold py-2 px-3 rounded-lg transition-colors">
-                        <i class="fa-solid fa-file-pdf text-red-400"></i> PDF
+                    <a href="Celestial _ Install and troubleshoot the Ethernet Passive Optical Network (EPON) two-box (Optical Node Unit (ONU) and XB7 or XER10) set-up for residential.pdf" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold py-2 px-3 rounded-lg transition-colors">
+                        <i class="fa-solid fa-arrow-up-right-from-square text-red-400"></i> Open PDF
                     </a>
                 </div>
             </div>
 
-            <!-- Card 2: PHT Guide -->
+            <!-- Card 2: Premise Health Test (PHT) -->
             <div class="doc-card flex flex-col bg-slate-900/90 rounded-2xl border border-slate-800 p-5 shadow-sm hover:border-indigo-500/50 hover:shadow-lg hover:shadow-indigo-500/5 transition-all group" data-keywords="pht premise health test icfr flux us tx ds rx docsis 3.1 moca fbc suckout how11339">
                 <div class="flex items-start justify-between mb-3">
                     <div class="w-11 h-11 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-xl flex items-center justify-center text-lg">
@@ -130,13 +135,13 @@
                     <a href="pht_guide.html" class="inline-flex items-center justify-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold py-2 px-3 rounded-lg transition-colors shadow-sm">
                         <i class="fa-regular fa-window-maximize"></i> Web Guide
                     </a>
-                    <a href="pht.pdf" download class="inline-flex items-center justify-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold py-2 px-3 rounded-lg transition-colors">
-                        <i class="fa-solid fa-file-pdf text-red-400"></i> PDF
+                    <a href="pht.pdf" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold py-2 px-3 rounded-lg transition-colors">
+                        <i class="fa-solid fa-arrow-up-right-from-square text-red-400"></i> Open PDF
                     </a>
                 </div>
             </div>
 
-            <!-- Card 3: Trouble Calls Policy -->
+            <!-- Card 3: Trouble Calls Standard Policy -->
             <div class="doc-card flex flex-col bg-slate-900/90 rounded-2xl border border-slate-800 p-5 shadow-sm hover:border-rose-500/50 hover:shadow-lg hover:shadow-rose-500/5 transition-all group" data-keywords="tc trouble calls pol2166 truck roll completion codes u10 u11 u12 u14 cos cancellation">
                 <div class="flex items-start justify-between mb-3">
                     <div class="w-11 h-11 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded-xl flex items-center justify-center text-lg">
@@ -156,8 +161,8 @@
                     <a href="tc_policy.html" class="inline-flex items-center justify-center gap-1.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold py-2 px-3 rounded-lg transition-colors shadow-sm">
                         <i class="fa-regular fa-window-maximize"></i> Web Guide
                     </a>
-                    <a href="Celestial _ Tech Ops_ Work order management — Trouble calls (TCs) standard policy.pdf" download class="inline-flex items-center justify-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold py-2 px-3 rounded-lg transition-colors">
-                        <i class="fa-solid fa-file-pdf text-red-400"></i> PDF
+                    <a href="Celestial _ Tech Ops_ Work order management — Trouble calls (TCs) standard policy.pdf" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold py-2 px-3 rounded-lg transition-colors">
+                        <i class="fa-solid fa-arrow-up-right-from-square text-red-400"></i> Open PDF
                     </a>
                 </div>
             </div>
@@ -176,19 +181,19 @@
                     Outside-Only SRO Methods of Procedure
                 </h3>
                 <p class="text-xs text-slate-400 flex-1 leading-relaxed mb-4">
-                    Protocols for exterior service calls: FVD tests, bonding validation (&lt;25 ohms), tap scans, and appendix job codes.
+                    Protocols for exterior service calls: FVD safety tests, bonding validation (&lt;25 ohms), tap scans, and appendix job codes.
                 </p>
                 <div class="grid grid-cols-2 gap-2 mt-auto pt-3 border-t border-slate-800/80">
                     <a href="sro_procedures.html" class="inline-flex items-center justify-center gap-1.5 bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold py-2 px-3 rounded-lg transition-colors shadow-sm">
                         <i class="fa-regular fa-window-maximize"></i> Web Guide
                     </a>
-                    <a href="Celestial _ Operational Excellence Standard (OES) — Methods of Procedure (MoPr) for outside-only special request order (SRO) — Residential.pdf" download class="inline-flex items-center justify-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold py-2 px-3 rounded-lg transition-colors">
-                        <i class="fa-solid fa-file-pdf text-red-400"></i> PDF
+                    <a href="Celestial _ Operational Excellence Standard (OES) — Methods of Procedure (MoPr) for outside-only special request order (SRO) — Residential.pdf" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold py-2 px-3 rounded-lg transition-colors">
+                        <i class="fa-solid fa-arrow-up-right-from-square text-red-400"></i> Open PDF
                     </a>
                 </div>
             </div>
 
-            <!-- Card 5: Cables & Hardware Specs -->
+            <!-- Card 5: Approved Cables & Hardware -->
             <div class="doc-card flex flex-col bg-slate-900/90 rounded-2xl border border-slate-800 p-5 shadow-sm hover:border-teal-500/50 hover:shadow-lg hover:shadow-teal-500/5 transition-all group" data-keywords="cables connectors hardware f connector torque 30 in-lb cat6 fiber sc upc sc apc how22896">
                 <div class="flex items-start justify-between mb-3">
                     <div class="w-11 h-11 bg-teal-500/10 text-teal-400 border border-teal-500/20 rounded-xl flex items-center justify-center text-lg">
@@ -208,8 +213,8 @@
                     <a href="hardware_specs.html" class="inline-flex items-center justify-center gap-1.5 bg-teal-600 hover:bg-teal-500 text-white text-xs font-semibold py-2 px-3 rounded-lg transition-colors shadow-sm">
                         <i class="fa-regular fa-window-maximize"></i> Web Guide
                     </a>
-                    <a href="Celestial _ Operational Excellence Standard (OES) — Approved cables, connectors, and hardware specifications.pdf" download class="inline-flex items-center justify-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold py-2 px-3 rounded-lg transition-colors">
-                        <i class="fa-solid fa-file-pdf text-red-400"></i> PDF
+                    <a href="Celestial _ Operational Excellence Standard (OES) — Approved cables, connectors, and hardware specifications.pdf" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold py-2 px-3 rounded-lg transition-colors">
+                        <i class="fa-solid fa-arrow-up-right-from-square text-red-400"></i> Open PDF
                     </a>
                 </div>
             </div>
@@ -234,8 +239,8 @@
                     <a href="cpe_installation.html" class="inline-flex items-center justify-center gap-1.5 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold py-2 px-3 rounded-lg transition-colors shadow-sm">
                         <i class="fa-regular fa-window-maximize"></i> Web Guide
                     </a>
-                    <a href="Celestial _ Operational Excellence Standard (OES) — Customer Premise Equipment (CPE) installation.pdf" download class="inline-flex items-center justify-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold py-2 px-3 rounded-lg transition-colors">
-                        <i class="fa-solid fa-file-pdf text-red-400"></i> PDF
+                    <a href="Celestial _ Operational Excellence Standard (OES) — Customer Premise Equipment (CPE) installation.pdf" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold py-2 px-3 rounded-lg transition-colors">
+                        <i class="fa-solid fa-arrow-up-right-from-square text-red-400"></i> Open PDF
                     </a>
                 </div>
             </div>
@@ -260,8 +265,8 @@
                     <a href="service_distribution.html" class="inline-flex items-center justify-center gap-1.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold py-2 px-3 rounded-lg transition-colors shadow-sm">
                         <i class="fa-regular fa-window-maximize"></i> Web Guide
                     </a>
-                    <a href="Celestial _ Operational Excellence Standard (OES) — Service distribution point and enclosure.pdf" download class="inline-flex items-center justify-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold py-2 px-3 rounded-lg transition-colors">
-                        <i class="fa-solid fa-file-pdf text-red-400"></i> PDF
+                    <a href="Celestial _ Operational Excellence Standard (OES) — Service distribution point and enclosure.pdf" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold py-2 px-3 rounded-lg transition-colors">
+                        <i class="fa-solid fa-arrow-up-right-from-square text-red-400"></i> Open PDF
                     </a>
                 </div>
             </div>
@@ -286,8 +291,8 @@
                     <a href="midsplit_tr.html" class="inline-flex items-center justify-center gap-1.5 bg-yellow-600 hover:bg-yellow-500 text-white text-xs font-semibold py-2 px-3 rounded-lg transition-colors shadow-sm">
                         <i class="fa-regular fa-window-maximize"></i> Web Guide
                     </a>
-                    <a href="Celestial _ Operational Excellence Standard (OES) — Mid-split customer troubleshooting and remediation.pdf" download class="inline-flex items-center justify-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold py-2 px-3 rounded-lg transition-colors">
-                        <i class="fa-solid fa-file-pdf text-red-400"></i> PDF
+                    <a href="Celestial _ Operational Excellence Standard (OES) — Mid-split customer troubleshooting and remediation.pdf" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold py-2 px-3 rounded-lg transition-colors">
+                        <i class="fa-solid fa-arrow-up-right-from-square text-red-400"></i> Open PDF
                     </a>
                 </div>
             </div>
@@ -312,8 +317,8 @@
                     <a href="connected_devices.html" class="inline-flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold py-2 px-3 rounded-lg transition-colors shadow-sm">
                         <i class="fa-regular fa-window-maximize"></i> Web Guide
                     </a>
-                    <a href="Celestial _ Operational Excellence Standard (OES) — Connected Devices Insights.pdf" download class="inline-flex items-center justify-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold py-2 px-3 rounded-lg transition-colors">
-                        <i class="fa-solid fa-file-pdf text-red-400"></i> PDF
+                    <a href="Celestial _ Operational Excellence Standard (OES) — Connected Devices Insights.pdf" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold py-2 px-3 rounded-lg transition-colors">
+                        <i class="fa-solid fa-arrow-up-right-from-square text-red-400"></i> Open PDF
                     </a>
                 </div>
             </div>
@@ -338,8 +343,8 @@
                     <a href="premise_wiring.html" class="inline-flex items-center justify-center gap-1.5 bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold py-2 px-3 rounded-lg transition-colors shadow-sm">
                         <i class="fa-regular fa-window-maximize"></i> Web Guide
                     </a>
-                    <a href="Celestial _ Operational Excellence Standard (OES) — Premise wiring installation.pdf" download class="inline-flex items-center justify-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold py-2 px-3 rounded-lg transition-colors">
-                        <i class="fa-solid fa-file-pdf text-red-400"></i> PDF
+                    <a href="Celestial _ Operational Excellence Standard (OES) — Premise wiring installation.pdf" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold py-2 px-3 rounded-lg transition-colors">
+                        <i class="fa-solid fa-arrow-up-right-from-square text-red-400"></i> Open PDF
                     </a>
                 </div>
             </div>
@@ -350,7 +355,7 @@
         <div id="noResults" class="hidden text-center py-16">
             <i class="fa-regular fa-circle-question text-4xl text-slate-600 mb-3 block"></i>
             <h3 class="text-lg font-bold text-white">No matching documents found</h3>
-            <p class="text-xs text-slate-400 mt-1">Try searching with a different term, doc code, or keyword.</p>
+            <p class="text-xs text-slate-400 mt-1">Try searching with a different doc code or keyword.</p>
         </div>
 
     </main>
