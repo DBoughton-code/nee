@@ -389,13 +389,13 @@
           <span style="font-size: 1.2rem; color: var(--text-muted);">❯</span>
         </div>
 
-        <!-- Supervisor Team Blast -->
-        <div class="hub-tile" onclick="openTeamBlastView()">
+        <!-- Supervisor Hub Option (Replaces direct Team Blast) -->
+        <div class="hub-tile" onclick="openSupervisorView()">
           <div class="hub-tile-left">
-            <div class="hub-icon-wrap" style="background: rgba(239, 68, 68, 0.15);">📢</div>
+            <div class="hub-icon-wrap" style="background: rgba(234, 179, 8, 0.15);">👑</div>
             <div>
-              <div class="hub-title" style="color: #ef4444;">Team Blast Comms</div>
-              <div class="hub-sub">Supervisor mass texts (BCC Gateway)</div>
+              <div class="hub-title" style="color: #facc15;">Supervisor Hub</div>
+              <div class="hub-sub">Management controls & direct text blast</div>
             </div>
           </div>
           <span style="font-size: 1.2rem; color: var(--text-muted);">❯</span>
@@ -556,7 +556,6 @@
       </div>
     </div>
 
-    <!-- Additional Optional Photos for Downed Jobs -->
     <div class="card">
       <div class="card-title">
         <span>Additional Evidence Photos (Optional)</span>
@@ -701,47 +700,48 @@
     </div>
   </div>
 
-  <!-- SCREEN 6: TEAM BLAST COMMS (SUPERVISOR) -->
-  <div id="view-team-blast" class="view-screen">
+  <!-- SCREEN 6: SUPERVISOR HUB & TEXT BLAST -->
+  <div id="view-supervisor" class="view-screen">
     <div class="nav-top-bar">
       <button type="button" class="btn-back" onclick="navigateHome()">❮ Main Menu</button>
     </div>
 
     <div class="header">
-      <h2 style="color: #ef4444;">Team Blast Comms</h2>
-      <p>Supervisor Mass Text (BCC Gateway)</p>
+      <h2 style="color: #facc15;">Supervisor Hub</h2>
+      <p>Management Direct Messaging & Alerts</p>
     </div>
 
+    <!-- Custom Text Blast -->
     <div class="card">
-      <div class="card-title">Custom Team Alert</div>
+      <div class="card-title">Send Custom Text Blast</div>
       <div class="form-group" style="margin-bottom: 0;">
-        <textarea id="customBlastText" placeholder="Type a custom message for the whole team..."></textarea>
+        <textarea id="customBlastText" placeholder="Write custom alert text..."></textarea>
       </div>
-      <button type="button" class="btn" style="background-color: #ef4444; margin-top: 12px;" onclick="sendTrueGatewayBlast('custom')">
-        📢 Send Mass Text (BCC)
+      <button type="button" class="btn" style="background-color: #eab308; color: #451a03; margin-top: 12px;" onclick="sendDirectTextBlast('custom')">
+        💬 Open In Text Messages
       </button>
     </div>
 
+    <!-- Quick SMS Templates -->
     <div class="card">
-      <div class="card-title">1-Tap Standard Alerts</div>
-      <div class="sms-contact-box" style="background: rgba(239, 68, 68, 0.08); border-color: #ef4444; color: #fca5a5;">
-        ℹ️ <strong>Gateway Routing:</strong> These buttons launch iOS Mail with the team hidden in the BCC line. They will arrive as individual SMS texts on the techs' phones.
-      </div>
-      <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 12px;">
-        <button type="button" class="btn" style="background-color: #eab308; color: #451a03;" onclick="sendTrueGatewayBlast('huddle')">☕ Morning Huddle (15 Mins)</button>
-        <button type="button" class="btn" style="background-color: #ef4444;" onclick="sendTrueGatewayBlast('weather')">⛈️ Weather Alert (Stand Down)</button>
-        <button type="button" class="btn" style="background-color: #10b981;" onclick="sendTrueGatewayBlast('all_clear')">☀️ Weather All-Clear (Resume)</button>
-        <button type="button" class="btn" style="background-color: #f97316;" onclick="sendTrueGatewayBlast('overtime')">💰 Open Overtime Routes</button>
-        <button type="button" class="btn" style="background-color: #8b5cf6;" onclick="sendTrueGatewayBlast('qc_alert')">⚠️ QA / Audit Warning</button>
-        <button type="button" class="btn" style="background-color: #64748b;" onclick="sendTrueGatewayBlast('lost_tool')">🔍 Lost Equipment Check</button>
+      <div class="card-title">Standard Team Alerts (Open With Text)</div>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <button type="button" class="btn" style="background-color: #eab308; color: #451a03;" onclick="sendDirectTextBlast('huddle')">☕ Morning Huddle (15 Mins)</button>
+        <button type="button" class="btn" style="background-color: #ef4444;" onclick="sendDirectTextBlast('weather')">⛈️ Weather Alert (Stand Down)</button>
+        <button type="button" class="btn" style="background-color: #10b981;" onclick="sendDirectTextBlast('all_clear')">☀️ Weather All-Clear (Resume)</button>
+        <button type="button" class="btn" style="background-color: #f97316;" onclick="sendDirectTextBlast('overtime')">💰 Open Overtime Routes</button>
+        <button type="button" class="btn" style="background-color: #8b5cf6;" onclick="sendDirectTextBlast('qc_alert')">⚠️ QA / Audit Warning</button>
+        <button type="button" class="btn" style="background-color: #64748b;" onclick="sendDirectTextBlast('lost_tool')">🔍 Lost Equipment Check</button>
       </div>
     </div>
   </div>
-
-</div>
 <script>
   const GOOGLE_FORM_VIEW_URL = "https://docs.google.com/forms/d/e/1FAIpQLSf5QkuPSaumLkF33HvlreQeTCHY5hV6Q98cswc03EbFiEo0dQ/viewform?usp=header";
   const SUPERVISOR_EMAIL = "Donald.boughton@princetown.com";
+
+  // Optional: Add default comma-separated team phone numbers if you want recipient auto-fill
+  // e.g. const TEAM_PHONE_NUMBERS = "5082212243,3026795985,7746359784";
+  const TEAM_PHONE_NUMBERS = "";
 
   function openGoogleForm() {
     window.open(GOOGLE_FORM_VIEW_URL, '_blank');
@@ -773,7 +773,7 @@
   function openDownedView() { switchView('view-downed'); }
   function openRTMView() { switchView('view-rtm'); }
   function openCommsView() { switchView('view-comms'); }
-  function openTeamBlastView() { switchView('view-team-blast'); }
+  function openSupervisorView() { switchView('view-supervisor'); }
 
   function switchView(targetId) {
     document.querySelectorAll('.view-screen').forEach(el => el.classList.remove('view-active'));
@@ -1341,45 +1341,34 @@
   }
 
   // ----------------------------------------------------
-  // SUPERVISOR TEAM BLAST COMMS (BCC GATEWAY)
+  // SUPERVISOR DIRECT SMS BLAST (OPENS IN TEXT MESSAGES)
   // ----------------------------------------------------
-  const TEAM_ROSTER_GATEWAYS = [
-    "5082212243@vtext.com", // Ousmane
-    "3026795985@vtext.com", // James
-    "7746359784@vtext.com", // Don
-    // Add additional techs here
-  ];
-
-  const BLAST_TEMPLATES = {
+  const SUPERVISOR_BLAST_TEMPLATES = {
     huddle: "Good morning team. We are holding a mandatory morning huddle in 15 minutes. Please head to the staging area.",
     weather: "🚨 WEATHER ALERT: Lightning/Severe weather in the area. Stand down, get off ladders/poles immediately, and wait in your trucks for the all-clear.",
     all_clear: "✅ WEATHER ALL-CLEAR: The severe weather has passed. You may safely resume field operations.",
-    timesheets: "⏱️ REMINDER: Please ensure all job codes are closed and timesheets are submitted before heading home.",
-    warehouse: "📦 WAREHOUSE: The North Haven warehouse is locking up early today. Grab any required equipment in the next 45 minutes.",
     overtime: "💰 ROUTE COVERAGE: We have open routes available this Saturday. Reply directly to this text if you want the overtime hours.",
-    lost_tool: "🔍 LOST EQUIPMENT: A technician is missing a piece of equipment. Please check your trucks to see if you accidentally grabbed a spare meter or ladder today.",
-    qc_alert: "⚠️ QC ALERT: We are seeing a spike in failed QA audits today on grounding and drop tags. Please double-check your house boxes before closing jobs."
+    qc_alert: "⚠️ QC ALERT: We are seeing a spike in failed QA audits today on grounding and drop tags. Please double-check your house boxes before closing jobs.",
+    lost_tool: "🔍 LOST EQUIPMENT: A technician is missing a piece of equipment. Please check your trucks to see if you accidentally grabbed a spare meter or ladder today."
   };
 
-  function sendTrueGatewayBlast(templateKey) {
+  function sendDirectTextBlast(templateKey) {
     let messageBody = "";
 
     if (templateKey === 'custom') {
       const customText = document.getElementById('customBlastText').value.trim();
       if (!customText) {
-        alert("Please type a message first.");
+        alert("Please write a message first.");
         return;
       }
-      messageBody = customText;
+      messageBody = `[PRINCE TELECOM ALERT]\n\n${customText}`;
     } else {
-      messageBody = BLAST_TEMPLATES[templateKey];
+      messageBody = `[PRINCE TELECOM ALERT]\n\n${SUPERVISOR_BLAST_TEMPLATES[templateKey]}`;
     }
 
-    const bccList = TEAM_ROSTER_GATEWAYS.join(",");
-    const subject = encodeURIComponent("Prince Telecom Alert");
-    const body = encodeURIComponent(`[TEAM ALERT]\n\n${messageBody}`);
-    
-    window.location.href = `mailto:?bcc=${bccList}&subject=${subject}&body=${body}`;
+    // Launch native Messages app with text prefilled
+    const recipients = TEAM_PHONE_NUMBERS ? `${TEAM_PHONE_NUMBERS}` : '';
+    window.location.href = `sms:${recipients}&body=${encodeURIComponent(messageBody)}`;
 
     if (templateKey === 'custom') {
       document.getElementById('customBlastText').value = '';
@@ -1388,3 +1377,4 @@
 </script>
 </body>
 </html>
+</div>
