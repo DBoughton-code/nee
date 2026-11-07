@@ -51,7 +51,7 @@
 
     .nav-top-bar {
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-start;
       align-items: center;
       margin-bottom: 4px;
     }
@@ -209,7 +209,6 @@
 
     textarea { resize: vertical; min-height: 70px; }
 
-    /* Collapsible Equipment Accordion */
     details.equip-cat {
       background: #0f172a;
       border: 1px solid var(--card-border);
@@ -307,19 +306,19 @@
       box-shadow: 0 0 4px rgba(0,0,0,0.5);
     }
 
-    /* Tap-to-Select Contact Chips */
+    /* Bottom Contact Selector Chips */
     .contact-chips-grid {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
       gap: 8px;
-      margin-top: 6px;
+      margin-bottom: 12px;
     }
 
     .contact-chip {
       background: #0f172a;
       border: 1.5px solid var(--card-border);
       border-radius: 8px;
-      padding: 10px 6px;
+      padding: 10px 4px;
       text-align: center;
       cursor: pointer;
       user-select: none;
@@ -327,7 +326,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
+      gap: 2px;
     }
 
     .contact-chip.selected {
@@ -508,7 +507,6 @@
   <div id="view-qc" class="view-screen">
     <div class="nav-top-bar">
       <button type="button" class="btn-back" onclick="navigateHome()">❮ Main Menu</button>
-      <span style="font-size: 0.8rem; font-weight: 700; color: var(--primary);">COMCAST QC MODE</span>
     </div>
 
     <div class="header">
@@ -583,7 +581,6 @@
   <div id="view-downed" class="view-screen">
     <div class="nav-top-bar">
       <button type="button" class="btn-back" onclick="navigateHome()">❮ Main Menu</button>
-      <span style="font-size: 0.8rem; font-weight: 700; color: var(--danger);">DOWNED JOB MODE</span>
     </div>
 
     <div class="header">
@@ -668,7 +665,6 @@
   <div id="view-rtm" class="view-screen">
     <div class="nav-top-bar">
       <button type="button" class="btn-back" onclick="navigateHome()">❮ Main Menu</button>
-      <span style="font-size: 0.8rem; font-weight: 700; color: var(--purple);">RTM ESCALATION MODE</span>
     </div>
 
     <div class="header">
@@ -760,7 +756,6 @@
   <div id="view-equip" class="view-screen">
     <div class="nav-top-bar">
       <button type="button" class="btn-back" onclick="navigateHome()">❮ Main Menu</button>
-      <span style="font-size: 0.8rem; font-weight: 700; color: var(--teal);">EQUIPMENT RESTOCK</span>
     </div>
 
     <div class="header">
@@ -787,28 +782,6 @@
           <option value="Other must call Ousmane, James, Don to setup">Other must call Ousmane, James, Don to setup</option>
         </select>
       </div>
-
-      <!-- Tap to Select Recipients Chips (Multi-Select) -->
-      <div class="form-group" style="margin-top: 8px;">
-        <label>SMS Recipients (Tap to Select / Deselect) *</label>
-        <div class="contact-chips-grid">
-          <div class="contact-chip selected" id="chip_ousmane" onclick="toggleRecipient('ousmane')">
-            <span class="contact-chip-name">Ousmane</span>
-            <span class="contact-chip-phone">508-221-2243</span>
-            <span class="contact-chip-status" id="status_ousmane">✓ Selected</span>
-          </div>
-          <div class="contact-chip selected" id="chip_james" onclick="toggleRecipient('james')">
-            <span class="contact-chip-name">James</span>
-            <span class="contact-chip-phone">302-679-5985</span>
-            <span class="contact-chip-status" id="status_james">✓ Selected</span>
-          </div>
-          <div class="contact-chip selected" id="chip_don" onclick="toggleRecipient('don')">
-            <span class="contact-chip-name">Don</span>
-            <span class="contact-chip-phone">774-635-9784</span>
-            <span class="contact-chip-status" id="status_don">✓ Selected</span>
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- Equipment Accordions with Sliders -->
@@ -825,8 +798,29 @@
       </div>
     </div>
 
+    <!-- Bottom Dispatch Card with Multi-Select Contact Buttons -->
     <div class="card">
       <div class="card-title">Dispatch Equipment Manifest</div>
+
+      <!-- Multi-Select Recipient Chips -->
+      <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 6px;">Select Recipients to Text (Tap to Toggle):</label>
+      <div class="contact-chips-grid">
+        <div class="contact-chip selected" id="chip_ousmane" onclick="toggleRecipient('ousmane')">
+          <span class="contact-chip-name">Ousmane</span>
+          <span class="contact-chip-phone">508-221-2243</span>
+          <span class="contact-chip-status" id="status_ousmane">✓ Selected</span>
+        </div>
+        <div class="contact-chip selected" id="chip_james" onclick="toggleRecipient('james')">
+          <span class="contact-chip-name">James</span>
+          <span class="contact-chip-phone">302-679-5985</span>
+          <span class="contact-chip-status" id="status_james">✓ Selected</span>
+        </div>
+        <div class="contact-chip selected" id="chip_don" onclick="toggleRecipient('don')">
+          <span class="contact-chip-name">Don</span>
+          <span class="contact-chip-phone">774-635-9784</span>
+          <span class="contact-chip-status" id="status_don">✓ Selected</span>
+        </div>
+      </div>
       
       <!-- Dynamic Buttons: 1 Tap-to-Text Button per Selected Recipient -->
       <div id="dynamicSmsButtonsContainer" style="display: flex; flex-direction: column; gap: 8px;"></div>
@@ -1115,7 +1109,7 @@
     renderDynamicSmsButtons();
   }
 
-  // Render dedicated buttons for selected contacts
+  // Render individual direct-text buttons for each selected supervisor
   function renderDynamicSmsButtons() {
     const container = document.getElementById('dynamicSmsButtonsContainer');
     if (!container) return;
@@ -1222,7 +1216,6 @@ ${notes ? `"${notes}"` : 'None'}
       } catch (err) {}
     }
 
-    // Fallback for older WebViews
     const tempArea = document.createElement("textarea");
     tempArea.value = payload.body;
     tempArea.style.position = "fixed";
