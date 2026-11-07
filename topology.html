@@ -1250,28 +1250,75 @@
         stbLossDs: 7.0,
         desc: 'All 4 outlets receive equal -7.0 dB attenuation. Standard balanced demarc architecture.',
         guide: '&bull; <strong>Port 1 (-7.0 dB):</strong> DOCSIS Gateway.<br>&bull; <strong>Ports 2-4 (-7.0 dB):</strong> TV Outlets.',
+        isCascade: false,
+        matrix: {
+          rxMin: 2.0,
+          rxIdeal: 10.0,
+          rxMax: 18.0,
+          txIdeal: 30.0,
+          txMax: 38.0
+        }
+      },
+      '8way': {
+        id: '8way',
+        name: 'Single Balanced 8-Way Splitter (-11.0 dB)',
+        short: 'Balanced 8-Way',
+        ports: 8,
+        lossDs: 11.0,
+        lossUs: 11.0,
+        stbLossDs: 11.0,
+        desc: 'Demarc home-run hub. All ports balanced at -11.0 dB attenuation.',
+        guide: '&bull; <strong>Port 1 (-11.0 dB):</strong> DOCSIS Gateway.<br>&bull; <strong>Active Ports (-11.0 dB):</strong> TV Outlets.<br>&bull; <strong>Unused Ports:</strong> 75Ω locking terminators required.',
+        isCascade: false,
+        matrix: {
+          rxMin: 6.0,
+          rxIdeal: 14.0,
+          rxMax: 22.0,
+          txIdeal: 26.0,
+          txMax: 34.0
+        }
+      },
+      cascade: {
+        id: 'cascade',
+        name: 'Cascaded Splitter (⚠️ Anti-Pattern / Avoid)',
+        short: 'Cascaded 2-Way',
+        ports: 6,
+        lossDs: 4.5,
+        lossUs: 4.5,
+        stbLossDs: 11.5,
+        desc: 'Demarc 2-Way feeding secondary splitter. Creates return squeeze and severe MoCA isolation loss.',
+        guide: '⚠️ <strong>Non-Standard:</strong> Re-cable with a single home-run splitter (3-Way, 4-Way, or 8-Way).',
+        isCascade: true,
+        matrix: null
+      }
+    };
+
     function handleTapDs(val) {
       state.tapDs = parseFloat(val);
-      document.getElementById('tapDsVal').textContent = (state.tapDs > 0 ? '+' : '') + state.tapDs.toFixed(1);
+      const el = document.getElementById('tapDsVal');
+      if (el) el.textContent = (state.tapDs > 0 ? '+' : '') + state.tapDs.toFixed(1);
       calculate();
     }
 
     function handleTapTx(val) {
       state.tapTx = parseFloat(val);
-      document.getElementById('tapTxVal').textContent = state.tapTx.toFixed(1);
+      const el = document.getElementById('tapTxVal');
+      if (el) el.textContent = state.tapTx.toFixed(1);
       calculate();
     }
 
     function handleModemCount(val) {
       state.modemCount = parseInt(val, 10);
-      document.getElementById('modemCountVal').textContent = state.modemCount === 1 ? '1 Modem Active' : 'No Modem (TV Only)';
+      const el = document.getElementById('modemCountVal');
+      if (el) el.textContent = state.modemCount === 1 ? '1 Modem Active' : 'No Modem (TV Only)';
       autoAdjustManualId();
       calculate();
     }
 
     function handleTvSlider(val) {
       state.stbCount = parseInt(val, 10);
-      document.getElementById('tvCountVal').textContent = `${state.stbCount} TV${state.stbCount === 1 ? '' : 's'}`;
+      const el = document.getElementById('tvCountVal');
+      if (el) el.textContent = `${state.stbCount} TV${state.stbCount === 1 ? '' : 's'}`;
       autoAdjustManualId();
       calculate();
     }
@@ -1292,13 +1339,15 @@
 
     function handleDropLen(val) {
       state.dropLen = parseInt(val, 10);
-      document.getElementById('dropLenVal').textContent = state.dropLen;
+      const el = document.getElementById('dropLenVal');
+      if (el) el.textContent = state.dropLen;
       calculate();
     }
 
     function handleInsideLen(val) {
       state.insideLen = parseInt(val, 10);
-      document.getElementById('insideLenVal').textContent = state.insideLen;
+      const el = document.getElementById('insideLenVal');
+      if (el) el.textContent = state.insideLen;
       calculate();
     }
 
@@ -1318,16 +1367,23 @@
 
     // Calculation Engine
     function calculate() {
-      state.dropType = document.getElementById('dropType').value;
+      const dropTypeSelect = document.getElementById('dropType');
+      if (dropTypeSelect) {
+        state.dropType = dropTypeSelect.value;
+      }
       
       const totalOutlets = state.modemCount + state.stbCount;
       const modemLabel = state.modemCount === 1 ? '1 DOCSIS Modem' : '0 Modems';
-      document.getElementById('deviceSummaryText').innerHTML = 
-        `Total House Outlets: <strong>${totalOutlets}</strong> (${modemLabel} + ${state.stbCount} TV Outlet${state.stbCount === 1 ? '' : 's'}).`;
+      const summaryText = document.getElementById('deviceSummaryText');
+      if (summaryText) {
+        summaryText.innerHTML = 
+          `Total House Outlets: <strong>${totalOutlets}</strong> (${modemLabel} + ${state.stbCount} TV Outlet${state.stbCount === 1 ? '' : 's'}).`;
+      }
 
       // OES Drop Rule: Series 6 max 150 ft
       const isOesViolation = (state.dropType === 'rg6' && state.dropLen > 150);
-      document.getElementById('oesAlert').style.display = isOesViolation ? 'flex' : 'none';
+      const oesAlert = document.getElementById('oesAlert');
+      if (oesAlert) oesAlert.style.display = isOesViolation ? 'flex' : 'none';
 
       // Attenuation Rates
       const dropDsRate = state.dropType === 'rg6' ? 0.060 : 0.038; // per ft at 1 GHz
@@ -1340,8 +1396,10 @@
       const insideLossDs = Number((state.insideLen * insideDsRate).toFixed(1));
       const insideLossUs = Number((state.insideLen * insideUsRate).toFixed(1));
 
-      document.getElementById('dropLossDisplay').textContent = `Drop Loss: -${dropLossDs} dB (1G)`;
-      document.getElementById('insideLossDisplay').textContent = `Inside Loss: -${insideLossDs} dB (1G)`;
+      const dropLossDisp = document.getElementById('dropLossDisplay');
+      if (dropLossDisp) dropLossDisp.textContent = `Drop Loss: -${dropLossDs.toFixed(1)} dB (1G)`;
+      const insideLossDisp = document.getElementById('insideLossDisplay');
+      if (insideLossDisp) insideLossDisp.textContent = `Inside Loss: -${insideLossDs.toFixed(1)} dB (1G)`;
 
       // EXPECTED GROUND BLOCK NUMBERS (Pre-Splitter, after Drop Cable)
       const gbRx = Number((state.tapDs - dropLossDs).toFixed(1));
@@ -1356,7 +1414,6 @@
           ? Number((state.tapTx + dropLossUs + item.lossUs + insideLossUs).toFixed(1)) 
           : null;
         
-        // If no modem, STBs take primary/balanced ports or item.stbLossDs
         const stbLossToUse = (state.modemCount === 0) ? item.lossDs : (item.stbLossDs !== null ? item.stbLossDs : item.lossDs);
         const sRx = (state.stbCount > 0)
           ? Number((state.tapDs - dropLossDs - stbLossToUse - insideLossDs).toFixed(1))
@@ -1383,10 +1440,7 @@
           penalty += excessPorts * 5;
         }
 
-        // STB range penalty
         if (sRx !== null && (sRx < -8.0 || sRx > 8.0)) penalty += 50;
-
-        // Cascade penalty
         if (item.isCascade) penalty += 400;
 
         return { ...item, mRx, mTx, sRx, penalty, portShortfall, excessPorts };
@@ -1405,124 +1459,149 @@
 
       // Render Manual Grid
       const manualGrid = document.getElementById('splitterGrid');
-      manualGrid.innerHTML = '';
-      candidateKeys.forEach(k => {
-        const item = catalog[k];
-        const isSel = (state.manualId === k);
-        const hasEnoughPorts = item.ports >= totalOutlets;
-        const btn = document.createElement('div');
-        
-        let cls = 'splitter-btn';
-        if (item.isCascade) cls += ' cascade';
-        if (isSel) cls += ' selected';
-        if (!hasEnoughPorts && !item.isCascade) cls += ' disabled';
+      if (manualGrid) {
+        manualGrid.innerHTML = '';
+        candidateKeys.forEach(k => {
+          const item = catalog[k];
+          const isSel = (active.id === k);
+          const hasEnoughPorts = item.ports >= totalOutlets;
+          const btn = document.createElement('div');
+          
+          let cls = 'splitter-btn';
+          if (item.isCascade) cls += ' cascade';
+          if (isSel) cls += ' selected';
+          if (!hasEnoughPorts && !item.isCascade) cls += ' disabled';
 
-        btn.className = cls;
-        btn.onclick = () => selectManualSplitter(k);
+          btn.className = cls;
+          btn.onclick = () => selectManualSplitter(k);
 
-        btn.innerHTML = `
-          <div class="s-name">${item.short}</div>
-          <div class="s-meta">${item.ports} Port${item.ports > 1 ? 's' : ''} ${!hasEnoughPorts ? '• <span style="color:var(--rose)">Need ' + totalOutlets + '</span>' : ''}</div>
-          <div class="s-loss">${item.isCascade ? '⚠️ Non-Standard' : '-' + item.lossDs + ' dB'}</div>
-        `;
-        manualGrid.appendChild(btn);
-      });
+          btn.innerHTML = `
+            <div class="s-name">${item.short}</div>
+            <div class="s-meta">${item.ports} Port${item.ports > 1 ? 's' : ''} ${!hasEnoughPorts ? '• <span style="color:var(--rose)">Need ' + totalOutlets + '</span>' : ''}</div>
+            <div class="s-loss">${item.isCascade ? '⚠️ Non-Standard' : '-' + item.lossDs.toFixed(1) + ' dB'}</div>
+          `;
+          manualGrid.appendChild(btn);
+        });
+      }
 
-      document.getElementById('manualSelectedMeta').textContent = 
-        `${active.short} (-${active.lossDs} dB DS)`;
+      const metaEl = document.getElementById('manualSelectedMeta');
+      if (metaEl) {
+        metaEl.textContent = `${active.short} (-${active.lossDs.toFixed(1)} dB DS)`;
+      }
 
       // Port shortfall warning
       const shortfallEl = document.getElementById('portShortfallAlert');
-      if (active.portShortfall > 0) {
-        shortfallEl.style.display = 'flex';
-        document.getElementById('portShortfallText').innerHTML = 
-          `Selected <strong>${active.short}</strong> has only ${active.ports} port(s), but premise requires ${totalOutlets} outlets. Shortfall: <strong>${active.portShortfall} port(s)</strong>.`;
-      } else {
-        shortfallEl.style.display = 'none';
+      if (shortfallEl) {
+        if (active.portShortfall > 0) {
+          shortfallEl.style.display = 'flex';
+          const sfText = document.getElementById('portShortfallText');
+          if (sfText) {
+            sfText.innerHTML = `Selected <strong>${active.short}</strong> has only ${active.ports} port(s), but premise requires ${totalOutlets} outlets. Shortfall: <strong>${active.portShortfall} port(s)</strong>.`;
+          }
+        } else {
+          shortfallEl.style.display = 'none';
+        }
       }
 
       // Populate Hero Banner
-      document.getElementById('heroName').textContent = active.name;
-      document.getElementById('heroDesc').textContent = active.desc;
-      document.getElementById('portCapacityBadge').textContent = `${active.ports}-PORT DEMARC (${totalOutlets} OUTLETS IN USE)`;
-      document.getElementById('portGuideText').innerHTML = active.guide;
+      const heroName = document.getElementById('heroName');
+      if (heroName) heroName.textContent = active.name;
+      const heroDesc = document.getElementById('heroDesc');
+      if (heroDesc) heroDesc.textContent = active.desc;
+      const portBadge = document.getElementById('portCapacityBadge');
+      if (portBadge) portBadge.textContent = `${active.ports}-PORT DEMARC (${totalOutlets} OUTLETS IN USE)`;
+      const portGuide = document.getElementById('portGuideText');
+      if (portGuide) portGuide.innerHTML = active.guide;
 
       // Populate Dedicated Ground Block Telemetry
-      document.getElementById('valGbRx').textContent = `${gbRx > 0 ? '+' : ''}${gbRx.toFixed(1)} dBmV`;
-      document.getElementById('valGbTx').textContent = `${gbTx.toFixed(1)} dBmV`;
+      const gbRxEl = document.getElementById('valGbRx');
+      if (gbRxEl) gbRxEl.textContent = `${gbRx > 0 ? '+' : ''}${gbRx.toFixed(1)} dBmV`;
+      const gbTxEl = document.getElementById('valGbTx');
+      if (gbTxEl) gbTxEl.textContent = `${gbTx.toFixed(1)} dBmV`;
 
-      if (active.matrix) {
-        document.getElementById('gbMatrixCompare').textContent = 
+      const matrixComp = document.getElementById('gbMatrixCompare');
+      if (matrixComp && active.matrix) {
+        matrixComp.textContent = 
           `Target: Ideal ${active.matrix.rxIdeal > 0 ? '+' : ''}${active.matrix.rxIdeal.toFixed(1)} dBmV Rx | Safe: ${active.matrix.rxMin > 0 ? '+' : ''}${active.matrix.rxMin.toFixed(1)} to +${active.matrix.rxMax.toFixed(1)}`;
       }
 
       // Unused Ports Alert
       const termAlert = document.getElementById('terminatorAlert');
-      const unusedCount = Math.max(0, active.ports - totalOutlets);
-      if (unusedCount > 0 && !active.isCascade) {
-        termAlert.style.display = 'flex';
-        document.getElementById('terminatorText').innerHTML = 
-          `<strong>${unusedCount} unused port${unusedCount > 1 ? 's' : ''}</strong> must be capped with approved 75Ω locking terminators to prevent a 7-point TQI-C deduction and protect against RF noise ingress.`;
-      } else {
-        termAlert.style.display = 'none';
+      if (termAlert) {
+        const unusedCount = Math.max(0, active.ports - totalOutlets);
+        if (unusedCount > 0 && !active.isCascade) {
+          termAlert.style.display = 'flex';
+          const termText = document.getElementById('terminatorText');
+          if (termText) {
+            termText.innerHTML = `<strong>${unusedCount} unused port${unusedCount > 1 ? 's' : ''}</strong> must be capped with approved 75Ω locking terminators to prevent a 7-point TQI-C deduction and protect against RF noise ingress.`;
+          }
+        } else {
+          termAlert.style.display = 'none';
+        }
       }
 
       // Populate Delivered Device Telemetry Cards
       const rxEl = document.getElementById('valModemRx');
       const rxSub = document.getElementById('subModemRx');
-      if (state.modemCount === 1 && active.mRx !== null) {
-        rxEl.textContent = `${active.mRx > 0 ? '+' : ''}${active.mRx.toFixed(1)} dBmV`;
-        if (active.mRx < -15.0 || active.mRx > 15.0) {
-          rxEl.className = 't-val val-fail';
-          rxSub.textContent = 'HARD FAIL (< -15 or > +15)';
-        } else if (active.mRx < -8.0 || active.mRx > 8.0) {
-          rxEl.className = 't-val val-warn';
-          rxSub.textContent = 'MARGINAL (Safe: -8 to +8)';
+      if (rxEl && rxSub) {
+        if (state.modemCount === 1 && active.mRx !== null) {
+          rxEl.textContent = `${active.mRx > 0 ? '+' : ''}${active.mRx.toFixed(1)} dBmV`;
+          if (active.mRx < -15.0 || active.mRx > 15.0) {
+            rxEl.className = 't-val val-fail';
+            rxSub.textContent = 'HARD FAIL (< -15 or > +15)';
+          } else if (active.mRx < -8.0 || active.mRx > 8.0) {
+            rxEl.className = 't-val val-warn';
+            rxSub.textContent = 'MARGINAL (Safe: -8 to +8)';
+          } else {
+            rxEl.className = 't-val val-safe';
+            rxSub.textContent = 'Target: 0.0 (-8.0 to +8.0)';
+          }
         } else {
-          rxEl.className = 't-val val-safe';
-          rxSub.textContent = 'Target: 0.0 (-8.0 to +8.0)';
+          rxEl.textContent = 'N/A';
+          rxEl.className = 't-val';
+          rxSub.textContent = 'No Modem (TV Only)';
         }
-      } else {
-        rxEl.textContent = 'N/A';
-        rxEl.className = 't-val';
-        rxSub.textContent = 'No Modem (TV Only)';
       }
 
       const txEl = document.getElementById('valModemTx');
       const txSub = document.getElementById('subModemTx');
-      if (state.modemCount === 1 && active.mTx !== null) {
-        txEl.textContent = `${active.mTx.toFixed(1)} dBmV`;
-        if (active.mTx < 35.0 || active.mTx > 53.0) {
-          txEl.className = 't-val val-fail';
-          txSub.textContent = 'HARD FAIL (< 35 or > 53)';
-        } else if (active.mTx > 48.0) {
-          txEl.className = 't-val val-warn';
-          txSub.textContent = 'MARGINAL (> 48.0 dBmV)';
+      if (txEl && txSub) {
+        if (state.modemCount === 1 && active.mTx !== null) {
+          txEl.textContent = `${active.mTx.toFixed(1)} dBmV`;
+          if (active.mTx < 35.0 || active.mTx > 53.0) {
+            txEl.className = 't-val val-fail';
+            txSub.textContent = 'HARD FAIL (< 35 or > 53)';
+          } else if (active.mTx > 48.0) {
+            txEl.className = 't-val val-warn';
+            txSub.textContent = 'MARGINAL (> 48.0 dBmV)';
+          } else {
+            txEl.className = 't-val val-ideal';
+            txSub.textContent = 'Safe: 35.0 to 48.0';
+          }
         } else {
-          txEl.className = 't-val val-ideal';
-          txSub.textContent = 'Safe: 35.0 to 48.0';
+          txEl.textContent = 'N/A';
+          txEl.className = 't-val';
+          txSub.textContent = 'No Modem (TV Only)';
         }
-      } else {
-        txEl.textContent = 'N/A';
-        txEl.className = 't-val';
-        txSub.textContent = 'No Modem (TV Only)';
       }
 
       const stbEl = document.getElementById('valStbRx');
       const stbSub = document.getElementById('subStbRx');
-      if (active.sRx !== null) {
-        stbEl.textContent = `${active.sRx > 0 ? '+' : ''}${active.sRx.toFixed(1)} dBmV`;
-        if (active.sRx < -8.0 || active.sRx > 8.0) {
-          stbEl.className = 't-val val-warn';
-          stbSub.textContent = 'MARGINAL (Safe: -8 to +8)';
+      if (stbEl && stbSub) {
+        if (active.sRx !== null) {
+          stbEl.textContent = `${active.sRx > 0 ? '+' : ''}${active.sRx.toFixed(1)} dBmV`;
+          if (active.sRx < -8.0 || active.sRx > 8.0) {
+            stbEl.className = 't-val val-warn';
+            stbSub.textContent = 'MARGINAL (Safe: -8 to +8)';
+          } else {
+            stbEl.className = 't-val val-safe';
+            stbSub.textContent = 'Safe: -8.0 to +8.0';
+          }
         } else {
-          stbEl.className = 't-val val-safe';
-          stbSub.textContent = 'Safe: -8.0 to +8.0';
+          stbEl.textContent = 'N/A';
+          stbEl.className = 't-val';
+          stbSub.textContent = '0 TVs connected';
         }
-      } else {
-        stbEl.textContent = 'N/A';
-        stbEl.className = 't-val';
-        stbSub.textContent = '0 TVs connected';
       }
 
       // Overall PHT Status
@@ -1540,78 +1619,92 @@
 
       if (hasHardFail) {
         const text = active.portShortfall > 0 ? '❌ PORT SHORTFALL' : '❌ PHT HARD FAIL';
-        topBadge.className = 'pht-header-badge badge-fail';
-        topBadge.innerHTML = `<span>${text}</span>`;
-        heroBadge.className = 'pht-header-badge badge-fail';
-        heroBadge.innerHTML = `<span>${text}</span>`;
-        heroBanner.style.borderColor = 'var(--rose)';
+        if (topBadge) {
+          topBadge.className = 'pht-header-badge badge-fail';
+          topBadge.innerHTML = `<span>${text}</span>`;
+        }
+        if (heroBadge) {
+          heroBadge.className = 'pht-header-badge badge-fail';
+          heroBadge.innerHTML = `<span>${text}</span>`;
+        }
+        if (heroBanner) heroBanner.style.borderColor = 'var(--rose)';
       } else if (hasMarginal) {
-        topBadge.className = 'pht-header-badge badge-marginal';
-        topBadge.innerHTML = `<span>⚠️ PHT MARGINAL</span>`;
-        heroBadge.className = 'pht-header-badge badge-marginal';
-        heroBadge.innerHTML = `<span>⚠️ PHT MARGINAL</span>`;
-        heroBanner.style.borderColor = 'var(--amber)';
+        if (topBadge) {
+          topBadge.className = 'pht-header-badge badge-marginal';
+          topBadge.innerHTML = `<span>⚠️ PHT MARGINAL</span>`;
+        }
+        if (heroBadge) {
+          heroBadge.className = 'pht-header-badge badge-marginal';
+          heroBadge.innerHTML = `<span>⚠️ PHT MARGINAL</span>`;
+        }
+        if (heroBanner) heroBanner.style.borderColor = 'var(--amber)';
       } else {
-        topBadge.className = 'pht-header-badge badge-pass';
-        topBadge.innerHTML = `<span>✓ OPTIMAL PHT PASS</span>`;
-        heroBadge.className = 'pht-header-badge badge-pass';
-        heroBadge.innerHTML = `<span>✓ OPTIMAL PHT PASS</span>`;
-        heroBanner.style.borderColor = 'var(--cyan)';
+        if (topBadge) {
+          topBadge.className = 'pht-header-badge badge-pass';
+          topBadge.innerHTML = `<span>✓ OPTIMAL PHT PASS</span>`;
+        }
+        if (heroBadge) {
+          heroBadge.className = 'pht-header-badge badge-pass';
+          heroBadge.innerHTML = `<span>✓ OPTIMAL PHT PASS</span>`;
+        }
+        if (heroBanner) heroBanner.style.borderColor = 'var(--cyan)';
       }
 
       // Populate Evaluated List
       const topList = document.getElementById('topologiesList');
-      topList.innerHTML = '';
+      if (topList) {
+        topList.innerHTML = '';
 
-      evaluated.forEach(item => {
-        const isActive = (item.id === active.id);
-        const hasPorts = (item.ports >= totalOutlets);
-        const row = document.createElement('div');
-        
-        let rowCls = 'topology-row';
-        if (item.isCascade) rowCls += ' cascade-row';
-        if (isActive) rowCls += ' active';
+        evaluated.forEach(item => {
+          const isActive = (item.id === active.id);
+          const hasPorts = (item.ports >= totalOutlets);
+          const row = document.createElement('div');
+          
+          let rowCls = 'topology-row';
+          if (item.isCascade) rowCls += ' cascade-row';
+          if (isActive) rowCls += ' active';
 
-        row.className = rowCls;
-        row.onclick = () => {
-          if (state.mode === 'auto') setMode('manual');
-          selectManualSplitter(item.id);
-        };
+          row.className = rowCls;
+          row.onclick = () => {
+            if (state.mode === 'auto') setMode('manual');
+            selectManualSplitter(item.id);
+          };
 
-        const isOverallPass = (state.modemCount === 0 || (item.mTx <= 48.0 && item.mRx >= -8.0 && item.mRx <= 8.0)) &&
-                              (item.sRx === null || (item.sRx >= -8.0 && item.sRx <= 8.0)) && !item.isCascade;
+          const isOverallPass = (state.modemCount === 0 || (item.mTx <= 48.0 && item.mRx >= -8.0 && item.mRx <= 8.0)) &&
+                                (item.sRx === null || (item.sRx >= -8.0 && item.sRx <= 8.0)) && !item.isCascade;
 
-        const passBadge = (!hasPorts && !item.isCascade)
-          ? `<span style="font-size:0.65rem; color:var(--rose); font-weight:800;">[SHORTFALL]</span>`
-          : isOverallPass
-            ? `<span style="font-size:0.65rem; color:var(--emerald); font-weight:800;">[PASS]</span>`
-            : `<span style="font-size:0.65rem; color:var(--amber); font-weight:800;">[MARGINAL]</span>`;
+          const passBadge = (!hasPorts && !item.isCascade)
+            ? `<span style="font-size:0.65rem; color:var(--rose); font-weight:800;">[SHORTFALL]</span>`
+            : isOverallPass
+              ? `<span style="font-size:0.65rem; color:var(--emerald); font-weight:800;">[PASS]</span>`
+              : `<span style="font-size:0.65rem; color:var(--amber); font-weight:800;">[MARGINAL]</span>`;
 
-        const displayRx = state.modemCount === 1 ? item.mRx : item.sRx;
-        const displayTx = state.modemCount === 1 ? item.mTx : null;
+          const displayRx = state.modemCount === 1 ? item.mRx : item.sRx;
+          const displayTx = state.modemCount === 1 ? item.mTx : null;
 
-        row.innerHTML = `
-          <div class="row-info">
-            <div class="row-title">
-              ${passBadge}
-              <span style="${item.isCascade ? 'text-decoration: line-through; color: var(--rose);' : ''}">${item.name}</span>
+          row.innerHTML = `
+            <div class="row-info">
+              <div class="row-title">
+                ${passBadge}
+                <span style="${item.isCascade ? 'text-decoration: line-through; color: var(--rose);' : ''}">${item.name}</span>
+              </div>
+              <div class="row-meta">${item.desc}</div>
             </div>
-            <div class="row-meta">${item.desc}</div>
-          </div>
-          <div class="row-metrics">
-            <span style="color:${displayRx !== null && displayRx >= -8 && displayRx <= 8 ? 'var(--cyan)' : 'var(--amber)'}">
-              ${displayRx !== null ? ((displayRx > 0 ? '+' : '') + displayRx.toFixed(1) + ' Rx') : 'N/A'}
-            </span>
-            ${displayTx !== null ? `
-              <span style="color:var(--text-sub)">|</span>
-              <span style="color:${displayTx <= 48 ? 'var(--emerald)' : 'var(--rose)'}">
-                ${displayTx.toFixed(1)} Tx
+            <div class="row-metrics">
+              <span style="color:${displayRx !== null && displayRx >= -8 && displayRx <= 8 ? 'var(--cyan)' : 'var(--amber)'}">
+                ${displayRx !== null ? ((displayRx > 0 ? '+' : '') + displayRx.toFixed(1) + ' Rx') : 'N/A'}
               </span>
-            ` : ''}
-          </div>
-        `;
-        topList.appendChild(row);
-      });
+              ${displayTx !== null ? `
+                <span style="color:var(--text-sub)">|</span>
+                <span style="color:${displayTx <= 48 ? 'var(--emerald)' : 'var(--rose)'}">
+                  ${displayTx.toFixed(1)} Tx
+                </span>
+              ` : ''}
+            </div>
+          `;
+          topList.appendChild(row);
+        });
+      }
     }
 
     // Modal Content Generator
@@ -1768,6 +1861,43 @@
       toast.style.display = 'block';
       setTimeout(() => { toast.style.display = 'none'; }, 3000);
     }
+
+    // Explicit Dual Event Binding for Fluid Touch & Mouse Sliders
+    function attachSliderListeners() {
+      const sliderBindings = [
+        { id: 'tapDs', fn: handleTapDs },
+        { id: 'tapTx', fn: handleTapTx },
+        { id: 'dropLen', fn: handleDropLen },
+        { id: 'modemCount', fn: handleModemCount },
+        { id: 'tvCountSlider', fn: handleTvSlider },
+        { id: 'insideLen', fn: handleInsideLen }
+      ];
+
+      sliderBindings.forEach(binding => {
+        const el = document.getElementById(binding.id);
+        if (el) {
+          ['input', 'change'].forEach(evtType => {
+            el.addEventListener(evtType, (e) => {
+              binding.fn(e.target.value);
+            }, { passive: true });
+          });
+        }
+      });
+
+      const dropSelect = document.getElementById('dropType');
+      if (dropSelect) {
+        ['change', 'input'].forEach(evtType => {
+          dropSelect.addEventListener(evtType, () => {
+            calculate();
+          });
+        });
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      attachSliderListeners();
+      calculate();
+    });
 
     window.onload = function() {
       calculate();
