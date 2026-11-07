@@ -306,58 +306,18 @@
       box-shadow: 0 0 4px rgba(0,0,0,0.5);
     }
 
-    /* Bottom Contact Selector Chips */
-    .contact-chips-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-
-    .contact-chip {
-      background: #0f172a;
-      border: 1.5px solid var(--card-border);
+    .sms-contact-box {
+      background: rgba(20, 184, 166, 0.08);
+      border: 1px solid #14b8a6;
       border-radius: 8px;
-      padding: 10px 4px;
-      text-align: center;
-      cursor: pointer;
-      user-select: none;
-      transition: all 0.15s ease;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      font-size: 0.82rem;
+      color: #ccfbf1;
+      line-height: 1.4;
     }
 
-    .contact-chip.selected {
-      background: rgba(20, 184, 166, 0.15);
-      border-color: var(--teal);
-    }
-
-    .contact-chip-name {
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--text);
-    }
-
-    .contact-chip.selected .contact-chip-name {
-      color: #5eead4;
-    }
-
-    .contact-chip-phone {
-      font-size: 0.65rem;
-      color: var(--text-muted);
-    }
-
-    .contact-chip-status {
-      font-size: 0.7rem;
-      font-weight: 800;
-      color: var(--teal);
-    }
-
-    .contact-chip:not(.selected) .contact-chip-status {
-      color: #64748b;
-    }
+    .sms-contact-box strong { color: #5eead4; }
 
     .photo-grid {
       display: grid;
@@ -424,8 +384,6 @@
       margin-top: 8px;
       display: none;
     }
-
-    .status-info { background: #075985; color: #e0f2fe; }
 
     .remove-btn {
       position: absolute;
@@ -763,7 +721,6 @@
       <p>Please Fill Out By 9:00 AM Monday[span_0](start_span)[span_0](end_span)</p>
     </div>
 
-    <!-- Tech & Location Details -->
     <div class="card">
       <div class="card-title">Technician & Pickup Point</div>
       <div class="form-group">
@@ -784,13 +741,11 @@
       </div>
     </div>
 
-    <!-- Equipment Accordions with Sliders -->
     <div class="card">
       <div class="card-title">Material Catalog (Slide to Select)</div>
       <div id="equipAccordionContainer"></div>
     </div>
 
-    <!-- Optional Notes -->
     <div class="card">
       <div class="card-title">Special Request Notes</div>
       <div class="form-group">
@@ -798,53 +753,29 @@
       </div>
     </div>
 
-    <!-- Bottom Dispatch Card with Multi-Select Contact Buttons -->
     <div class="card">
       <div class="card-title">Dispatch Equipment Manifest</div>
-
-      <!-- Multi-Select Recipient Chips -->
-      <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 6px;">Select Recipients to Text (Tap to Toggle):</label>
-      <div class="contact-chips-grid">
-        <div class="contact-chip selected" id="chip_ousmane" onclick="toggleRecipient('ousmane')">
-          <span class="contact-chip-name">Ousmane</span>
-          <span class="contact-chip-phone">508-221-2243</span>
-          <span class="contact-chip-status" id="status_ousmane">✓ Selected</span>
-        </div>
-        <div class="contact-chip selected" id="chip_james" onclick="toggleRecipient('james')">
-          <span class="contact-chip-name">James</span>
-          <span class="contact-chip-phone">302-679-5985</span>
-          <span class="contact-chip-status" id="status_james">✓ Selected</span>
-        </div>
-        <div class="contact-chip selected" id="chip_don" onclick="toggleRecipient('don')">
-          <span class="contact-chip-name">Don</span>
-          <span class="contact-chip-phone">774-635-9784</span>
-          <span class="contact-chip-status" id="status_don">✓ Selected</span>
-        </div>
+      <div class="sms-contact-box">
+        📲 <strong>Verizon SMS Routing (Direct Text to All 3):</strong><br>
+        • Ousmane (508-221-2243)<br>
+        • James (302-679-5985)<br>
+        • Don (774-635-9784)
       </div>
-      
-      <!-- Dynamic Buttons: 1 Tap-to-Text Button per Selected Recipient -->
-      <div id="dynamicSmsButtonsContainer" style="display: flex; flex-direction: column; gap: 8px;"></div>
 
-      <!-- Copy to Clipboard Fallback for Group Chats -->
-      <button type="button" class="btn btn-secondary" onclick="copyEquipManifest()" style="margin-top: 10px;">📋 Copy Order to Clipboard (Paste in Group Chat)</button>
-      
-      <!-- Reset Form -->
+      <button type="button" class="btn btn-sms" onclick="sendOrderAsVerizonSMS()">📲 Send Text to All 3 (Ousmane, James, Don)</button>
       <button type="button" class="btn btn-reset" onclick="resetEquipOrder()">Reset All Quantities</button>
-      
-      <div id="equipStatus" class="status-msg" style="margin-top: 10px;"></div>
     </div>
   </div>
 </div>
 <script>
-  const GOOGLE_FORM_RESPONSE_URL = "https://docs.google.com/forms/d/e/YOUR_FORM_ID_HERE/formResponse";
   const SUPERVISOR_EMAIL = "Donald.boughton@princetown.com";
 
-  // Contact Directory & Selection State
-  const CONTACT_DIRECTORY = {
-    ousmane: { name: "Ousmane", phone: "5082212243", selected: true },
-    james: { name: "James", phone: "3026795985", selected: true },
-    don: { name: "Don", phone: "7746359784", selected: true }
-  };
+  // Verizon Email-to-SMS Gateway Addresses for Ousmane, James, and Don
+  const VERIZON_SMS_GATEWAYS = [
+    "5082212243@vtext.com", // Ousmane
+    "3026795985@vtext.com", // James
+    "7746359784@vtext.com"  // Don
+  ];
 
   const COMCAST_PHOTO_SCHEMA = [
     { id: "tap", label: "1. Tap w/ Drop Tag & Strand Attachment" },
@@ -863,7 +794,6 @@
   const rtmExtraPhotos = [];
   let rtmExtraCounter = 0;
 
-  // Complete Catalog mapped from your Google Form[span_1](start_span)[span_1](end_span)[span_2](start_span)[span_2](end_span)[span_3](start_span)[span_3](end_span)[span_4](start_span)[span_4](end_span)[span_5](start_span)[span_5](end_span)[span_6](start_span)[span_6](end_span)[span_7](start_span)[span_7](end_span)[span_8](start_span)[span_8](end_span)[span_9](start_span)[span_9](end_span)[span_10](start_span)[span_10](end_span)[span_11](start_span)[span_11](end_span)[span_12](start_span)[span_12](end_span)
   const EQUIP_CATALOG = [
     {
       category: "CPE - MODEMS",
@@ -1038,7 +968,6 @@
 
   const equipCounts = {};
 
-  // Build the catalog using range sliders
   function buildEquipCatalogUI() {
     const container = document.getElementById('equipAccordionContainer');
     container.innerHTML = '';
@@ -1090,55 +1019,6 @@
     }
   }
 
-  // Toggle recipient contact chips
-  function toggleRecipient(key) {
-    if (!CONTACT_DIRECTORY[key]) return;
-    CONTACT_DIRECTORY[key].selected = !CONTACT_DIRECTORY[key].selected;
-    
-    const chip = document.getElementById(`chip_${key}`);
-    const status = document.getElementById(`status_${key}`);
-    
-    if (CONTACT_DIRECTORY[key].selected) {
-      chip.classList.add('selected');
-      status.textContent = '✓ Selected';
-    } else {
-      chip.classList.remove('selected');
-      status.textContent = '— Off';
-    }
-
-    renderDynamicSmsButtons();
-  }
-
-  // Render individual direct-text buttons for each selected supervisor
-  function renderDynamicSmsButtons() {
-    const container = document.getElementById('dynamicSmsButtonsContainer');
-    if (!container) return;
-    container.innerHTML = '';
-
-    const selectedKeys = Object.keys(CONTACT_DIRECTORY).filter(k => CONTACT_DIRECTORY[k].selected);
-
-    if (selectedKeys.length === 0) {
-      container.innerHTML = `<p style="font-size:0.82rem; color:var(--danger); margin:4px 0; text-align:center;">⚠️ Select at least one recipient chip above to enable texting.</p>`;
-      return;
-    }
-
-    selectedKeys.forEach(key => {
-      const contact = CONTACT_DIRECTORY[key];
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'btn btn-sms';
-      btn.style.marginTop = '0';
-      btn.innerHTML = `📲 Send Text to ${contact.name} (${formatDisplayPhone(contact.phone)})`;
-      btn.onclick = () => sendDirectTextToPerson(contact.phone);
-      container.appendChild(btn);
-    });
-  }
-
-  function formatDisplayPhone(p) {
-    return `(${p.slice(0,3)}) ${p.slice(3,6)}-${p.slice(6)}`;
-  }
-
-  // Build order text payload
   function buildEquipOrderPayload() {
     const techName = document.getElementById('equipTechName').value.trim();
     const techNum = document.getElementById('equipTechNum').value.trim();
@@ -1169,82 +1049,21 @@
     }
 
     const timestamp = new Date().toLocaleString();
-    const body = `📦 WEEKLY EQUIPMENT ORDER MANIFEST
-Due: By 9:00 AM Monday
-Logged: ${timestamp}
+    const subject = `EQUIP ORDER | Tech ${techNum} (${techName})`;
+    const body = `WEEKLY EQUIPMENT ORDER\nDue: 9am Mon\nTime: ${timestamp}\n\nTECH:\n• Name: ${techName}\n• ID: ${techNum}\n• Pickup: ${pickupLoc}\n\nITEMS:\n${manifestLines.length > 0 ? manifestLines.join('\n\n') : 'Custom notes only'}\n\nNOTES:\n${notes ? `"${notes}"` : 'None'}`;
 
-TECHNICIAN:
-• Name: ${techName}
-• Tech ID: ${techNum}
-• Pickup: ${pickupLoc}
-
-ORDERED QUANTITIES:
-${manifestLines.length > 0 ? manifestLines.join('\n\n') : 'No catalog items selected (Custom notes only)'}
-
-SPECIAL REQUEST NOTES:
-${notes ? `"${notes}"` : 'None'}
-
--- Prince Telecom Field Suite`;
-
-    return { body, techNum, techName, pickupLoc };
+    return { subject, body };
   }
 
-  // Launch single-recipient prefilled SMS
-  function sendDirectTextToPerson(phoneNumber) {
+  // Sends the order to all 3 supervisors via Verizon Email-to-SMS
+  function sendOrderAsVerizonSMS() {
     const payload = buildEquipOrderPayload();
     if (!payload) return;
 
-    const cleanPhone = phoneNumber.replace(/[^0-9]/g, '');
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    const delim = isIOS ? '&' : '?';
-
-    window.location.href = `sms:${cleanPhone}${delim}body=${encodeURIComponent(payload.body)}`;
-  }
-
-  // Clipboard copy fallback for group chats
-  async function copyEquipManifest() {
-    const payload = buildEquipOrderPayload();
-    if (!payload) return;
-
-    if (navigator.clipboard && window.isSecureContext) {
-      try {
-        await navigator.clipboard.writeText(payload.body);
-        showEquipStatus("✅ Manifest copied to clipboard! Paste it into your supervisor group chat.", "info");
-        setTimeout(hideEquipStatus, 4000);
-        return;
-      } catch (err) {}
-    }
-
-    const tempArea = document.createElement("textarea");
-    tempArea.value = payload.body;
-    tempArea.style.position = "fixed";
-    tempArea.style.left = "-9999px";
-    tempArea.style.top = "0";
-    tempArea.setAttribute("readonly", "");
-    document.body.appendChild(tempArea);
-    tempArea.focus();
-    tempArea.select();
-    tempArea.setSelectionRange(0, 99999);
-    document.execCommand("copy");
-    document.body.removeChild(tempArea);
-
-    showEquipStatus("✅ Manifest copied to clipboard! Paste it into your supervisor group chat.", "info");
-    setTimeout(hideEquipStatus, 4000);
-  }
-
-  function showEquipStatus(msg, type) {
-    const el = document.getElementById('equipStatus');
-    if (el) {
-      el.textContent = msg;
-      el.className = `status-msg status-${type}`;
-      el.style.display = 'block';
-    }
-  }
-
-  function hideEquipStatus() {
-    const el = document.getElementById('equipStatus');
-    if (el) el.style.display = 'none';
+    const recipients = VERIZON_SMS_GATEWAYS.join(",");
+    const mailtoUrl = `mailto:${recipients}?subject=${encodeURIComponent(payload.subject)}&body=${encodeURIComponent(payload.body)}`;
+    
+    window.location.href = mailtoUrl;
   }
 
   function resetEquipOrder() {
@@ -1259,10 +1078,8 @@ ${notes ? `"${notes}"` : 'None'}
       }
     }
     document.getElementById('equipNotes').value = '';
-    hideEquipStatus();
   }
 
-  // Navigation Controllers
   function navigateHome() { switchView('view-dashboard'); }
   function openQCView() { switchView('view-qc'); }
   function openDownedView() { switchView('view-downed'); }
@@ -1314,7 +1131,6 @@ ${notes ? `"${notes}"` : 'None'}
 
     renderRequiredPhotoGrid();
     buildEquipCatalogUI();
-    renderDynamicSmsButtons();
   });
 
   function updateNetworkStatus() {
@@ -1528,7 +1344,6 @@ ${notes ? `"${notes}"` : 'None'}
     document.getElementById('rtmExtraCount').textContent = `(${rtmExtraPhotos.filter(p => p !== null).length})`;
   }
 
-  // Submit Standard QC Inspection
   async function submitQC() {
     const jobNum = document.getElementById('jobNum').value.trim();
     const techNum = document.getElementById('techNum').value.trim();
@@ -1571,7 +1386,6 @@ ${notes ? `"${notes}"` : 'None'}
     label.textContent = reason === 'Other (Need Notes)' ? "Detailed Explanation (REQUIRED for 'Other') *" : "Detailed Explanation *";
   }
 
-  // Submit Downed Job Escalation
   async function submitDownedJob() {
     const jobNum = document.getElementById('downedJobNum').value.trim();
     const techNum = document.getElementById('downedTechNum').value.trim();
@@ -1605,7 +1419,6 @@ ${notes ? `"${notes}"` : 'None'}
     dispatchPayload(emailSubject, emailBody, attachedFiles);
   }
 
-  // Submit Refer to Maintenance (RTM)
   async function submitRTMJob() {
     const jobNum = document.getElementById('rtmJobNum').value.trim();
     const techNum = document.getElementById('rtmTechNum').value.trim();
@@ -1648,7 +1461,6 @@ ${notes ? `"${notes}"` : 'None'}
     dispatchPayload(emailSubject, emailBody, attachedFiles);
   }
 
-  // Cross-Platform Share & Email Fallback
   async function dispatchPayload(subject, body, files) {
     if (navigator.canShare && navigator.canShare({ files: files })) {
       try {
@@ -1659,7 +1471,6 @@ ${notes ? `"${notes}"` : 'None'}
     window.location.href = `mailto:${SUPERVISOR_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   }
 
-  // Reset Standard QC Form
   function resetForm() {
     document.getElementById('jobNum').value = '';
     document.getElementById('address').value = '';
@@ -1671,7 +1482,6 @@ ${notes ? `"${notes}"` : 'None'}
     updateExtraCount();
   }
 
-  // Reset Downed Form
   function resetDownedForm() {
     document.getElementById('downedJobNum').value = '';
     document.getElementById('downedAddress').value = '';
@@ -1690,7 +1500,6 @@ ${notes ? `"${notes}"` : 'None'}
     });
   }
 
-  // Reset RTM Form
   function resetRTMForm() {
     document.getElementById('rtmJobNum').value = '';
     document.getElementById('rtmAddress').value = '';
