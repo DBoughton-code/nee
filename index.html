@@ -307,17 +307,18 @@
     }
 
     .sms-contact-box {
-      background: rgba(20, 184, 166, 0.08);
-      border: 1px solid #14b8a6;
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid #b45309;
+      border-left: 4px solid var(--warning);
       border-radius: 8px;
-      padding: 10px 12px;
+      padding: 12px;
       margin-bottom: 12px;
-      font-size: 0.82rem;
-      color: #ccfbf1;
-      line-height: 1.4;
+      font-size: 0.84rem;
+      color: #fef08a;
+      line-height: 1.45;
     }
 
-    .sms-contact-box strong { color: #5eead4; }
+    .sms-contact-box strong { color: #fde047; }
 
     .photo-grid {
       display: grid;
@@ -384,6 +385,8 @@
       margin-top: 8px;
       display: none;
     }
+
+    .status-info { background: #075985; color: #e0f2fe; }
 
     .remove-btn {
       position: absolute;
@@ -753,29 +756,29 @@
       </div>
     </div>
 
+    <!-- Dispatch Card with Instructions and One-Tap Blank SMS Launcher -->
     <div class="card">
       <div class="card-title">Dispatch Equipment Manifest</div>
+      
       <div class="sms-contact-box">
-        📲 <strong>Verizon SMS Routing (Direct Text to All 3):</strong><br>
+        ⚠️ <strong>REQUIRED RECIPIENTS:</strong><br>
+        Messages will open with a blank recipient bar and your order automatically copied.<br><br>
+        <strong>Add all 3 supervisors or select your existing group thread:</strong><br>
         • Ousmane (508-221-2243)<br>
         • James (302-679-5985)<br>
-        • Don (774-635-9784)
+        • Don (774-635-9784)<br><br>
+        <em>Then tap the text field, select <strong>Paste</strong>, and hit Send.</em>
       </div>
 
-      <button type="button" class="btn btn-sms" onclick="sendOrderAsVerizonSMS()">📲 Send Text to All 3 (Ousmane, James, Don)</button>
+      <button type="button" class="btn btn-sms" onclick="openBlankSmsAndCopy()">📱 Open Text & Copy Order (Paste to All 3)</button>
       <button type="button" class="btn btn-reset" onclick="resetEquipOrder()">Reset All Quantities</button>
+
+      <div id="equipStatus" class="status-msg"></div>
     </div>
   </div>
 </div>
 <script>
   const SUPERVISOR_EMAIL = "Donald.boughton@princetown.com";
-
-  // Verizon Email-to-SMS Gateway Addresses for Ousmane, James, and Don
-  const VERIZON_SMS_GATEWAYS = [
-    "5082212243@vtext.com", // Ousmane
-    "3026795985@vtext.com", // James
-    "7746359784@vtext.com"  // Don
-  ];
 
   const COMCAST_PHOTO_SCHEMA = [
     { id: "tap", label: "1. Tap w/ Drop Tag & Strand Attachment" },
@@ -1049,21 +1052,51 @@
     }
 
     const timestamp = new Date().toLocaleString();
-    const subject = `EQUIP ORDER | Tech ${techNum} (${techName})`;
-    const body = `WEEKLY EQUIPMENT ORDER\nDue: 9am Mon\nTime: ${timestamp}\n\nTECH:\n• Name: ${techName}\n• ID: ${techNum}\n• Pickup: ${pickupLoc}\n\nITEMS:\n${manifestLines.length > 0 ? manifestLines.join('\n\n') : 'Custom notes only'}\n\nNOTES:\n${notes ? `"${notes}"` : 'None'}`;
+    const body = `WEEKLY EQUIPMENT ORDER\nDue: 9:00 AM Monday\nTime: ${timestamp}\n\nTECHNICIAN:\n• Name: ${techName}\n• Tech ID: ${techNum}\n• Pickup: ${pickupLoc}\n\nORDERED ITEMS:\n${manifestLines.length > 0 ? manifestLines.join('\n\n') : 'Custom notes only'}\n\nNOTES:\n${notes ? `"${notes}"` : 'None'}`;
 
-    return { subject, body };
+    return { body };
   }
 
-  // Sends the order to all 3 supervisors via Verizon Email-to-SMS
-  function sendOrderAsVerizonSMS() {
+  // Copies the full order manifest to clipboard and opens blank SMS compose
+  async function openBlankSmsAndCopy() {
     const payload = buildEquipOrderPayload();
     if (!payload) return;
 
-    const recipients = VERIZON_SMS_GATEWAYS.join(",");
-    const mailtoUrl = `mailto:${recipients}?subject=${encodeURIComponent(payload.subject)}&body=${encodeURIComponent(payload.body)}`;
-    
-    window.location.href = mailtoUrl;
+    if (navigator.clipboard && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(payload.body);
+      } catch (err) {
+        fallbackCopyText(payload.body);
+      }
+    } else {
+      fallbackCopyText(payload.body);
+    }
+
+    const statusEl = document.getElementById('equipStatus');
+    if (statusEl) {
+      statusEl.textContent = "✅ Order copied! Messages is opening. Select Ousmane, James, and Don and tap Paste.";
+      statusEl.className = "status-msg status-info";
+      statusEl.style.display = "block";
+    }
+
+    setTimeout(() => {
+      window.location.href = "sms:&body=";
+    }, 450);
+  }
+
+  function fallbackCopyText(textToCopy) {
+    const tempArea = document.createElement("textarea");
+    tempArea.value = textToCopy;
+    tempArea.style.position = "fixed";
+    tempArea.style.left = "-9999px";
+    tempArea.style.top = "0";
+    tempArea.setAttribute("readonly", "");
+    document.body.appendChild(tempArea);
+    tempArea.focus();
+    tempArea.select();
+    tempArea.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+    document.body.removeChild(tempArea);
   }
 
   function resetEquipOrder() {
@@ -1078,6 +1111,8 @@
       }
     }
     document.getElementById('equipNotes').value = '';
+    const statusEl = document.getElementById('equipStatus');
+    if (statusEl) statusEl.style.display = 'none';
   }
 
   function navigateHome() { switchView('view-dashboard'); }
