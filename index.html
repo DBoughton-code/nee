@@ -480,7 +480,6 @@
       </div>
     </div>
 
-    <!-- Required Proof Photos -->
     <div class="card">
       <div class="card-title">Required Evidence Photos *</div>
       <div class="photo-grid">
@@ -611,7 +610,6 @@
     </div>
   </div>
 </div>
-
 <script>
   // Live Google Form Link
   const GOOGLE_FORM_VIEW_URL = "https://docs.google.com/forms/d/e/1FAIpQLSf5QkuPSaumLkF33HvlreQeTCHY5hV6Q98cswc03EbFiEo0dQ/viewform?usp=header";
@@ -869,7 +867,7 @@
     document.getElementById('extraCount').textContent = `(${extraPhotos.filter(p => p !== null).length})`;
   }
 
-  // Downed Job Optional Photos
+  // Downed Job Extra Photos
   function addDownedExtraPhotoSlot() {
     downedExtraCounter++;
     const id = downedExtraCounter;
@@ -903,7 +901,7 @@
     document.getElementById('downedExtraCount').textContent = `(${downedExtraPhotos.filter(p => p !== null).length})`;
   }
 
-  // RTM Optional Photos
+  // RTM Extra Photos
   function addRtmExtraPhotoSlot() {
     rtmExtraCounter++;
     const id = rtmExtraCounter;
@@ -937,6 +935,7 @@
     document.getElementById('rtmExtraCount').textContent = `(${rtmExtraPhotos.filter(p => p !== null).length})`;
   }
 
+  // Dispatch Handlers
   async function submitQC() {
     const jobNum = document.getElementById('jobNum').value.trim();
     const techNum = document.getElementById('techNum').value.trim();
@@ -1070,10 +1069,29 @@
     window.location.href = `mailto:${SUPERVISOR_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   }
 
+  // ----------------------------------------------------
+  // TOTAL WIPE RESET FUNCTIONS (Clears all inputs & cache)
+  // ----------------------------------------------------
+
+  // 1. Reset Standard QC Form
   function resetForm() {
     document.getElementById('jobNum').value = '';
+    document.getElementById('techNum').value = ''; 
     document.getElementById('address').value = '';
+    document.getElementById('city').value = '';
+    document.getElementById('state').value = '';
     document.getElementById('notes').value = '';
+    
+    localStorage.removeItem('qc_tech_num'); 
+    localStorage.removeItem('qc_city');
+    localStorage.removeItem('qc_state');
+    
+    const statusEl = document.getElementById('status');
+    if (statusEl) {
+      statusEl.style.display = 'none';
+      statusEl.textContent = '';
+    }
+
     renderRequiredPhotoGrid();
     document.getElementById('extraPhotosGrid').innerHTML = '';
     extraPhotos.length = 0;
@@ -1081,23 +1099,29 @@
     updateExtraCount();
   }
 
+  // 2. Reset Downed Form
   function resetDownedForm() {
-    // 1. Clear text and selection fields
     document.getElementById('downedJobNum').value = '';
+    document.getElementById('downedTechNum').value = ''; 
     document.getElementById('downedAddress').value = '';
+    document.getElementById('downedCity').value = '';
+    document.getElementById('downedState').value = '';
     document.getElementById('downedNotes').value = '';
+    
+    localStorage.removeItem('qc_tech_num'); 
+    localStorage.removeItem('qc_city');
+    localStorage.removeItem('qc_state');
+    
     const reasonSelect = document.getElementById('downedReason');
     if (reasonSelect) reasonSelect.selectedIndex = 0;
     checkDownedReason();
 
-    // 2. Clear status banner
     const statusEl = document.getElementById('downedStatus');
     if (statusEl) {
       statusEl.style.display = 'none';
       statusEl.textContent = '';
     }
 
-    // 3. Reset primary required photos
     downedPhotos.downed_curb = null;
     downedPhotos.downed_issue = null;
     ['downed_curb', 'downed_issue'].forEach(k => {
@@ -1113,18 +1137,34 @@
       if (input) input.value = '';
     });
 
-    // 4. Clear extra optional photos
     document.getElementById('downedExtraPhotosGrid').innerHTML = '';
     downedExtraPhotos.length = 0;
     downedExtraCounter = 0;
     updateDownedExtraCount();
   }
 
+  // 3. Reset RTM Form
   function resetRTMForm() {
     document.getElementById('rtmJobNum').value = '';
+    document.getElementById('rtmTechNum').value = ''; 
     document.getElementById('rtmAddress').value = '';
+    document.getElementById('rtmCity').value = '';
+    document.getElementById('rtmState').value = '';
     document.getElementById('rtmNotes').value = '';
-    document.getElementById('rtmReason').selectedIndex = 0;
+    
+    localStorage.removeItem('qc_tech_num'); 
+    localStorage.removeItem('qc_city');
+    localStorage.removeItem('qc_state');
+    
+    const reasonSelect = document.getElementById('rtmReason');
+    if (reasonSelect) reasonSelect.selectedIndex = 0;
+
+    const statusEl = document.getElementById('rtmStatus');
+    if (statusEl) {
+      statusEl.style.display = 'none';
+      statusEl.textContent = '';
+    }
+
     rtmPhotos.rtm_levels = null;
     rtmPhotos.rtm_tap = null;
     ['rtm_levels', 'rtm_tap'].forEach(k => {
@@ -1139,6 +1179,7 @@
       if (box) box.classList.remove('has-photo');
       if (input) input.value = '';
     });
+
     document.getElementById('rtmExtraPhotosGrid').innerHTML = '';
     rtmExtraPhotos.length = 0;
     rtmExtraCounter = 0;
