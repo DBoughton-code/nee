@@ -307,19 +307,58 @@
       box-shadow: 0 0 4px rgba(0,0,0,0.5);
     }
 
-    /* Contacts Tag Box for SMS */
-    .sms-contact-box {
-      background: rgba(20, 184, 166, 0.08);
-      border: 1px solid #14b8a6;
-      border-radius: 8px;
-      padding: 10px 12px;
-      margin-bottom: 12px;
-      font-size: 0.82rem;
-      color: #ccfbf1;
-      line-height: 1.4;
+    /* Tap-to-Select Contact Chips */
+    .contact-chips-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin-top: 6px;
     }
 
-    .sms-contact-box strong { color: #5eead4; }
+    .contact-chip {
+      background: #0f172a;
+      border: 1.5px solid var(--card-border);
+      border-radius: 8px;
+      padding: 10px 6px;
+      text-align: center;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .contact-chip.selected {
+      background: rgba(20, 184, 166, 0.15);
+      border-color: var(--teal);
+    }
+
+    .contact-chip-name {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .contact-chip.selected .contact-chip-name {
+      color: #5eead4;
+    }
+
+    .contact-chip-phone {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+    }
+
+    .contact-chip-status {
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: var(--teal);
+    }
+
+    .contact-chip:not(.selected) .contact-chip-status {
+      color: #64748b;
+    }
 
     .photo-grid {
       display: grid;
@@ -376,7 +415,6 @@
     .btn-downed { background-color: var(--danger); margin-top: 8px; }
     .btn-rtm { background-color: var(--purple); margin-top: 8px; }
     .btn-sms { background-color: #059669; color: #fff; margin-top: 8px; font-weight: 800; }
-    .btn-equip { background-color: var(--teal); color: #042f2e; margin-top: 8px; font-weight: 800; }
     input[type="file"] { display: none; }
 
     .status-msg {
@@ -716,7 +754,7 @@
     </div>
   </div>
 
-  <!-- SCREEN 5: WEEKLY EQUIPMENT ORDER (WITH SLIDERS & 3-NUM SMS GROUP) -->
+  <!-- SCREEN 5: WEEKLY EQUIPMENT ORDER (TAP-TO-SELECT SMS RECIPIENTS) -->
   <div id="view-equip" class="view-screen">
     <div class="nav-top-bar">
       <button type="button" class="btn-back" onclick="navigateHome()">❮ Main Menu</button>
@@ -748,17 +786,26 @@
         </select>
       </div>
 
-      <!-- SMS Recipients Default Notice -->
-      <div class="sms-contact-box">
-        📲 <strong>SMS Order Recipients (Defaulted):</strong><br>
-        • Ousmane: (508) 221-2243<br>
-        • James: (302) 679-5985<br>
-        • Don: (774) 635-9784
-      </div>
-
-      <div class="form-group">
-        <label for="warehousePhone">Additional Phone / Custom Recipient (Optional)</label>
-        <input type="tel" id="warehousePhone" placeholder="Add extra # if needed">
+      <!-- Tap to Select Recipients Chips (Multi-Select) -->
+      <div class="form-group" style="margin-top: 8px;">
+        <label>SMS Recipients (Tap to Select / Deselect) *</label>
+        <div class="contact-chips-grid">
+          <div class="contact-chip selected" id="chip_ousmane" onclick="toggleRecipient('ousmane')">
+            <span class="contact-chip-name">Ousmane</span>
+            <span class="contact-chip-phone">508-221-2243</span>
+            <span class="contact-chip-status" id="status_ousmane">✓ Active</span>
+          </div>
+          <div class="contact-chip selected" id="chip_james" onclick="toggleRecipient('james')">
+            <span class="contact-chip-name">James</span>
+            <span class="contact-chip-phone">302-679-5985</span>
+            <span class="contact-chip-status" id="status_james">✓ Active</span>
+          </div>
+          <div class="contact-chip selected" id="chip_don" onclick="toggleRecipient('don')">
+            <span class="contact-chip-name">Don</span>
+            <span class="contact-chip-phone">774-635-9784</span>
+            <span class="contact-chip-status" id="status_don">✓ Active</span>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -777,9 +824,8 @@
     </div>
 
     <div class="card">
-      <!-- Direct SMS and Email Buttons -->
-      <button type="button" class="btn btn-sms" onclick="sendEquipText()">📱 Text Order (Ousmane, James & Don)</button>
-      <button type="button" class="btn btn-equip" onclick="submitEquipOrder()">📧 Email / Database Dispatch</button>
+      <!-- Direct SMS Action Button Only -->
+      <button type="button" class="btn btn-sms" onclick="sendEquipText()">📱 Text Selected Recipients (SMS)</button>
       <button type="button" class="btn btn-reset" onclick="resetEquipOrder()">Reset All Quantities</button>
     </div>
   </div>
@@ -788,12 +834,12 @@
   const GOOGLE_FORM_RESPONSE_URL = "https://docs.google.com/forms/d/e/YOUR_FORM_ID_HERE/formResponse";
   const SUPERVISOR_EMAIL = "Donald.boughton@princetown.com";
 
-  // Defaulted SMS recipients: Ousmane, James, and Don
-  const DEFAULT_SMS_NUMBERS = [
-    "5082212243", // Ousmane
-    "3026795985", // James
-    "7746359784"  // Don
-  ];
+  // Contact Directory & Selection State
+  const CONTACT_DIRECTORY = {
+    ousmane: { name: "Ousmane", phone: "5082212243", selected: true },
+    james: { name: "James", phone: "3026795985", selected: true },
+    don: { name: "Don", phone: "7746359784", selected: true }
+  };
 
   const COMCAST_PHOTO_SCHEMA = [
     { id: "tap", label: "1. Tap w/ Drop Tag & Strand Attachment" },
@@ -987,6 +1033,23 @@
 
   const equipCounts = {};
 
+  // Toggle recipient contact chips
+  function toggleRecipient(key) {
+    if (!CONTACT_DIRECTORY[key]) return;
+    CONTACT_DIRECTORY[key].selected = !CONTACT_DIRECTORY[key].selected;
+    
+    const chip = document.getElementById(`chip_${key}`);
+    const status = document.getElementById(`status_${key}`);
+    
+    if (CONTACT_DIRECTORY[key].selected) {
+      chip.classList.add('selected');
+      status.textContent = '✓ Active';
+    } else {
+      chip.classList.remove('selected');
+      status.textContent = '— Off';
+    }
+  }
+
   // Build the catalog using range sliders
   function buildEquipCatalogUI() {
     const container = document.getElementById('equipAccordionContainer');
@@ -1039,7 +1102,7 @@
     }
   }
 
-  // Compile the manifest text
+  // Build order text payload
   function buildEquipOrderPayload() {
     const techName = document.getElementById('equipTechName').value.trim();
     const techNum = document.getElementById('equipTechNum').value.trim();
@@ -1070,7 +1133,6 @@
     }
 
     const timestamp = new Date().toLocaleString();
-    const subject = `📦 [EQUIPMENT ORDER] Tech ${techNum} (${techName}) | ${pickupLoc}`;
     const body = `📦 WEEKLY EQUIPMENT ORDER MANIFEST
 Due: By 9:00 AM Monday
 Logged: ${timestamp}
@@ -1088,35 +1150,33 @@ ${notes ? `"${notes}"` : 'None'}
 
 -- Prince Telecom Field Suite`;
 
-    return { subject, body, techNum, techName, pickupLoc };
+    return { body, techNum, techName, pickupLoc };
   }
 
-  // 1. Direct SMS Text Option (Defaulted to Ousmane, James, and Don)
+  // Send Direct SMS to Selected Contacts
   function sendEquipText() {
     const payload = buildEquipOrderPayload();
     if (!payload) return;
 
-    const extraPhone = document.getElementById('warehousePhone').value.trim();
-    let recipients = [...DEFAULT_SMS_NUMBERS];
-    if (extraPhone) {
-      recipients.push(extraPhone.replace(/[^0-9]/g, ''));
+    // Gather selected recipients
+    const selectedRecipients = [];
+    for (const key in CONTACT_DIRECTORY) {
+      if (CONTACT_DIRECTORY[key].selected) {
+        selectedRecipients.push(CONTACT_DIRECTORY[key].phone);
+      }
+    }
+
+    if (selectedRecipients.length === 0) {
+      alert("Please select at least one recipient (Ousmane, James, or Don) to send text.");
+      return;
     }
 
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    // iOS uses commas for multiple numbers; Android/others use semicolons
     const numberDelim = isIOS ? ',' : ';';
     const queryDelim = isIOS ? '&' : '?';
 
-    const numbersString = recipients.join(numberDelim);
+    const numbersString = selectedRecipients.join(numberDelim);
     window.location.href = `sms:${numbersString}${queryDelim}body=${encodeURIComponent(payload.body)}`;
-  }
-
-  // 2. Email / Standard Dispatch Option
-  function submitEquipOrder() {
-    const payload = buildEquipOrderPayload();
-    if (!payload) return;
-
-    dispatchPayload(payload.subject, payload.body, []);
   }
 
   function resetEquipOrder() {
