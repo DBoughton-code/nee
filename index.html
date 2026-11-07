@@ -273,6 +273,7 @@
       margin-top: 8px;
       display: none;
     }
+    .status-info { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid #3b82f6; }
 
     .remove-btn {
       position: absolute;
@@ -303,6 +304,8 @@
     <div class="card">
       <div class="card-title">Select Job Workflow</div>
       <div class="hub-grid">
+        
+        <!-- QC Job -->
         <div class="hub-tile" onclick="openQCView()">
           <div class="hub-tile-left">
             <div class="hub-icon-wrap">📋</div>
@@ -314,6 +317,7 @@
           <span style="font-size: 1.2rem; color: var(--text-muted);">❯</span>
         </div>
 
+        <!-- Downed Job -->
         <div class="hub-tile" onclick="openDownedView()">
           <div class="hub-tile-left">
             <div class="hub-icon-wrap hub-icon-downed">🛑</div>
@@ -325,6 +329,7 @@
           <span style="font-size: 1.2rem; color: var(--text-muted);">❯</span>
         </div>
 
+        <!-- RTM -->
         <div class="hub-tile" onclick="openRTMView()">
           <div class="hub-tile-left">
             <div class="hub-icon-wrap hub-icon-rtm">🔧</div>
@@ -336,7 +341,7 @@
           <span style="font-size: 1.2rem; color: var(--text-muted);">❯</span>
         </div>
 
-        <!-- Weekly Equipment Order: Launches official Google Form -->
+        <!-- Weekly Equipment Order -->
         <div class="hub-tile" onclick="openGoogleForm()">
           <div class="hub-tile-left">
             <div class="hub-icon-wrap hub-icon-equip">📦</div>
@@ -347,6 +352,55 @@
           </div>
           <span style="font-size: 1.2rem; color: var(--text-muted);">↗</span>
         </div>
+
+        <!-- Topology Optimizer -->
+        <div class="hub-tile" onclick="window.location.href='topology.html'">
+          <div class="hub-tile-left">
+            <div class="hub-icon-wrap" style="background: rgba(14, 165, 233, 0.15);">🔀</div>
+            <div>
+              <div class="hub-title" style="color: #38bdf8;">Topology Optimizer</div>
+              <div class="hub-sub">Calculate RF loss, Tx/Rx & best splitters</div>
+            </div>
+          </div>
+          <span style="font-size: 1.2rem; color: var(--text-muted);">↗</span>
+        </div>
+
+        <!-- TechOps Resource Hub -->
+        <div class="hub-tile" onclick="window.location.href='techops_resource_hub.html'">
+          <div class="hub-tile-left">
+            <div class="hub-icon-wrap" style="background: rgba(59, 130, 246, 0.15);">📚</div>
+            <div>
+              <div class="hub-title" style="color: #3b82f6;">TechOps Resource Hub</div>
+              <div class="hub-sub">SOPs, Installation Guidelines & PHT Specs</div>
+            </div>
+          </div>
+          <span style="font-size: 1.2rem; color: var(--text-muted);">↗</span>
+        </div>
+
+        <!-- Customer Comms -->
+        <div class="hub-tile" onclick="openCommsView()">
+          <div class="hub-tile-left">
+            <div class="hub-icon-wrap" style="background: rgba(245, 158, 11, 0.15);">💬</div>
+            <div>
+              <div class="hub-title" style="color: #fbbf24;">Customer Texts</div>
+              <div class="hub-sub">1-tap ETA, Gate Code & tNPS texts</div>
+            </div>
+          </div>
+          <span style="font-size: 1.2rem; color: var(--text-muted);">❯</span>
+        </div>
+
+        <!-- Supervisor Team Blast -->
+        <div class="hub-tile" onclick="openTeamBlastView()">
+          <div class="hub-tile-left">
+            <div class="hub-icon-wrap" style="background: rgba(239, 68, 68, 0.15);">📢</div>
+            <div>
+              <div class="hub-title" style="color: #ef4444;">Team Blast Comms</div>
+              <div class="hub-sub">Supervisor mass texts (BCC Gateway)</div>
+            </div>
+          </div>
+          <span style="font-size: 1.2rem; color: var(--text-muted);">❯</span>
+        </div>
+
       </div>
     </div>
   </div>
@@ -502,7 +556,6 @@
       </div>
     </div>
 
-    <!-- Additional Optional Photos for Downed Jobs -->
     <div class="card">
       <div class="card-title">
         <span>Additional Evidence Photos (Optional)</span>
@@ -609,9 +662,81 @@
       <button type="button" class="btn btn-reset" onclick="resetRTMForm()">Clear RTM Form</button>
     </div>
   </div>
-</div>
+
+  <!-- SCREEN 5: CUSTOMER COMMS -->
+  <div id="view-comms" class="view-screen">
+    <div class="nav-top-bar">
+      <button type="button" class="btn-back" onclick="navigateHome()">❮ Main Menu</button>
+    </div>
+
+    <div class="header">
+      <h2 style="color: #fbbf24;">Customer Texts</h2>
+      <p>1-Tap Prewritten Customer Updates</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Customer Phone Number</div>
+      <div class="form-group" style="margin-bottom: 0;">
+        <input type="tel" id="customerPhone" placeholder="e.g. 555-123-4567" style="font-size: 1.2rem; font-weight: 700; letter-spacing: 2px; text-align: center; padding: 16px;">
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Select Message Template</div>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <button type="button" class="btn" style="background-color: #059669;" onclick="sendCustomerText('eta15')">⏱️ ETA: 15 Minutes</button>
+        <button type="button" class="btn" style="background-color: #0d9488;" onclick="sendCustomerText('eta30')">⏱️ ETA: 30 Minutes</button>
+        <button type="button" class="btn" style="background-color: #ca8a04;" onclick="sendCustomerText('arrival')">🚪 Outside / No Answer</button>
+        <button type="button" class="btn" style="background-color: #4f46e5;" onclick="sendCustomerText('access')">🚧 Need Gate Code / Secure Pets</button>
+        <button type="button" class="btn" style="background-color: #be123c;" onclick="sendCustomerText('late')">⏳ Running Late</button>
+        <button type="button" class="btn" style="background-color: #475569;" onclick="sendCustomerText('maintenance')">🔧 Working Outside</button>
+      </div>
+
+      <div style="border-top: 1px solid #334155; margin-top: 16px; padding-top: 16px;">
+        <div style="font-size: 0.85rem; font-weight: 700; color: #94a3b8; margin-bottom: 8px; text-transform: uppercase;">Job Completion (tNPS)</div>
+        <button type="button" class="btn" style="background-color: #0284c7; margin-top: 0;" onclick="sendCustomerText('tnps_short')">⭐ Send Survey Request (Short)</button>
+        <button type="button" class="btn" style="background-color: #0369a1; margin-top: 10px;" onclick="sendCustomerText('tnps_detailed')">⭐ Send Survey Request (Detailed)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 6: TEAM BLAST COMMS (SUPERVISOR) -->
+  <div id="view-team-blast" class="view-screen">
+    <div class="nav-top-bar">
+      <button type="button" class="btn-back" onclick="navigateHome()">❮ Main Menu</button>
+    </div>
+
+    <div class="header">
+      <h2 style="color: #ef4444;">Team Blast Comms</h2>
+      <p>Supervisor Mass Text (BCC Gateway)</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Custom Team Alert</div>
+      <div class="form-group" style="margin-bottom: 0;">
+        <textarea id="customBlastText" placeholder="Type a custom message for the whole team..."></textarea>
+      </div>
+      <button type="button" class="btn" style="background-color: #ef4444; margin-top: 12px;" onclick="sendTrueGatewayBlast('custom')">
+        📢 Send Mass Text (BCC)
+      </button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">1-Tap Standard Alerts</div>
+      <div class="sms-contact-box" style="background: rgba(239, 68, 68, 0.08); border-color: #ef4444; color: #fca5a5;">
+        ℹ️ <strong>Gateway Routing:</strong> These buttons launch iOS Mail with the team hidden in the BCC line. They will arrive as individual SMS texts on the techs' phones.
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 12px;">
+        <button type="button" class="btn" style="background-color: #eab308; color: #451a03;" onclick="sendTrueGatewayBlast('huddle')">☕ Morning Huddle (15 Mins)</button>
+        <button type="button" class="btn" style="background-color: #ef4444;" onclick="sendTrueGatewayBlast('weather')">⛈️ Weather Alert (Stand Down)</button>
+        <button type="button" class="btn" style="background-color: #10b981;" onclick="sendTrueGatewayBlast('all_clear')">☀️ Weather All-Clear (Resume)</button>
+        <button type="button" class="btn" style="background-color: #f97316;" onclick="sendTrueGatewayBlast('overtime')">💰 Open Overtime Routes</button>
+        <button type="button" class="btn" style="background-color: #8b5cf6;" onclick="sendTrueGatewayBlast('qc_alert')">⚠️ QA / Audit Warning</button>
+        <button type="button" class="btn" style="background-color: #64748b;" onclick="sendTrueGatewayBlast('lost_tool')">🔍 Lost Equipment Check</button>
+      </div>
+    </div>
+  </div>
 <script>
-  // Live Google Form Link
   const GOOGLE_FORM_VIEW_URL = "https://docs.google.com/forms/d/e/1FAIpQLSf5QkuPSaumLkF33HvlreQeTCHY5hV6Q98cswc03EbFiEo0dQ/viewform?usp=header";
   const SUPERVISOR_EMAIL = "Donald.boughton@princetown.com";
 
@@ -639,10 +764,13 @@
   const rtmExtraPhotos = [];
   let rtmExtraCounter = 0;
 
+  // View Navigation
   function navigateHome() { switchView('view-dashboard'); }
   function openQCView() { switchView('view-qc'); }
   function openDownedView() { switchView('view-downed'); }
   function openRTMView() { switchView('view-rtm'); }
+  function openCommsView() { switchView('view-comms'); }
+  function openTeamBlastView() { switchView('view-team-blast'); }
 
   function switchView(targetId) {
     document.querySelectorAll('.view-screen').forEach(el => el.classList.remove('view-active'));
@@ -653,6 +781,7 @@
     }
   }
 
+  // Field Synchronization
   function syncTechNum(val) {
     document.getElementById('techNum').value = val;
     document.getElementById('downedTechNum').value = val;
@@ -691,6 +820,7 @@
     banner.style.display = navigator.onLine ? 'none' : 'block';
   }
 
+  // Camera & Photo Stamping
   function renderRequiredPhotoGrid() {
     const grid = document.getElementById('requiredPhotosGrid');
     grid.innerHTML = '';
@@ -833,7 +963,7 @@
     };
   }
 
-  // Comcast QC Extra Photos
+  // Extra Photos Logic
   function addExtraPhotoSlot() {
     extraCounter++;
     const id = extraCounter;
@@ -867,7 +997,6 @@
     document.getElementById('extraCount').textContent = `(${extraPhotos.filter(p => p !== null).length})`;
   }
 
-  // Downed Job Extra Photos
   function addDownedExtraPhotoSlot() {
     downedExtraCounter++;
     const id = downedExtraCounter;
@@ -901,7 +1030,6 @@
     document.getElementById('downedExtraCount').textContent = `(${downedExtraPhotos.filter(p => p !== null).length})`;
   }
 
-  // RTM Extra Photos
   function addRtmExtraPhotoSlot() {
     rtmExtraCounter++;
     const id = rtmExtraCounter;
@@ -935,7 +1063,7 @@
     document.getElementById('rtmExtraCount').textContent = `(${rtmExtraPhotos.filter(p => p !== null).length})`;
   }
 
-  // Dispatch Handlers
+  // Job Submission Payloads
   async function submitQC() {
     const jobNum = document.getElementById('jobNum').value.trim();
     const techNum = document.getElementById('techNum').value.trim();
@@ -1072,8 +1200,6 @@
   // ----------------------------------------------------
   // TOTAL WIPE RESET FUNCTIONS (Clears all inputs & cache)
   // ----------------------------------------------------
-
-  // 1. Reset Standard QC Form
   function resetForm() {
     document.getElementById('jobNum').value = '';
     document.getElementById('techNum').value = ''; 
@@ -1099,7 +1225,6 @@
     updateExtraCount();
   }
 
-  // 2. Reset Downed Form
   function resetDownedForm() {
     document.getElementById('downedJobNum').value = '';
     document.getElementById('downedTechNum').value = ''; 
@@ -1143,7 +1268,6 @@
     updateDownedExtraCount();
   }
 
-  // 3. Reset RTM Form
   function resetRTMForm() {
     document.getElementById('rtmJobNum').value = '';
     document.getElementById('rtmTechNum').value = ''; 
@@ -1185,6 +1309,80 @@
     rtmExtraCounter = 0;
     updateRtmExtraCount();
   }
+
+  // ----------------------------------------------------
+  // CUSTOMER SMS COMMS
+  // ----------------------------------------------------
+  const CUSTOMER_TEMPLATES = {
+    eta15: "Hi, this is your Prince Telecom technician for your Xfinity appointment. I am on my way and will arrive in approximately 15 minutes.",
+    eta30: "Hi, this is your Prince Telecom technician for your Xfinity appointment. I am on my way and will arrive in approximately 30 minutes.",
+    arrival: "Hi, your technician is outside for your Xfinity appointment. Please let me know if you are available, or I will need to move on to my next job soon.",
+    access: "Hi, your technician is here. Could you please provide the gate code or ensure any pets in the yard are secured so I can safely begin the work?",
+    late: "Hi, this is your Prince Telecom tech. My previous job is taking longer than expected. I am still coming today and will send you an exact ETA when I am en route. Thank you for your patience.",
+    maintenance: "Hi, your Prince Telecom technician is currently working on the lines outside your home. Your services may temporarily drop while I complete this maintenance.",
+    tnps_short: "Hi, it was a pleasure assisting you today! Xfinity will send a short survey regarding my visit. This grades me personally, and I strive for a 10/10. Thank you for your time!",
+    tnps_detailed: "Hi, this is your Prince Telecom tech. You may receive a survey from Xfinity about today's visit. Please note this survey grades MY service today, not the company or your bill. If I provided 10/10 service, I would greatly appreciate your rating!"
+  };
+
+  function sendCustomerText(templateKey) {
+    const phoneInput = document.getElementById('customerPhone').value;
+    const cleanPhone = phoneInput.replace(/[^0-9]/g, '');
+
+    if (!cleanPhone || cleanPhone.length < 10) {
+      alert("Please enter a valid 10-digit customer phone number first.");
+      return;
+    }
+
+    const message = CUSTOMER_TEMPLATES[templateKey];
+    window.location.href = `sms:${cleanPhone}&body=${encodeURIComponent(message)}`;
+  }
+
+  // ----------------------------------------------------
+  // SUPERVISOR TEAM BLAST COMMS (BCC GATEWAY)
+  // ----------------------------------------------------
+  const TEAM_ROSTER_GATEWAYS = [
+    "5082212243@vtext.com", // Ousmane
+    "3026795985@vtext.com", // James
+    "7746359784@vtext.com", // Don
+    // Add additional techs here
+  ];
+
+  const BLAST_TEMPLATES = {
+    huddle: "Good morning team. We are holding a mandatory morning huddle in 15 minutes. Please head to the staging area.",
+    weather: "🚨 WEATHER ALERT: Lightning/Severe weather in the area. Stand down, get off ladders/poles immediately, and wait in your trucks for the all-clear.",
+    all_clear: "✅ WEATHER ALL-CLEAR: The severe weather has passed. You may safely resume field operations.",
+    timesheets: "⏱️ REMINDER: Please ensure all job codes are closed and timesheets are submitted before heading home.",
+    warehouse: "📦 WAREHOUSE: The North Haven warehouse is locking up early today. Grab any required equipment in the next 45 minutes.",
+    overtime: "💰 ROUTE COVERAGE: We have open routes available this Saturday. Reply directly to this text if you want the overtime hours.",
+    lost_tool: "🔍 LOST EQUIPMENT: A technician is missing a piece of equipment. Please check your trucks to see if you accidentally grabbed a spare meter or ladder today.",
+    qc_alert: "⚠️ QC ALERT: We are seeing a spike in failed QA audits today on grounding and drop tags. Please double-check your house boxes before closing jobs."
+  };
+
+  function sendTrueGatewayBlast(templateKey) {
+    let messageBody = "";
+
+    if (templateKey === 'custom') {
+      const customText = document.getElementById('customBlastText').value.trim();
+      if (!customText) {
+        alert("Please type a message first.");
+        return;
+      }
+      messageBody = customText;
+    } else {
+      messageBody = BLAST_TEMPLATES[templateKey];
+    }
+
+    const bccList = TEAM_ROSTER_GATEWAYS.join(",");
+    const subject = encodeURIComponent("Prince Telecom Alert");
+    const body = encodeURIComponent(`[TEAM ALERT]\n\n${messageBody}`);
+    
+    window.location.href = `mailto:?bcc=${bccList}&subject=${subject}&body=${body}`;
+
+    if (templateKey === 'custom') {
+      document.getElementById('customBlastText').value = '';
+    }
+  }
 </script>
 </body>
 </html>
+</div>
