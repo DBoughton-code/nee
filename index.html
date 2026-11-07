@@ -22,6 +22,7 @@
       --danger: #ef4444;
       --warning: #f59e0b;
       --purple: #a855f7;
+      --teal: #14b8a6;
       --input-bg: #0f172a;
       --input-border: #475569;
     }
@@ -137,6 +138,7 @@
 
     .hub-icon-downed { background: rgba(239, 68, 68, 0.15); }
     .hub-icon-rtm { background: rgba(168, 85, 247, 0.15); }
+    .hub-icon-equip { background: rgba(20, 184, 166, 0.15); }
 
     .hub-title { font-size: 1.05rem; font-weight: 700; color: var(--text); }
     .hub-sub { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
@@ -207,6 +209,55 @@
 
     textarea { resize: vertical; min-height: 70px; }
 
+    /* Equipment Counter Component */
+    .equip-item-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #0f172a;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+      margin-bottom: 8px;
+    }
+
+    .equip-name {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .counter-control {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .counter-btn {
+      width: 32px;
+      height: 32px;
+      background: #334155;
+      color: #fff;
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      font-weight: 800;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .counter-btn:active { background: var(--teal); }
+
+    .counter-val {
+      min-width: 24px;
+      text-align: center;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #5eead4;
+    }
+
     .photo-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -261,6 +312,7 @@
     .btn-reset { background-color: #475569; margin-top: 8px; }
     .btn-downed { background-color: var(--danger); margin-top: 8px; }
     .btn-rtm { background-color: var(--purple); margin-top: 8px; }
+    .btn-equip { background-color: var(--teal); color: #042f2e; margin-top: 8px; }
     input[type="file"] { display: none; }
 
     .status-msg {
@@ -271,9 +323,6 @@
       margin-top: 8px;
       display: none;
     }
-
-    .status-warning { background: #78350f; color: #fef3c7; }
-    .status-info { background: #075985; color: #e0f2fe; }
 
     .remove-btn {
       position: absolute;
@@ -292,7 +341,7 @@
 <body>
 
 <div class="container">
-  <div id="offlineBanner" class="offline-banner">⚠️ Working Offline - Jobs Will Auto-Sync When Online</div>
+  <div id="offlineBanner" class="offline-banner">⚠️ Working Offline - Syncs Automatically</div>
 
   <!-- SCREEN 1: MAIN MENU -->
   <div id="view-dashboard" class="view-screen view-active">
@@ -304,7 +353,7 @@
     <div class="card">
       <div class="card-title">Select Job Workflow</div>
       <div class="hub-grid">
-        <!-- Choice 1: Comcast QC -->
+        <!-- 1: Comcast QC -->
         <div class="hub-tile" onclick="openQCView()">
           <div class="hub-tile-left">
             <div class="hub-icon-wrap">📋</div>
@@ -316,7 +365,7 @@
           <span style="font-size: 1.2rem; color: var(--text-muted);">❯</span>
         </div>
 
-        <!-- Choice 2: Downed Job -->
+        <!-- 2: Downed Job -->
         <div class="hub-tile" onclick="openDownedView()">
           <div class="hub-tile-left">
             <div class="hub-icon-wrap hub-icon-downed">🛑</div>
@@ -328,13 +377,25 @@
           <span style="font-size: 1.2rem; color: var(--text-muted);">❯</span>
         </div>
 
-        <!-- Choice 3: Refer to Maintenance (RTM) -->
+        <!-- 3: Refer to Maintenance -->
         <div class="hub-tile" onclick="openRTMView()">
           <div class="hub-tile-left">
             <div class="hub-icon-wrap hub-icon-rtm">🔧</div>
             <div>
               <div class="hub-title" style="color: #c084fc;">Refer to Maintenance</div>
               <div class="hub-sub">RTM SA, bucket assists & damaged plant</div>
+            </div>
+          </div>
+          <span style="font-size: 1.2rem; color: var(--text-muted);">❯</span>
+        </div>
+
+        <!-- 4: Equipment Order -->
+        <div class="hub-tile" onclick="openEquipView()">
+          <div class="hub-tile-left">
+            <div class="hub-icon-wrap hub-icon-equip">📦</div>
+            <div>
+              <div class="hub-title" style="color: #2dd4bf;">Equipment Order</div>
+              <div class="hub-sub">Order modems, boxes, drops & materials</div>
             </div>
           </div>
           <span style="font-size: 1.2rem; color: var(--text-muted);">❯</span>
@@ -553,14 +614,13 @@
       </div>
       <div class="form-group">
         <label for="rtmNotes">Detailed Issue Description *</label>
-        <textarea id="rtmNotes" placeholder="Describe tap condition, port status, low/high carrier levels, physical plant damage, or ladder limitations..."></textarea>
+        <textarea id="rtmNotes" placeholder="Describe tap condition, port status, carrier levels, or ladder limitations..."></textarea>
       </div>
     </div>
 
     <div class="card">
       <div class="card-title">Photo Evidence</div>
       <div class="photo-grid">
-        <!-- Mandatory Meter Screenshot -->
         <div class="photo-box rtm-photo" id="box-rtm_levels" onclick="triggerCamera('input-rtm_levels')">
           <span class="photo-icon">📱</span>
           <label>1. Meter Levels @ Tap *</label>
@@ -569,8 +629,6 @@
           <img id="prev-rtm_levels" style="display:none;" />
           <input type="file" id="input-rtm_levels" accept="image/*" onchange="processPhoto(event, 'rtm_levels', false, 'rtm')">
         </div>
-
-        <!-- Optional Tap Issue Photo -->
         <div class="photo-box rtm-photo" id="box-rtm_tap" onclick="triggerCamera('input-rtm_tap')">
           <span class="photo-icon">📷</span>
           <label>2. Tap Issue Photo (Optional)</label>
@@ -582,7 +640,6 @@
       </div>
     </div>
 
-    <!-- Optional Extra Photos for RTM -->
     <div class="card">
       <div class="card-title">
         <span>Additional Plant / Span Photos</span>
@@ -596,6 +653,160 @@
       <div id="rtmStatus" class="status-msg"></div>
       <button type="button" class="btn btn-rtm" onclick="submitRTMJob()">🔧 Dispatch Maintenance Referral</button>
       <button type="button" class="btn btn-reset" onclick="resetRTMForm()">Clear RTM Form</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 5: EQUIPMENT ORDER -->
+  <div id="view-equip" class="view-screen">
+    <div class="nav-top-bar">
+      <button type="button" class="btn-back" onclick="navigateHome()">❮ Main Menu</button>
+      <span style="font-size: 0.8rem; font-weight: 700; color: var(--teal);">EQUIPMENT RESTOCK</span>
+    </div>
+
+    <div class="header">
+      <h2 style="color: var(--teal);">Equipment Order</h2>
+      <p>Warehouse Request & Field Material Restock</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Technician & Warehouse Info</div>
+      <div class="form-group">
+        <label for="equipTechNum">Tech Number *</label>
+        <input type="text" id="equipTechNum" placeholder="e.g. T-10492" oninput="syncTechNum(this.value)">
+      </div>
+      <div class="form-group">
+        <label for="equipTechName">Tech Full Name *</label>
+        <input type="text" id="equipTechName" placeholder="e.g. John Doe">
+      </div>
+      <div class="form-group">
+        <label for="pickupLocation">Pickup / Warehouse Location *</label>
+        <select id="pickupLocation">
+          <option value="Hartford Warehouse">Hartford Warehouse</option>
+          <option value="Bloomfield Hub">Bloomfield Hub</option>
+          <option value="Middletown Facility">Middletown Facility</option>
+          <option value="Waterbury Garage">Waterbury Garage</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Modems & Gateways -->
+    <div class="card">
+      <div class="card-title">Modems, Gateways & Video CPE</div>
+      <div class="equip-item-row">
+        <span class="equip-name">XB7 Wireless Gateway</span>
+        <div class="counter-control">
+          <button type="button" class="counter-btn" onclick="adjustCount('xb7', -1)">-</button>
+          <span class="counter-val" id="cnt_xb7">0</span>
+          <button type="button" class="counter-btn" onclick="adjustCount('xb7', 1)">+</button>
+        </div>
+      </div>
+      <div class="equip-item-row">
+        <span class="equip-name">XB8 WiFi 6E Gateway</span>
+        <div class="counter-control">
+          <button type="button" class="counter-btn" onclick="adjustCount('xb8', -1)">-</button>
+          <span class="counter-val" id="cnt_xb8">0</span>
+          <button type="button" class="counter-btn" onclick="adjustCount('xb8', 1)">+</button>
+        </div>
+      </div>
+      <div class="equip-item-row">
+        <span class="equip-name">Xi6 4K Wireless Box</span>
+        <div class="counter-control">
+          <button type="button" class="counter-btn" onclick="adjustCount('xi6', -1)">-</button>
+          <span class="counter-val" id="cnt_xi6">0</span>
+          <button type="button" class="counter-btn" onclick="adjustCount('xi6', 1)">+</button>
+        </div>
+      </div>
+      <div class="equip-item-row">
+        <span class="equip-name">XiOne 4K Streaming Box</span>
+        <div class="counter-control">
+          <button type="button" class="counter-btn" onclick="adjustCount('xione', -1)">-</button>
+          <span class="counter-val" id="cnt_xione">0</span>
+          <button type="button" class="counter-btn" onclick="adjustCount('xione', 1)">+</button>
+        </div>
+      </div>
+      <div class="equip-item-row">
+        <span class="equip-name">XR15 Voice Remote</span>
+        <div class="counter-control">
+          <button type="button" class="counter-btn" onclick="adjustCount('xr15', -1)">-</button>
+          <span class="counter-val" id="cnt_xr15">0</span>
+          <button type="button" class="counter-btn" onclick="adjustCount('xr15', 1)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Drop Cable & Passives -->
+    <div class="card">
+      <div class="card-title">Drop Cable, Passives & Hardware</div>
+      <div class="equip-item-row">
+        <span class="equip-name">RG6 Aerial Spool (1000')</span>
+        <div class="counter-control">
+          <button type="button" class="counter-btn" onclick="adjustCount('rg6_aerial', -1)">-</button>
+          <span class="counter-val" id="cnt_rg6_aerial">0</span>
+          <button type="button" class="counter-btn" onclick="adjustCount('rg6_aerial', 1)">+</button>
+        </div>
+      </div>
+      <div class="equip-item-row">
+        <span class="equip-name">RG6 Underground (Flooded)</span>
+        <div class="counter-control">
+          <button type="button" class="counter-btn" onclick="adjustCount('rg6_under', -1)">-</button>
+          <span class="counter-val" id="cnt_rg6_under">0</span>
+          <button type="button" class="counter-btn" onclick="adjustCount('rg6_under', 1)">+</button>
+        </div>
+      </div>
+      <div class="equip-item-row">
+        <span class="equip-name">RG11 Underground Spool</span>
+        <div class="counter-control">
+          <button type="button" class="counter-btn" onclick="adjustCount('rg11', -1)">-</button>
+          <span class="counter-val" id="cnt_rg11">0</span>
+          <button type="button" class="counter-btn" onclick="adjustCount('rg11', 1)">+</button>
+        </div>
+      </div>
+      <div class="equip-item-row">
+        <span class="equip-name">2-Way Balanced Splitters</span>
+        <div class="counter-control">
+          <button type="button" class="counter-btn" onclick="adjustCount('split_2way', -1)">-</button>
+          <span class="counter-val" id="cnt_split_2way">0</span>
+          <button type="button" class="counter-btn" onclick="adjustCount('split_2way', 1)">+</button>
+        </div>
+      </div>
+      <div class="equip-item-row">
+        <span class="equip-name">3-Way Splitters (Bal/Unbal)</span>
+        <div class="counter-control">
+          <button type="button" class="counter-btn" onclick="adjustCount('split_3way', -1)">-</button>
+          <span class="counter-val" id="cnt_split_3way">0</span>
+          <button type="button" class="counter-btn" onclick="adjustCount('split_3way', 1)">+</button>
+        </div>
+      </div>
+      <div class="equip-item-row">
+        <span class="equip-name">Ground Blocks & Dual Tags</span>
+        <div class="counter-control">
+          <button type="button" class="counter-btn" onclick="adjustCount('ground_blocks', -1)">-</button>
+          <span class="counter-val" id="cnt_ground_blocks">0</span>
+          <button type="button" class="counter-btn" onclick="adjustCount('ground_blocks', 1)">+</button>
+        </div>
+      </div>
+      <div class="equip-item-row">
+        <span class="equip-name">Drop Hangers (Bag of 50)</span>
+        <div class="counter-control">
+          <button type="button" class="counter-btn" onclick="adjustCount('drop_hangers', -1)">-</button>
+          <span class="counter-val" id="cnt_drop_hangers">0</span>
+          <button type="button" class="counter-btn" onclick="adjustCount('drop_hangers', 1)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Special Requests -->
+    <div class="card">
+      <div class="card-title">Additional Items / Special Notes</div>
+      <div class="form-group">
+        <textarea id="equipNotes" placeholder="Need extra fittings, silicone, drill bits, boots, ladder racks, or custom sizes?..."></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <div id="equipStatus" class="status-msg"></div>
+      <button type="button" class="btn btn-equip" onclick="submitEquipOrder()">📦 Submit Equipment Order</button>
+      <button type="button" class="btn btn-reset" onclick="resetEquipOrder()">Reset Quantities</button>
     </div>
   </div>
 </div>
@@ -629,10 +840,42 @@
   const rtmExtraPhotos = [];
   let rtmExtraCounter = 0;
 
+  // Equipment Item Inventory State
+  const equipCounts = {
+    xb7: 0,
+    xb8: 0,
+    xi6: 0,
+    xione: 0,
+    xr15: 0,
+    rg6_aerial: 0,
+    rg6_under: 0,
+    rg11: 0,
+    split_2way: 0,
+    split_3way: 0,
+    ground_blocks: 0,
+    drop_hangers: 0
+  };
+
+  const equipItemLabels = {
+    xb7: "XB7 Wireless Gateway",
+    xb8: "XB8 WiFi 6E Gateway",
+    xi6: "Xi6 4K Wireless Box",
+    xione: "XiOne 4K Streaming Box",
+    xr15: "XR15 Voice Remote",
+    rg6_aerial: "RG6 Aerial Spool (1000')",
+    rg6_under: "RG6 Underground (Flooded)",
+    rg11: "RG11 Underground Spool",
+    split_2way: "2-Way Balanced Splitters",
+    split_3way: "3-Way Splitters (Bal/Unbal)",
+    ground_blocks: "Ground Blocks & Dual Tags",
+    drop_hangers: "Drop Hangers (Bag of 50)"
+  };
+
   function navigateHome() { switchView('view-dashboard'); }
   function openQCView() { switchView('view-qc'); }
   function openDownedView() { switchView('view-downed'); }
   function openRTMView() { switchView('view-rtm'); }
+  function openEquipView() { switchView('view-equip'); }
 
   function switchView(targetId) {
     document.querySelectorAll('.view-screen').forEach(el => el.classList.remove('view-active'));
@@ -647,6 +890,7 @@
     document.getElementById('techNum').value = val;
     document.getElementById('downedTechNum').value = val;
     document.getElementById('rtmTechNum').value = val;
+    document.getElementById('equipTechNum').value = val;
     localStorage.setItem('qc_tech_num', val);
   }
 
@@ -885,6 +1129,51 @@
 
   function updateRtmExtraCount() {
     document.getElementById('rtmExtraCount').textContent = `(${rtmExtraPhotos.filter(p => p !== null).length})`;
+  }
+
+  /* Equipment Counter Logic */
+  function adjustCount(itemKey, delta) {
+    equipCounts[itemKey] = Math.max(0, (equipCounts[itemKey] || 0) + delta);
+    document.getElementById(`cnt_${itemKey}`).textContent = equipCounts[itemKey];
+  }
+
+  async function submitEquipOrder() {
+    const techNum = document.getElementById('equipTechNum').value.trim();
+    const techName = document.getElementById('equipTechName').value.trim();
+    const pickupLoc = document.getElementById('pickupLocation').value;
+    const notes = document.getElementById('equipNotes').value.trim();
+
+    if (!techNum || !techName) {
+      alert("Please provide Tech Number and Tech Full Name.");
+      return;
+    }
+
+    let orderedItems = [];
+    for (const key in equipCounts) {
+      if (equipCounts[key] > 0) {
+        orderedItems.push(`  • ${equipItemLabels[key]}: ${equipCounts[key]}`);
+      }
+    }
+
+    if (orderedItems.length === 0 && !notes) {
+      alert("Please select at least one item quantity or write a custom request in the notes.");
+      return;
+    }
+
+    const timestamp = new Date().toLocaleString();
+    const emailSubject = `📦 [EQUIPMENT ORDER] Tech ${techNum} (${techName}) | ${pickupLoc}`;
+    const emailBody = `EQUIPMENT RESTOCK MANIFEST\nWarehouse: ${pickupLoc}\nTimestamp: ${timestamp}\n\nTECHNICIAN:\n• Tech ID: ${techNum}\n• Tech Name: ${techName}\n\nREQUESTED ITEMS:\n${orderedItems.length > 0 ? orderedItems.join('\n') : '  (None selected - see notes below)'}\n\nSPECIAL NOTES / CUSTOM HARDWARE:\n"${notes || 'None'}"\n\n-- Dispatched via Prince Field Suite`;
+
+    dispatchPayload(emailSubject, emailBody, []);
+  }
+
+  function resetEquipOrder() {
+    for (const key in equipCounts) {
+      equipCounts[key] = 0;
+      const el = document.getElementById(`cnt_${key}`);
+      if (el) el.textContent = '0';
+    }
+    document.getElementById('equipNotes').value = '';
   }
 
   async function submitQC() {
