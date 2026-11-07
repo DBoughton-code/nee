@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechOps Resource Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased flex flex-col min-h-screen">
+
+    <!-- Header / Navbar -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3 cursor-pointer">
+                    <div class="bg-blue-600 text-white p-2 rounded-lg">
+                        <i class="ph ph-books text-2xl"></i>
+                    </div>
+                    <span class="font-bold text-xl text-slate-900 tracking-tight">TechOps Resource Center</span>
+                </div>
+                <div class="hidden md:flex text-sm text-slate-500 font-medium">
+                    <span>Internal Knowledge Base</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="bg-slate-900 text-white py-20 px-4">
+        <div class="max-w-4xl mx-auto text-center space-y-6">
+            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight">
+                Standard Operating Procedures & Guidelines
+            </h1>
+            <p class="text-lg md:text-xl text-slate-400 font-light max-w-2xl mx-auto">
+                Your central hub for technical documentation, installation standards, troubleshooting flows, and operational excellence policies.
+            </p>
+        </div>
+    </section>
+
+    <!-- Main Content Grid -->
+    <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 w-full">
+        
+        <div class="mb-8 flex items-center justify-between">
+            <h2 class="text-2xl font-bold text-slate-900">Documentation Directory</h2>
+            <span class="text-sm font-medium text-slate-500 bg-slate-200 px-3 py-1 rounded-full">10 Documents</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            
+            <!-- Card 1 -->
+            <div class="group relative flex flex-col bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg hover:border-blue-300 transition-all duration-200 hover:-translate-y-1 p-6">
+                <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mb-4 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                    <i class="ph ph-hard-drives text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">EPON Two-Box Setup</h3>
+                <p class="text-sm text-slate-600 flex-1">Guide for Ethernet Passive Optical Network two-box (ONU & Gateway) residential setup.</p>
+                <div class="mt-4 flex items-center z-10">
+                    <a href="epon_setup.html" class="text-blue-600 text-sm font-medium flex items-center before:absolute before:inset-0">
+                        Read Guide <i class="ph ph-arrow-right ml-1 group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="group relative flex flex-col bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg hover:border-indigo-300 transition-all duration-200 hover:-translate-y-1 p-6">
+                <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mb-4 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                    <i class="ph ph-heartbeat text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">Premise Health Test (PHT)</h3>
+                <p class="text-sm text-slate-600 flex-1">Advanced diagnostic thresholds, ICFR metrics, and FBC spectrum analysis procedures.</p>
+                <div class="mt-4 flex items-center z-10">
+                    <a href="pht_guide.html" class="text-indigo-600 text-sm font-medium flex items-center before:absolute before:inset-0">
+                        Read Guide <i class="ph ph-arrow-right ml-1 group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="group relative flex flex-col bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg hover:border-rose-300 transition-all duration-200 hover:-translate-y-1 p-6">
+                <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center mb-4 group-hover:bg-rose-600 group-hover:text-white transition-colors">
+                    <i class="ph ph-phone-disconnect text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">Trouble Calls (TCs) Policy</h3>
+                <p class="text-sm text-slate-600 flex-1">Standard policy for handling trouble calls, truck roll completion codes, and cancellations.</p>
+                <div class="mt-4 flex items-center z-10">
+                    <a href="tc_policy.html" class="text-rose-600 text-sm font-medium flex items-center before:absolute before:inset-0">
+                        Read Guide <i class="ph ph-arrow-right ml-1 group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="group relative flex flex-col bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg hover:border-orange-300 transition-all duration-200 hover:-translate-y-1 p-6">
+                <div class="w-12 h-12 bg-orange-50 text-orange-600 rounded-xl flex items-center justify-center mb-4 group-hover:bg-orange-600 group-hover:text-white transition-colors">
+                    <i class="ph ph-hard-hat text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">Outside-only SRO Procedures</h3>
+                <p class="text-sm text-slate-600 flex-1">Methods of Procedure (MoPr) for outside-only Special Request Orders (SRO).</p>
+                <div class="mt-4 flex items-center z-10">
+                    <a href="sro_procedures.html" class="text-orange-600 text-sm font-medium flex items-center before:absolute before:inset-0">
+                        Read Guide <i class="ph ph-arrow-right ml-1 group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card 5 -->
+            <div class="group relative flex flex-col bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg hover:border-teal-300 transition-all duration-200 hover:-translate-y-1 p-6">
+                <div class="w-12 h-12 bg-teal-50 text-teal-600 rounded-xl flex items-center justify-center mb-4 group-hover:bg-teal-600 group-hover:text-white transition-colors">
+                    <i class="ph ph-plug text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">Cables & Hardware Specs</h3>
+                <p class="text-sm text-slate-600 flex-1">Approved cables, connectors, bandwidth ranges, and hardware specifications for installations.</p>
+                <div class="mt-4 flex items-center z-10">
+                    <a href="hardware_specs.html" class="text-teal-600 text-sm font-medium flex items-center before:absolute before:inset-0">
+                        Read Guide <i class="ph ph-arrow-right ml-1 group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card 6 -->
+            <div class="group relative flex flex-col bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg hover:border-sky-300 transition-all duration-200 hover:-translate-y-1 p-6">
+                <div class="w-12 h-12 bg-sky-50 text-sky-600 rounded-xl flex items-center justify-center mb-4 group-hover:bg-sky-600 group-hover:text-white transition-colors">
+                    <i class="ph ph-router text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">CPE Installation</h3>
+                <p class="text-sm text-slate-600 flex-1">Location considerations, interference mitigation, and mounting options for Customer Premise Equipment.</p>
+                <div class="mt-4 flex items-center z-10">
+                    <a href="cpe_installation.html" class="text-sky-600 text-sm font-medium flex items-center before:absolute before:inset-0">
+                        Read Guide <i class="ph ph-arrow-right ml-1 group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card 7 -->
+            <div class="group relative flex flex-col bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg hover:border-purple-300 transition-all duration-200 hover:-translate-y-1 p-6">
+                <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center mb-4 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                    <i class="ph ph-bounding-box text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">Service Distribution Point</h3>
+                <p class="text-sm text-slate-600 flex-1">Installation requirements for cables and enclosures at the main service distribution point.</p>
+                <div class="mt-4 flex items-center z-10">
+                    <a href="service_distribution.html" class="text-purple-600 text-sm font-medium flex items-center before:absolute before:inset-0">
+                        Read Guide <i class="ph ph-arrow-right ml-1 group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card 8 -->
+            <div class="group relative flex flex-col bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg hover:border-amber-300 transition-all duration-200 hover:-translate-y-1 p-6">
+                <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center mb-4 group-hover:bg-amber-600 group-hover:text-white transition-colors">
+                    <i class="ph ph-broadcast text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">Mid-Split Troubleshooting</h3>
+                <p class="text-sm text-slate-600 flex-1">Identifying and remediating issues regarding mid-split activation, tiling, and OFDMA partial bonding.</p>
+                <div class="mt-4 flex items-center z-10">
+                    <a href="midsplit_tr.html" class="text-amber-600 text-sm font-medium flex items-center before:absolute before:inset-0">
+                        Read Guide <i class="ph ph-arrow-right ml-1 group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card 9 -->
+            <div class="group relative flex flex-col bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg hover:border-emerald-300 transition-all duration-200 hover:-translate-y-1 p-6">
+                <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center mb-4 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                    <i class="ph ph-devices text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">Connected Devices Insights</h3>
+                <p class="text-sm text-slate-600 flex-1">Telemetry definitions (PHY, RSSI, SNR) and guidance for triaging potentially impaired connected devices.</p>
+                <div class="mt-4 flex items-center z-10">
+                    <a href="connected_devices.html" class="text-emerald-600 text-sm font-medium flex items-center before:absolute before:inset-0">
+                        Read Guide <i class="ph ph-arrow-right ml-1 group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card 10 -->
+            <div class="group relative flex flex-col bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg hover:border-cyan-300 transition-all duration-200 hover:-translate-y-1 p-6">
+                <div class="w-12 h-12 bg-cyan-50 text-cyan-600 rounded-xl flex items-center justify-center mb-4 group-hover:bg-cyan-600 group-hover:text-white transition-colors">
+                    <i class="ph ph-share-network text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">Premise Wiring Installation</h3>
+                <p class="text-sm text-slate-600 flex-1">Requirements for the correct installation of interior/exterior wiring, drilling, and bend radii.</p>
+                <div class="mt-4 flex items-center z-10">
+                    <a href="premise_wiring.html" class="text-cyan-600 text-sm font-medium flex items-center before:absolute before:inset-0">
+                        Read Guide <i class="ph ph-arrow-right ml-1 group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-8 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-slate-500 text-sm">
+            <p>&copy; 2026 TechOps Internal Resources. For official use only.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
