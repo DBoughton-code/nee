@@ -236,60 +236,77 @@
     details.equip-cat[open] summary::after { content: "▲"; }
 
     .equip-cat-body {
-      padding: 8px 12px 12px 12px;
+      padding: 8px 12px 14px 12px;
       border-top: 1px solid var(--card-border);
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 12px;
     }
 
+    /* Slider-Based Equipment Row */
     .equip-item-row {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 6px 0;
+      flex-direction: column;
+      gap: 6px;
+      padding-bottom: 8px;
       border-bottom: 1px solid rgba(51, 65, 85, 0.4);
     }
 
-    .equip-item-row:last-child { border-bottom: none; }
+    .equip-item-row:last-child { border-bottom: none; padding-bottom: 0; }
+
+    .equip-label-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
     .equip-name {
       font-size: 0.85rem;
       font-weight: 600;
       color: var(--text);
-      max-width: 65%;
       line-height: 1.2;
     }
 
-    .counter-control {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .counter-btn {
-      width: 30px;
-      height: 30px;
-      background: #334155;
-      color: #fff;
-      border: 1px solid var(--card-border);
-      border-radius: 6px;
-      font-weight: 800;
-      font-size: 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
-
-    .counter-btn:active { background: var(--teal); }
-
     .counter-val {
-      min-width: 24px;
-      text-align: center;
       font-size: 0.95rem;
-      font-weight: 700;
+      font-weight: 800;
       color: #5eead4;
+      background: #1e293b;
+      padding: 2px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--card-border);
+      min-width: 20px;
+      text-align: center;
+    }
+
+    .counter-val.is-selected {
+      background: rgba(20, 184, 166, 0.25);
+      border-color: var(--teal);
+      color: #fff;
+    }
+
+    /* Range Slider Styling */
+    input[type="range"].equip-slider {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      background: #334155;
+      border-radius: 4px;
+      outline: none;
+      padding: 0;
+      margin: 4px 0;
+    }
+
+    input[type="range"].equip-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--teal);
+      cursor: pointer;
+      border: 2px solid #fff;
+      box-shadow: 0 0 4px rgba(0,0,0,0.5);
     }
 
     .photo-grid {
@@ -346,6 +363,7 @@
     .btn-reset { background-color: #475569; margin-top: 8px; }
     .btn-downed { background-color: var(--danger); margin-top: 8px; }
     .btn-rtm { background-color: var(--purple); margin-top: 8px; }
+    .btn-sms { background-color: #059669; color: #fff; margin-top: 8px; font-weight: 800; }
     .btn-equip { background-color: var(--teal); color: #042f2e; margin-top: 8px; font-weight: 800; }
     input[type="file"] { display: none; }
 
@@ -686,7 +704,7 @@
     </div>
   </div>
 
-  <!-- SCREEN 5: WEEKLY EQUIPMENT ORDER -->
+  <!-- SCREEN 5: WEEKLY EQUIPMENT ORDER (WITH SLIDERS & TEXT OPTION) -->
   <div id="view-equip" class="view-screen">
     <div class="nav-top-bar">
       <button type="button" class="btn-back" onclick="navigateHome()">❮ Main Menu</button>
@@ -717,11 +735,15 @@
           <option value="Other must call Ousmane, James, Don to setup">Other must call Ousmane, James, Don to setup</option>
         </select>
       </div>
+      <div class="form-group">
+        <label for="warehousePhone">Supervisor / Warehouse SMS # (Optional)</label>
+        <input type="tel" id="warehousePhone" placeholder="e.g. 8605551234 (Leave blank to choose in Messages)">
+      </div>
     </div>
 
-    <!-- Equipment Accordions Container -->
+    <!-- Equipment Accordions with Sliders -->
     <div class="card">
-      <div class="card-title">Material & Gear Catalog</div>
+      <div class="card-title">Material Catalog (Slide to Select)</div>
       <div id="equipAccordionContainer"></div>
     </div>
 
@@ -734,8 +756,9 @@
     </div>
 
     <div class="card">
-      <div id="equipStatus" class="status-msg"></div>
-      <button type="button" class="btn btn-equip" onclick="submitEquipOrder()">📦 Submit Equipment Order</button>
+      <!-- Direct SMS and Email Buttons -->
+      <button type="button" class="btn btn-sms" onclick="sendEquipText()">📱 Text Order (SMS)</button>
+      <button type="button" class="btn btn-equip" onclick="submitEquipOrder()">📧 Email / Database Dispatch</button>
       <button type="button" class="btn btn-reset" onclick="resetEquipOrder()">Reset All Quantities</button>
     </div>
   </div>
@@ -761,11 +784,12 @@
   const rtmExtraPhotos = [];
   let rtmExtraCounter = 0;
 
-  // Complete Catalog mapped from your Google Form
+  // Catalog with native steps and max values directly matching Google Form columns
   const EQUIP_CATALOG = [
     {
       category: "CPE - MODEMS",
       step: 1,
+      max: 14,
       items: [
         { id: "m_xb6", name: "XB6 Modem" },
         { id: "m_xb7", name: "XB7 Modem" },
@@ -778,6 +802,7 @@
     {
       category: "CPE - CABLE BOXES",
       step: 1,
+      max: 14,
       items: [
         { id: "cb_xg1_moto", name: "XG1 MOTO RED" },
         { id: "cb_xg1_sa", name: "XG1 SA BLUE" },
@@ -791,6 +816,7 @@
     {
       category: "COAX CABLE & SCREW CLIPS",
       step: 1,
+      max: 5,
       items: [
         { id: "cx_rg6_aer", name: "RG6 AERIAL" },
         { id: "cx_rg11_aer", name: "RG11 AERIAL" },
@@ -807,6 +833,7 @@
     {
       category: "CONNECTORS",
       step: 1,
+      max: 4,
       items: [
         { id: "con_in_rg6", name: "INDOOR RG6" },
         { id: "con_out_rg6", name: "OUTDOOR RG6" },
@@ -820,6 +847,7 @@
     {
       category: "GROUND BLOCKS & MOCA",
       step: 1,
+      max: 4,
       items: [
         { id: "gb_no_moca", name: "BOND BLOCKS NO MOCA (BAGS)" },
         { id: "gb_moca", name: "BOND BLOCKS WITH MOCA (BAGS)" },
@@ -830,6 +858,7 @@
     {
       category: "GROUND CLAMPS",
       step: 5,
+      max: 20,
       items: [
         { id: "gc_meter", name: "METER CLAMP" },
         { id: "gc_bronze", name: "GROUND CLAMP BRONZE" },
@@ -843,6 +872,7 @@
     {
       category: "SPLITTERS & WALL PLATES",
       step: 5,
+      max: 20,
       items: [
         { id: "sp_2way", name: "2 WAY SPLITTER" },
         { id: "sp_3way", name: "3 WAY SPLITTER" },
@@ -854,7 +884,8 @@
     },
     {
       category: "TIE WRAPS & CABLES",
-      step: 5,
+      step: 2,
+      max: 20,
       items: [
         { id: "tw_8in", name: "TIE WRAPS 8 INCH" },
         { id: "tw_14in", name: "TIE WRAPS 14 INCH" },
@@ -866,6 +897,7 @@
     {
       category: "DROP SUPPLIES",
       step: 5,
+      max: 20,
       items: [
         { id: "ds_hanger", name: "COAX DROP HANGER" },
         { id: "ds_phook", name: "P HOOKS (HOUSE)" },
@@ -877,6 +909,7 @@
     {
       category: "OTHER MISC SUPPLIES",
       step: 1,
+      max: 5,
       items: [
         { id: "ot_wht_bush", name: "WHITE BUSHINGS (BAG)" },
         { id: "ot_blk_bush", name: "BLACK BUSHINGS (BAG)" },
@@ -889,6 +922,7 @@
     {
       category: "FIBER SUPPLIES",
       step: 1,
+      max: 10,
       items: [
         { id: "fb_onu", name: "ONU" },
         { id: "fb_xer10", name: "XER 10" },
@@ -906,6 +940,7 @@
     {
       category: "FIBER AERIAL DROPS",
       step: 1,
+      max: 10,
       items: [
         { id: "fad_100", name: "100 FT FIBER DROP" },
         { id: "fad_150", name: "150 FT FIBER DROP" },
@@ -924,6 +959,7 @@
 
   const equipCounts = {};
 
+  // Build the catalog using range sliders
   function buildEquipCatalogUI() {
     const container = document.getElementById('equipAccordionContainer');
     container.innerHTML = '';
@@ -945,12 +981,13 @@
         const row = document.createElement('div');
         row.className = 'equip-item-row';
         row.innerHTML = `
-          <span class="equip-name">${item.name}</span>
-          <div class="counter-control">
-            <button type="button" class="counter-btn" onclick="adjustCount('${item.id}', -${cat.step})">-</button>
+          <div class="equip-label-bar">
+            <span class="equip-name">${item.name}</span>
             <span class="counter-val" id="cnt_${item.id}">0</span>
-            <button type="button" class="counter-btn" onclick="adjustCount('${item.id}', ${cat.step})">+</button>
           </div>
+          <input type="range" class="equip-slider" id="slider_${item.id}"
+            min="0" max="${cat.max}" step="${cat.step}" value="0"
+            oninput="handleSliderChange('${item.id}', this.value)">
         `;
         body.appendChild(row);
       });
@@ -960,13 +997,22 @@
     });
   }
 
-  function adjustCount(itemId, delta) {
-    equipCounts[itemId] = Math.max(0, (equipCounts[itemId] || 0) + delta);
-    const el = document.getElementById(`cnt_${itemId}`);
-    if (el) el.textContent = equipCounts[itemId];
+  function handleSliderChange(itemId, val) {
+    const num = parseInt(val, 10);
+    equipCounts[itemId] = num;
+    const badge = document.getElementById(`cnt_${itemId}`);
+    if (badge) {
+      badge.textContent = num;
+      if (num > 0) {
+        badge.classList.add('is-selected');
+      } else {
+        badge.classList.remove('is-selected');
+      }
+    }
   }
 
-  function submitEquipOrder() {
+  // Compile the text body for both text/SMS and email
+  function buildEquipOrderPayload() {
     const techName = document.getElementById('equipTechName').value.trim();
     const techNum = document.getElementById('equipTechNum').value.trim();
     const pickupLoc = document.getElementById('pickupLocation').value;
@@ -974,7 +1020,7 @@
 
     if (!techName || !techNum) {
       alert("Please enter Tech Name and Tech Number.");
-      return;
+      return null;
     }
 
     let manifestLines = [];
@@ -992,12 +1038,12 @@
 
     if (manifestLines.length === 0 && !notes) {
       alert("Please select at least one item quantity or enter items in special request notes.");
-      return;
+      return null;
     }
 
     const timestamp = new Date().toLocaleString();
-    const emailSubject = `📦 [WEEKLY GEAR ORDER] Tech ${techNum} (${techName}) | ${pickupLoc}`;
-    const emailBody = `WEEKLY EQUIPMENT ORDER MANIFEST
+    const subject = `📦 [EQUIPMENT ORDER] Tech ${techNum} (${techName}) | ${pickupLoc}`;
+    const body = `📦 WEEKLY EQUIPMENT ORDER MANIFEST
 Due: By 9:00 AM Monday
 Logged: ${timestamp}
 
@@ -1012,16 +1058,42 @@ ${manifestLines.length > 0 ? manifestLines.join('\n\n') : 'No catalog items sele
 SPECIAL REQUEST NOTES:
 ${notes ? `"${notes}"` : 'None'}
 
--- Sent via Prince Telecom Field Suite`;
+-- Prince Telecom Field Suite`;
 
-    dispatchPayload(emailSubject, emailBody, []);
+    return { subject, body, techNum, techName, pickupLoc };
+  }
+
+  // 1. Direct SMS Text Option
+  function sendEquipText() {
+    const payload = buildEquipOrderPayload();
+    if (!payload) return;
+
+    const phone = document.getElementById('warehousePhone').value.trim();
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const delim = isIOS ? '&' : '?';
+    const target = phone ? `sms:${phone}${delim}` : `sms:${delim}`;
+    
+    window.location.href = `${target}body=${encodeURIComponent(payload.body)}`;
+  }
+
+  // 2. Email / Standard Dispatch Option
+  function submitEquipOrder() {
+    const payload = buildEquipOrderPayload();
+    if (!payload) return;
+
+    dispatchPayload(payload.subject, payload.body, []);
   }
 
   function resetEquipOrder() {
     for (const key in equipCounts) {
       equipCounts[key] = 0;
-      const el = document.getElementById(`cnt_${key}`);
-      if (el) el.textContent = '0';
+      const slider = document.getElementById(`slider_${key}`);
+      const badge = document.getElementById(`cnt_${key}`);
+      if (slider) slider.value = 0;
+      if (badge) {
+        badge.textContent = '0';
+        badge.classList.remove('is-selected');
+      }
     }
     document.getElementById('equipNotes').value = '';
   }
