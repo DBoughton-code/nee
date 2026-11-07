@@ -480,6 +480,7 @@
       </div>
     </div>
 
+    <!-- Required Proof Photos -->
     <div class="card">
       <div class="card-title">Required Evidence Photos *</div>
       <div class="photo-grid">
@@ -500,6 +501,16 @@
           <input type="file" id="input-downed_issue" accept="image/*" onchange="processPhoto(event, 'downed_issue', false, 'downed')">
         </div>
       </div>
+    </div>
+
+    <!-- Additional Optional Photos for Downed Jobs -->
+    <div class="card">
+      <div class="card-title">
+        <span>Additional Evidence Photos (Optional)</span>
+        <span id="downedExtraCount" style="font-size:0.8rem; color:var(--text-muted);">(0)</span>
+      </div>
+      <div class="photo-grid" id="downedExtraPhotosGrid"></div>
+      <button type="button" class="btn btn-secondary" onclick="addDownedExtraPhotoSlot()" style="margin-top: 12px;">➕ Add Extra Downed Photo</button>
     </div>
 
     <div class="card">
@@ -602,7 +613,7 @@
 </div>
 
 <script>
-  // Direct link to your live Weekly Equipment Order Google Form
+  // Live Google Form Link
   const GOOGLE_FORM_VIEW_URL = "https://docs.google.com/forms/d/e/1FAIpQLSf5QkuPSaumLkF33HvlreQeTCHY5hV6Q98cswc03EbFiEo0dQ/viewform?usp=header";
   const SUPERVISOR_EMAIL = "Donald.boughton@princetown.com";
 
@@ -623,6 +634,9 @@
   let extraCounter = 0;
 
   const downedPhotos = { downed_curb: null, downed_issue: null };
+  const downedExtraPhotos = [];
+  let downedExtraCounter = 0;
+
   const rtmPhotos = { rtm_levels: null, rtm_tap: null };
   const rtmExtraPhotos = [];
   let rtmExtraCounter = 0;
@@ -794,8 +808,10 @@
         const stampedFile = new File([blob], file.name, { type: 'image/jpeg' });
         const stampedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
 
-        if (mode === 'downed') {
+        if (mode === 'downed' && !isExtra) {
           downedPhotos[key] = { file: stampedFile, dataUrl: stampedDataUrl };
+        } else if (mode === 'downed' && isExtra) {
+          downedExtraPhotos[key] = { file: stampedFile, dataUrl: stampedDataUrl };
         } else if (mode === 'rtm' && !isExtra) {
           rtmPhotos[key] = { file: stampedFile, dataUrl: stampedDataUrl };
         } else if (mode === 'rtm' && isExtra) {
@@ -819,6 +835,7 @@
     };
   }
 
+  // Comcast QC Extra Photos
   function addExtraPhotoSlot() {
     extraCounter++;
     const id = extraCounter;
@@ -852,6 +869,41 @@
     document.getElementById('extraCount').textContent = `(${extraPhotos.filter(p => p !== null).length})`;
   }
 
+  // Downed Job Optional Photos
+  function addDownedExtraPhotoSlot() {
+    downedExtraCounter++;
+    const id = downedExtraCounter;
+    downedExtraPhotos[id] = null;
+    const grid = document.getElementById('downedExtraPhotosGrid');
+    const box = document.createElement('div');
+    box.className = 'photo-box downed-photo';
+    box.id = `box-downed-extra-${id}`;
+    box.setAttribute('onclick', `triggerCamera('input-downed-extra-${id}')`);
+    box.innerHTML = `
+      <span class="remove-btn" onclick="event.stopPropagation(); removeDownedExtraPhoto(${id})">&times;</span>
+      <span class="photo-icon">📷</span>
+      <label>Downed Extra #${id}</label>
+      <span id="badge-downed-extra-${id}" style="display:none;" class="badge badge-downed">Stamped ✓</span>
+      <div id="addr-downed-extra-${id}" class="addr-tag"></div>
+      <img id="prev-downed-extra-${id}" style="display:none;" />
+      <input type="file" id="input-downed-extra-${id}" accept="image/*" onchange="processPhoto(event, ${id}, true, 'downed')">
+    `;
+    grid.appendChild(box);
+    updateDownedExtraCount();
+  }
+
+  function removeDownedExtraPhoto(id) {
+    downedExtraPhotos[id] = null;
+    const box = document.getElementById(`box-downed-extra-${id}`);
+    if (box) box.remove();
+    updateDownedExtraCount();
+  }
+
+  function updateDownedExtraCount() {
+    document.getElementById('downedExtraCount').textContent = `(${downedExtraPhotos.filter(p => p !== null).length})`;
+  }
+
+  // RTM Optional Photos
   function addRtmExtraPhotoSlot() {
     rtmExtraCounter++;
     const id = rtmExtraCounter;
@@ -945,7 +997,7 @@
       return;
     }
     if (!downedPhotos.downed_curb || !downedPhotos.downed_issue) {
-      alert("Please take both proof photos (House # and Issue Proof).");
+      alert("Please take both required proof photos (House # and Issue Proof).");
       return;
     }
 
@@ -954,8 +1006,14 @@
       new File([downedPhotos.downed_issue.file], `DOWNED_2_Issue_Job_${jobNum}.jpg`, { type: 'image/jpeg' })
     ];
 
+    downedExtraPhotos.forEach((item, idx) => {
+      if (item && item.file) {
+        attachedFiles.push(new File([item.file], `DOWNED_Extra_${idx + 1}_Job_${jobNum}.jpg`, { type: 'image/jpeg' }));
+      }
+    });
+
     const emailSubject = `🛑 [DOWNED JOB] ${reason.toUpperCase()} | Job #${jobNum} | Tech ${techNum} | ${address}`;
-    const emailBody = `🚨 DOWNED JOB / ESCALATION NOTICE\nStatus: Unserviceable\nReason: ${reason}\n\nJOB DETAILS:\n• Job: ${jobNum}\n• Tech: ${techNum}\n• Address: ${address}, ${city}, ${state}\n\nEXPLANATION:\n"${notes || 'None provided.'}"\n\nPHOTOS:\n[1] House # Proof\n[2] Obstruction Proof`;
+    const emailBody = `🚨 DOWNED JOB / ESCALATION NOTICE\nStatus: Unserviceable\nReason: ${reason}\n\nJOB DETAILS:\n• Job: ${jobNum}\n• Tech: ${techNum}\n• Address: ${address}, ${city}, ${state}\n\nEXPLANATION:\n"${notes || 'None provided.'}"\n\nPHOTOS ATTACHED (${attachedFiles.length} Total):\n✓ House # Proof\n✓ Issue / Obstruction Proof\n${attachedFiles.length > 2 ? `+ Additional Evidence Photos (${attachedFiles.length - 2})\n` : ''}`;
 
     dispatchPayload(emailSubject, emailBody, attachedFiles);
   }
@@ -1024,9 +1082,22 @@
   }
 
   function resetDownedForm() {
+    // 1. Clear text and selection fields
     document.getElementById('downedJobNum').value = '';
     document.getElementById('downedAddress').value = '';
     document.getElementById('downedNotes').value = '';
+    const reasonSelect = document.getElementById('downedReason');
+    if (reasonSelect) reasonSelect.selectedIndex = 0;
+    checkDownedReason();
+
+    // 2. Clear status banner
+    const statusEl = document.getElementById('downedStatus');
+    if (statusEl) {
+      statusEl.style.display = 'none';
+      statusEl.textContent = '';
+    }
+
+    // 3. Reset primary required photos
     downedPhotos.downed_curb = null;
     downedPhotos.downed_issue = null;
     ['downed_curb', 'downed_issue'].forEach(k => {
@@ -1034,11 +1105,19 @@
       const b = document.getElementById(`badge-${k}`);
       const a = document.getElementById(`addr-${k}`);
       const box = document.getElementById(`box-${k}`);
-      if (p) p.style.display = 'none';
+      const input = document.getElementById(`input-${k}`);
+      if (p) { p.src = ''; p.style.display = 'none'; }
       if (b) b.style.display = 'none';
       if (a) a.textContent = '';
       if (box) box.classList.remove('has-photo');
+      if (input) input.value = '';
     });
+
+    // 4. Clear extra optional photos
+    document.getElementById('downedExtraPhotosGrid').innerHTML = '';
+    downedExtraPhotos.length = 0;
+    downedExtraCounter = 0;
+    updateDownedExtraCount();
   }
 
   function resetRTMForm() {
@@ -1053,10 +1132,12 @@
       const b = document.getElementById(`badge-${k}`);
       const a = document.getElementById(`addr-${k}`);
       const box = document.getElementById(`box-${k}`);
-      if (p) p.style.display = 'none';
+      const input = document.getElementById(`input-${k}`);
+      if (p) { p.src = ''; p.style.display = 'none'; }
       if (b) b.style.display = 'none';
       if (a) a.textContent = '';
       if (box) box.classList.remove('has-photo');
+      if (input) input.value = '';
     });
     document.getElementById('rtmExtraPhotosGrid').innerHTML = '';
     rtmExtraPhotos.length = 0;
