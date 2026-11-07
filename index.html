@@ -426,6 +426,8 @@
       display: none;
     }
 
+    .status-info { background: #075985; color: #e0f2fe; }
+
     .remove-btn {
       position: absolute;
       top: 4px;
@@ -754,7 +756,7 @@
     </div>
   </div>
 
-  <!-- SCREEN 5: WEEKLY EQUIPMENT ORDER (TAP-TO-SELECT SMS RECIPIENTS) -->
+  <!-- SCREEN 5: WEEKLY EQUIPMENT ORDER -->
   <div id="view-equip" class="view-screen">
     <div class="nav-top-bar">
       <button type="button" class="btn-back" onclick="navigateHome()">❮ Main Menu</button>
@@ -793,17 +795,17 @@
           <div class="contact-chip selected" id="chip_ousmane" onclick="toggleRecipient('ousmane')">
             <span class="contact-chip-name">Ousmane</span>
             <span class="contact-chip-phone">508-221-2243</span>
-            <span class="contact-chip-status" id="status_ousmane">✓ Active</span>
+            <span class="contact-chip-status" id="status_ousmane">✓ Selected</span>
           </div>
           <div class="contact-chip selected" id="chip_james" onclick="toggleRecipient('james')">
             <span class="contact-chip-name">James</span>
             <span class="contact-chip-phone">302-679-5985</span>
-            <span class="contact-chip-status" id="status_james">✓ Active</span>
+            <span class="contact-chip-status" id="status_james">✓ Selected</span>
           </div>
           <div class="contact-chip selected" id="chip_don" onclick="toggleRecipient('don')">
             <span class="contact-chip-name">Don</span>
             <span class="contact-chip-phone">774-635-9784</span>
-            <span class="contact-chip-status" id="status_don">✓ Active</span>
+            <span class="contact-chip-status" id="status_don">✓ Selected</span>
           </div>
         </div>
       </div>
@@ -824,9 +826,18 @@
     </div>
 
     <div class="card">
-      <!-- Direct SMS Action Button Only -->
-      <button type="button" class="btn btn-sms" onclick="sendEquipText()">📱 Text Selected Recipients (SMS)</button>
+      <div class="card-title">Dispatch Equipment Manifest</div>
+      
+      <!-- Dynamic Buttons: 1 Tap-to-Text Button per Selected Recipient -->
+      <div id="dynamicSmsButtonsContainer" style="display: flex; flex-direction: column; gap: 8px;"></div>
+
+      <!-- Copy to Clipboard Fallback for Group Chats -->
+      <button type="button" class="btn btn-secondary" onclick="copyEquipManifest()" style="margin-top: 10px;">📋 Copy Order to Clipboard (Paste in Group Chat)</button>
+      
+      <!-- Reset Form -->
       <button type="button" class="btn btn-reset" onclick="resetEquipOrder()">Reset All Quantities</button>
+      
+      <div id="equipStatus" class="status-msg" style="margin-top: 10px;"></div>
     </div>
   </div>
 </div>
@@ -858,7 +869,7 @@
   const rtmExtraPhotos = [];
   let rtmExtraCounter = 0;
 
-  // Catalog with native steps and max values directly matching Google Form columns
+  // Complete Catalog mapped from your Google Form[span_1](start_span)[span_1](end_span)[span_2](start_span)[span_2](end_span)[span_3](start_span)[span_3](end_span)[span_4](start_span)[span_4](end_span)[span_5](start_span)[span_5](end_span)[span_6](start_span)[span_6](end_span)[span_7](start_span)[span_7](end_span)[span_8](start_span)[span_8](end_span)[span_9](start_span)[span_9](end_span)[span_10](start_span)[span_10](end_span)[span_11](start_span)[span_11](end_span)[span_12](start_span)[span_12](end_span)
   const EQUIP_CATALOG = [
     {
       category: "CPE - MODEMS",
@@ -1033,23 +1044,6 @@
 
   const equipCounts = {};
 
-  // Toggle recipient contact chips
-  function toggleRecipient(key) {
-    if (!CONTACT_DIRECTORY[key]) return;
-    CONTACT_DIRECTORY[key].selected = !CONTACT_DIRECTORY[key].selected;
-    
-    const chip = document.getElementById(`chip_${key}`);
-    const status = document.getElementById(`status_${key}`);
-    
-    if (CONTACT_DIRECTORY[key].selected) {
-      chip.classList.add('selected');
-      status.textContent = '✓ Active';
-    } else {
-      chip.classList.remove('selected');
-      status.textContent = '— Off';
-    }
-  }
-
   // Build the catalog using range sliders
   function buildEquipCatalogUI() {
     const container = document.getElementById('equipAccordionContainer');
@@ -1100,6 +1094,54 @@
         badge.classList.remove('is-selected');
       }
     }
+  }
+
+  // Toggle recipient contact chips
+  function toggleRecipient(key) {
+    if (!CONTACT_DIRECTORY[key]) return;
+    CONTACT_DIRECTORY[key].selected = !CONTACT_DIRECTORY[key].selected;
+    
+    const chip = document.getElementById(`chip_${key}`);
+    const status = document.getElementById(`status_${key}`);
+    
+    if (CONTACT_DIRECTORY[key].selected) {
+      chip.classList.add('selected');
+      status.textContent = '✓ Selected';
+    } else {
+      chip.classList.remove('selected');
+      status.textContent = '— Off';
+    }
+
+    renderDynamicSmsButtons();
+  }
+
+  // Render dedicated buttons for selected contacts
+  function renderDynamicSmsButtons() {
+    const container = document.getElementById('dynamicSmsButtonsContainer');
+    if (!container) return;
+    container.innerHTML = '';
+
+    const selectedKeys = Object.keys(CONTACT_DIRECTORY).filter(k => CONTACT_DIRECTORY[k].selected);
+
+    if (selectedKeys.length === 0) {
+      container.innerHTML = `<p style="font-size:0.82rem; color:var(--danger); margin:4px 0; text-align:center;">⚠️ Select at least one recipient chip above to enable texting.</p>`;
+      return;
+    }
+
+    selectedKeys.forEach(key => {
+      const contact = CONTACT_DIRECTORY[key];
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn btn-sms';
+      btn.style.marginTop = '0';
+      btn.innerHTML = `📲 Send Text to ${contact.name} (${formatDisplayPhone(contact.phone)})`;
+      btn.onclick = () => sendDirectTextToPerson(contact.phone);
+      container.appendChild(btn);
+    });
+  }
+
+  function formatDisplayPhone(p) {
+    return `(${p.slice(0,3)}) ${p.slice(3,6)}-${p.slice(6)}`;
   }
 
   // Build order text payload
@@ -1153,30 +1195,63 @@ ${notes ? `"${notes}"` : 'None'}
     return { body, techNum, techName, pickupLoc };
   }
 
-  // Send Direct SMS to Selected Contacts
-  function sendEquipText() {
+  // Launch single-recipient prefilled SMS
+  function sendDirectTextToPerson(phoneNumber) {
     const payload = buildEquipOrderPayload();
     if (!payload) return;
 
-    // Gather selected recipients
-    const selectedRecipients = [];
-    for (const key in CONTACT_DIRECTORY) {
-      if (CONTACT_DIRECTORY[key].selected) {
-        selectedRecipients.push(CONTACT_DIRECTORY[key].phone);
-      }
+    const cleanPhone = phoneNumber.replace(/[^0-9]/g, '');
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const delim = isIOS ? '&' : '?';
+
+    window.location.href = `sms:${cleanPhone}${delim}body=${encodeURIComponent(payload.body)}`;
+  }
+
+  // Clipboard copy fallback for group chats
+  async function copyEquipManifest() {
+    const payload = buildEquipOrderPayload();
+    if (!payload) return;
+
+    if (navigator.clipboard && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(payload.body);
+        showEquipStatus("✅ Manifest copied to clipboard! Paste it into your supervisor group chat.", "info");
+        setTimeout(hideEquipStatus, 4000);
+        return;
+      } catch (err) {}
     }
 
-    if (selectedRecipients.length === 0) {
-      alert("Please select at least one recipient (Ousmane, James, or Don) to send text.");
-      return;
+    // Fallback for older WebViews
+    const tempArea = document.createElement("textarea");
+    tempArea.value = payload.body;
+    tempArea.style.position = "fixed";
+    tempArea.style.left = "-9999px";
+    tempArea.style.top = "0";
+    tempArea.setAttribute("readonly", "");
+    document.body.appendChild(tempArea);
+    tempArea.focus();
+    tempArea.select();
+    tempArea.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+    document.body.removeChild(tempArea);
+
+    showEquipStatus("✅ Manifest copied to clipboard! Paste it into your supervisor group chat.", "info");
+    setTimeout(hideEquipStatus, 4000);
+  }
+
+  function showEquipStatus(msg, type) {
+    const el = document.getElementById('equipStatus');
+    if (el) {
+      el.textContent = msg;
+      el.className = `status-msg status-${type}`;
+      el.style.display = 'block';
     }
+  }
 
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    const numberDelim = isIOS ? ',' : ';';
-    const queryDelim = isIOS ? '&' : '?';
-
-    const numbersString = selectedRecipients.join(numberDelim);
-    window.location.href = `sms:${numbersString}${queryDelim}body=${encodeURIComponent(payload.body)}`;
+  function hideEquipStatus() {
+    const el = document.getElementById('equipStatus');
+    if (el) el.style.display = 'none';
   }
 
   function resetEquipOrder() {
@@ -1191,8 +1266,10 @@ ${notes ? `"${notes}"` : 'None'}
       }
     }
     document.getElementById('equipNotes').value = '';
+    hideEquipStatus();
   }
 
+  // Navigation Controllers
   function navigateHome() { switchView('view-dashboard'); }
   function openQCView() { switchView('view-qc'); }
   function openDownedView() { switchView('view-downed'); }
@@ -1244,6 +1321,7 @@ ${notes ? `"${notes}"` : 'None'}
 
     renderRequiredPhotoGrid();
     buildEquipCatalogUI();
+    renderDynamicSmsButtons();
   });
 
   function updateNetworkStatus() {
@@ -1457,6 +1535,7 @@ ${notes ? `"${notes}"` : 'None'}
     document.getElementById('rtmExtraCount').textContent = `(${rtmExtraPhotos.filter(p => p !== null).length})`;
   }
 
+  // Submit Standard QC Inspection
   async function submitQC() {
     const jobNum = document.getElementById('jobNum').value.trim();
     const techNum = document.getElementById('techNum').value.trim();
@@ -1499,6 +1578,7 @@ ${notes ? `"${notes}"` : 'None'}
     label.textContent = reason === 'Other (Need Notes)' ? "Detailed Explanation (REQUIRED for 'Other') *" : "Detailed Explanation *";
   }
 
+  // Submit Downed Job Escalation
   async function submitDownedJob() {
     const jobNum = document.getElementById('downedJobNum').value.trim();
     const techNum = document.getElementById('downedTechNum').value.trim();
@@ -1532,6 +1612,7 @@ ${notes ? `"${notes}"` : 'None'}
     dispatchPayload(emailSubject, emailBody, attachedFiles);
   }
 
+  // Submit Refer to Maintenance (RTM)
   async function submitRTMJob() {
     const jobNum = document.getElementById('rtmJobNum').value.trim();
     const techNum = document.getElementById('rtmTechNum').value.trim();
@@ -1574,6 +1655,7 @@ ${notes ? `"${notes}"` : 'None'}
     dispatchPayload(emailSubject, emailBody, attachedFiles);
   }
 
+  // Cross-Platform Share & Email Fallback
   async function dispatchPayload(subject, body, files) {
     if (navigator.canShare && navigator.canShare({ files: files })) {
       try {
@@ -1584,6 +1666,7 @@ ${notes ? `"${notes}"` : 'None'}
     window.location.href = `mailto:${SUPERVISOR_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   }
 
+  // Reset Standard QC Form
   function resetForm() {
     document.getElementById('jobNum').value = '';
     document.getElementById('address').value = '';
@@ -1595,6 +1678,7 @@ ${notes ? `"${notes}"` : 'None'}
     updateExtraCount();
   }
 
+  // Reset Downed Form
   function resetDownedForm() {
     document.getElementById('downedJobNum').value = '';
     document.getElementById('downedAddress').value = '';
@@ -1613,6 +1697,7 @@ ${notes ? `"${notes}"` : 'None'}
     });
   }
 
+  // Reset RTM Form
   function resetRTMForm() {
     document.getElementById('rtmJobNum').value = '';
     document.getElementById('rtmAddress').value = '';
