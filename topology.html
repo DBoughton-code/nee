@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Xfinity Field Tech RF Splitter Topology Optimizer</title>
+  <title>Xfinity Field Tech Demarc & Topology Calculator</title>
   <style>
     /* CSS Reset & Design Tokens */
     *, *::before, *::after {
@@ -29,7 +29,7 @@
       --amber-glow: rgba(245, 158, 11, 0.15);
       --rose: #f43f5e;
       --rose-glow: rgba(244, 63, 94, 0.15);
-      --indigo: #818cf8;
+      --purple: #a855f7;
 
       --radius-sm: 6px;
       --radius-md: 10px;
@@ -47,7 +47,7 @@
     }
 
     .container {
-      max-width: 920px;
+      max-width: 940px;
       margin: 0 auto;
     }
 
@@ -66,7 +66,7 @@
     .brand-title {
       font-size: 1.25rem;
       font-weight: 900;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.04em;
       color: var(--cyan);
       display: flex;
       align-items: center;
@@ -119,7 +119,7 @@
       margin-bottom: 16px;
     }
 
-    @media (min-width: 680px) {
+    @media (min-width: 700px) {
       .grid-2col {
         grid-template-columns: 1fr 1fr;
       }
@@ -151,7 +151,7 @@
       border-radius: 50%;
     }
 
-    /* Controls & Inputs */
+    /* Inputs & Steppers */
     .input-row {
       display: flex;
       gap: 10px;
@@ -217,7 +217,7 @@
       border-color: var(--cyan);
     }
 
-    /* Range Sliders */
+    /* Sliders */
     .slider-wrap {
       margin-top: 10px;
       display: flex;
@@ -243,7 +243,7 @@
       cursor: pointer;
     }
 
-    /* Alert Banner */
+    /* Alerts */
     .alert-banner {
       margin-top: 10px;
       padding: 8px 10px;
@@ -274,7 +274,7 @@
       margin-top: 10px;
     }
 
-    /* Device Counter */
+    /* Counter */
     .counter-wrap {
       display: flex;
       align-items: center;
@@ -311,7 +311,7 @@
       text-align: center;
     }
 
-    /* Mode Selection Switch Bar */
+    /* Mode Selection Bar */
     .mode-bar {
       display: flex;
       background: #090e17;
@@ -345,7 +345,7 @@
       box-shadow: 0 2px 8px rgba(6, 182, 212, 0.35);
     }
 
-    /* Splitter Grid (Manual Mode) */
+    /* Manual Splitter Grid */
     .splitter-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -353,13 +353,13 @@
       margin-bottom: 16px;
     }
 
-    @media (min-width: 580px) {
+    @media (min-width: 600px) {
       .splitter-grid {
         grid-template-columns: repeat(3, 1fr);
       }
     }
 
-    @media (min-width: 760px) {
+    @media (min-width: 800px) {
       .splitter-grid {
         grid-template-columns: repeat(4, 1fr);
       }
@@ -424,7 +424,7 @@
       color: var(--cyan);
     }
 
-    /* Hero Results Telemetry Banner */
+    /* Hero Banner */
     .hero-banner {
       background: linear-gradient(180deg, #162238 0%, #0d1524 100%);
       border: 2px solid var(--cyan);
@@ -441,7 +441,7 @@
       justify-content: space-between;
       align-items: center;
       gap: 10px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     .hero-title-area {
@@ -467,19 +467,86 @@
     .hero-desc {
       font-size: 0.74rem;
       color: var(--text-muted);
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
-    /* 4-Card Telemetry Grid */
+    /* Ground Block Dedicated Strip */
+    .gb-strip {
+      background: rgba(168, 85, 247, 0.08);
+      border: 1px solid rgba(168, 85, 247, 0.35);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .gb-strip:hover {
+      background: rgba(168, 85, 247, 0.14);
+      border-color: var(--purple);
+    }
+
+    .gb-label-area {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .gb-badge {
+      background: var(--purple);
+      color: #0b0f19;
+      font-size: 0.65rem;
+      font-weight: 900;
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      text-transform: uppercase;
+    }
+
+    .gb-title {
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .gb-readings {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    .gb-val-box {
+      text-align: right;
+    }
+
+    .gb-val-tag {
+      font-size: 0.62rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      display: block;
+    }
+
+    .gb-val-num {
+      font-size: 1.05rem;
+      font-weight: 900;
+      color: #e9d5ff;
+    }
+
+    /* 3-Card Device Telemetry Grid */
     .telemetry-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: 1fr;
       gap: 10px;
     }
 
-    @media (min-width: 680px) {
+    @media (min-width: 600px) {
       .telemetry-grid {
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(3, 1fr);
       }
     }
 
@@ -491,7 +558,6 @@
       text-align: center;
       cursor: pointer;
       transition: all 0.2s ease;
-      position: relative;
     }
 
     .telemetry-card:hover {
@@ -526,7 +592,7 @@
     .val-warn { color: var(--amber); }
     .val-fail { color: var(--rose); }
 
-    /* Demarc Port Instructions Box */
+    /* Port Guide Box */
     .port-box {
       margin-top: 14px;
       background: #090e17;
@@ -552,7 +618,7 @@
       line-height: 1.6;
     }
 
-    /* Ranked Topologies Table */
+    /* Evaluated List */
     .table-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -627,7 +693,7 @@
       font-weight: 700;
     }
 
-    /* Action Buttons */
+    /* Copy Button */
     .btn-copy {
       width: 100%;
       background: var(--cyan);
@@ -675,7 +741,7 @@
       background: #111a2e;
       border: 1px solid var(--cyan);
       border-radius: var(--radius-lg);
-      max-width: 540px;
+      max-width: 560px;
       width: 100%;
       padding: 22px;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
@@ -692,11 +758,6 @@
       justify-content: space-between;
       align-items: flex-start;
       margin-bottom: 14px;
-    }
-
-    .modal-title-area {
-      display: flex;
-      flex-direction: column;
     }
 
     .modal-category {
@@ -747,6 +808,25 @@
       font-weight: 800;
     }
 
+    .modal-body table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      margin-bottom: 12px;
+      font-size: 0.72rem;
+    }
+
+    .modal-body th, .modal-body td {
+      border: 1px solid var(--card-border);
+      padding: 6px 8px;
+      text-align: left;
+    }
+
+    .modal-body th {
+      background: #090e17;
+      color: var(--text-muted);
+    }
+
     .modal-body p {
       margin-bottom: 8px;
     }
@@ -760,7 +840,7 @@
       margin-bottom: 4px;
     }
 
-    /* Toast Notification */
+    /* Toast */
     .toast {
       position: fixed;
       bottom: 20px;
@@ -786,10 +866,10 @@
     <header>
       <div>
         <div class="brand-title">
-          <span>📶</span> XFINITY FIELD TECH TOPOLOGY OPTIMIZER
+          <span>📶</span> XFINITY FIELD TECH DEMARC &amp; TOPOLOGY
         </div>
         <div class="brand-subtitle">
-          Passive Single-Point Demarc Architecture • MoCA 2.0/2.5 Compliant
+          Expected Ground Block Levels &bull; Single-Demarc Topologies &bull; Zero Cascades
         </div>
       </div>
       <div id="phtBadge" class="pht-header-badge badge-pass" onclick="openModal('pht')">
@@ -797,14 +877,14 @@
       </div>
     </header>
 
-    <!-- Main Inputs Grid -->
+    <!-- Tap & Premise Inputs -->
     <div class="grid-2col">
 
-      <!-- Tap & Drop Input Card -->
+      <!-- Tap & Drop Input -->
       <div class="card">
         <div class="card-title">
           <span class="dot" style="background: var(--cyan);"></span>
-          Tap & Drop Specification
+          Tap &amp; Drop Specification
         </div>
 
         <div class="input-row">
@@ -844,7 +924,7 @@
           <input type="range" id="dropLen" min="20" max="300" step="5" value="100" oninput="handleDropLen(this.value)">
           <div class="slider-header" style="font-size: 0.65rem; color: var(--text-sub);">
             <span>20 ft</span>
-            <span id="dropLossDisplay">Loss: -6.0 dB</span>
+            <span id="dropLossDisplay">Drop Loss: -6.0 dB</span>
             <span>300 ft</span>
           </div>
         </div>
@@ -857,11 +937,11 @@
         </div>
       </div>
 
-      <!-- Premise Devices Card -->
+      <!-- Premise Devices Input -->
       <div class="card">
         <div class="card-title">
           <span class="dot" style="background: var(--amber);"></span>
-          Premise Devices & Inside Wiring
+          Premise Devices &amp; Inside Run
         </div>
 
         <div class="input-row">
@@ -887,7 +967,7 @@
           <input type="range" id="insideLen" min="15" max="150" step="5" value="50" style="accent-color: var(--amber);" oninput="handleInsideLen(this.value)">
           <div class="slider-header" style="font-size: 0.65rem; color: var(--text-sub);">
             <span>15 ft</span>
-            <span id="insideLossDisplay">Loss: -3.0 dB</span>
+            <span id="insideLossDisplay">Inside Loss: -3.0 dB</span>
             <span>150 ft</span>
           </div>
         </div>
@@ -902,7 +982,7 @@
 
     </div>
 
-    <!-- Mode Selection Bar -->
+    <!-- Mode Selector -->
     <div class="mode-bar">
       <button id="modeAuto" class="mode-btn active" onclick="setMode('auto')">
         ⚡ Auto-Recommend (Optimal PHT)
@@ -933,7 +1013,7 @@
       </div>
     </div>
 
-    <!-- Live Results Telemetry Hero Banner -->
+    <!-- Hero Results Banner -->
     <div id="heroBanner" class="hero-banner">
       <div class="hero-header">
         <div class="hero-title-area">
@@ -948,27 +1028,43 @@
         Gateway on -5.0 dB Hot Leg protects return transmit power. STBs utilize -8.5 dB weak legs.
       </div>
 
-      <!-- 4 Telemetry Cards -->
+      <!-- DEDICATED EXPECTED GROUND BLOCK STRIP -->
+      <div class="gb-strip" onclick="openModal('gb')">
+        <div class="gb-label-area">
+          <span class="gb-badge">Ground Block</span>
+          <div>
+            <div class="gb-title">Expected Ground Block Levels (Pre-Split)</div>
+            <div id="gbMatrixCompare" style="font-size: 0.68rem; color: #d8b4fe;">Target: Ideal +8.0 dBmV Rx | Safe: 0.0 to +16.0</div>
+          </div>
+        </div>
+        <div class="gb-readings">
+          <div class="gb-val-box">
+            <span class="gb-val-tag">Expected GB Rx</span>
+            <span id="valGbRx" class="gb-val-num">+9.0 dBmV</span>
+          </div>
+          <div class="gb-val-box">
+            <span class="gb-val-tag">Expected GB Tx</span>
+            <span id="valGbTx" class="gb-val-num" style="color: #fed7aa;">39.6 dBmV</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3 Device Telemetry Cards (Rx, Tx, STB Rx) -->
       <div class="telemetry-grid">
         <div class="telemetry-card" onclick="openModal('rx')">
-          <div class="t-label">Modem 1 GHz Rx</div>
+          <div class="t-label">Delivered Modem 1 GHz Rx</div>
           <div id="valModemRx" class="t-val val-safe">+1.5 dBmV</div>
-          <div id="subModemRx" class="t-sub">Ideal: 0.0 (-8 to +8)</div>
+          <div id="subModemRx" class="t-sub">Target: 0.0 (-8.0 to +8.0)</div>
         </div>
         <div class="telemetry-card" onclick="openModal('tx')">
-          <div class="t-label">Modem US Tx</div>
+          <div class="t-label">Required Modem US Tx</div>
           <div id="valModemTx" class="t-val val-ideal">44.5 dBmV</div>
           <div id="subModemTx" class="t-sub">Safe: 35.0 to 48.0</div>
         </div>
         <div class="telemetry-card" onclick="openModal('stb')">
-          <div class="t-label">STB 1 GHz Rx</div>
+          <div class="t-label">Delivered STB 1 GHz Rx</div>
           <div id="valStbRx" class="t-val val-safe">+1.5 dBmV</div>
           <div id="subStbRx" class="t-sub">Safe: -8.0 to +8.0</div>
-        </div>
-        <div class="telemetry-card" onclick="openModal('tilt')">
-          <div class="t-label">Coaxial Tilt</div>
-          <div id="valTilt" class="t-val val-safe">4.5 dB</div>
-          <div id="subTilt" class="t-sub">Limit: &le; 8.0 dB</div>
         </div>
       </div>
 
@@ -984,7 +1080,7 @@
         </div>
       </div>
 
-      <!-- Terminator Warning Notice -->
+      <!-- Terminator Notice -->
       <div id="terminatorAlert" class="alert-banner alert-terminator" style="display: none;">
         <span>⚠️</span>
         <div id="terminatorText">
@@ -1006,7 +1102,7 @@
 
     <!-- Copy Job Note Button -->
     <button class="btn-copy" onclick="copyJobSummary()">
-      📋 Copy Wiring Plan to Job Notes
+      📋 Copy Wiring Plan &amp; Ground Block Levels to Job Notes
     </button>
 
   </div>
@@ -1033,7 +1129,7 @@
   <script>
     // State
     const state = {
-      mode: 'auto', // 'auto' | 'manual'
+      mode: 'auto',
       manualId: '3way_hot',
       tapDs: 15.0,
       tapTx: 38.0,
@@ -1055,7 +1151,14 @@
         stbLossDs: null,
         desc: 'Direct drop home-run through PoE ground block. Zero passive split loss.',
         guide: '&bull; <strong>Port Connection:</strong> Direct drop home-run to DOCSIS Gateway. Terminate all unused house lines.',
-        isCascade: false
+        isCascade: false,
+        matrix: {
+          rxMin: -5.0,
+          rxIdeal: 3.0,
+          rxMax: 11.0,
+          txIdeal: 37.0,
+          txMax: 45.0
+        }
       },
       '2way': {
         id: '2way',
@@ -1067,7 +1170,14 @@
         stbLossDs: 4.5,
         desc: '1 input, 2 balanced ports (-4.5 dB). Perfectly equalized downstream and return.',
         guide: '&bull; <strong>Port 1 (-4.5 dB):</strong> Dedicated DOCSIS Gateway.<br>&bull; <strong>Port 2 (-4.5 dB):</strong> TV STB.',
-        isCascade: false
+        isCascade: false,
+        matrix: {
+          rxMin: -0.5,
+          rxIdeal: 7.5,
+          rxMax: 15.5,
+          txIdeal: 32.5,
+          txMax: 40.5
+        }
       },
       '3way_hot': {
         id: '3way_hot',
@@ -1079,7 +1189,14 @@
         stbLossDs: 8.5,
         desc: 'Gateway on -5.0 dB Hot Leg protects return Tx power. STBs take -8.5 dB weak legs.',
         guide: '&bull; <strong>HOT LEG (-5.0 dB):</strong> Connect DOCSIS Gateway.<br>&bull; <strong>WEAK LEGS (-8.5 dB):</strong> Connect TV Outlets.',
-        isCascade: false
+        isCascade: false,
+        matrix: {
+          rxMin: 0.0,
+          rxIdeal: 8.0,
+          rxMax: 16.0,
+          txIdeal: 32.0,
+          txMax: 40.0
+        }
       },
       '3way_weak': {
         id: '3way_weak',
@@ -1091,7 +1208,14 @@
         stbLossDs: 5.0,
         desc: 'Gateway on -8.5 dB weak leg. Higher upstream transmit required. Non-optimal if hot leg is open.',
         guide: '&bull; <strong>HOT LEG (-5.0 dB):</strong> High-loss TV run.<br>&bull; <strong>WEAK LEG (-8.5 dB):</strong> Connect DOCSIS Gateway.<br>&bull; <strong>WEAK LEG 2 (-8.5 dB):</strong> Secondary TV.',
-        isCascade: false
+        isCascade: false,
+        matrix: {
+          rxMin: 3.5,
+          rxIdeal: 11.5,
+          rxMax: 19.5,
+          txIdeal: 28.5,
+          txMax: 36.5
+        }
       },
       '4way': {
         id: '4way',
@@ -1103,7 +1227,14 @@
         stbLossDs: 7.0,
         desc: 'All 4 outlets receive equal -7.0 dB attenuation. Standard balanced demarc architecture.',
         guide: '&bull; <strong>Port 1 (-7.0 dB):</strong> DOCSIS Gateway.<br>&bull; <strong>Ports 2-4 (-7.0 dB):</strong> TV Outlets.',
-        isCascade: false
+        isCascade: false,
+        matrix: {
+          rxMin: 2.0,
+          rxIdeal: 10.0,
+          rxMax: 18.0,
+          txIdeal: 30.0,
+          txMax: 38.0
+        }
       },
       '8way': {
         id: '8way',
@@ -1115,7 +1246,14 @@
         stbLossDs: 11.0,
         desc: 'Central demarc splitter for high outlet count. All unused ports must be capped with 75Ω terminators.',
         guide: '&bull; <strong>Port 1 (-11.0 dB):</strong> DOCSIS Gateway.<br>&bull; <strong>Active Ports (-11.0 dB):</strong> TV Outlets.<br>&bull; <strong>Unused Ports:</strong> Capped with 75&Omega; locking terminators.',
-        isCascade: false
+        isCascade: false,
+        matrix: {
+          rxMin: 6.0,
+          rxIdeal: 14.0,
+          rxMax: 22.0,
+          txIdeal: 26.0,
+          txMax: 34.0
+        }
       },
       cascade: {
         id: 'cascade',
@@ -1127,11 +1265,17 @@
         stbLossDs: 11.5,
         desc: '2-Way feeding another splitter in series. Causes severe MoCA isolation loss, micro-reflections & return squeeze.',
         guide: '&bull; <strong>Primary 2-Way:</strong> Leg 1 to Gateway (-4.5 dB), Leg 2 to Secondary Splitter.<br>&bull; <strong>Secondary Splitter:</strong> TVs suffer -11.5 dB with high MoCA isolation penalty.',
-        isCascade: true
+        isCascade: true,
+        matrix: {
+          rxMin: 6.5,
+          rxIdeal: 14.5,
+          rxMax: 22.5,
+          txIdeal: 25.5,
+          txMax: 33.5
+        }
       }
     };
 
-    // Helper adjusters
     function adjustStep(id, delta) {
       const el = document.getElementById(id);
       let val = Number((parseFloat(el.value) + delta).toFixed(1));
@@ -1144,7 +1288,6 @@
       document.getElementById('tvCountVal').textContent = `${state.stbCount} TV${state.stbCount === 1 ? '' : 's'}`;
       
       const totalOutlets = state.stbCount + 1;
-      // Auto upgrade manual selection if ports are insufficient
       if (state.mode === 'manual') {
         const cur = catalog[state.manualId];
         if (cur && cur.ports < totalOutlets) {
@@ -1208,8 +1351,12 @@
       const insideLossDs = Number((state.insideLen * insideDsRate).toFixed(1));
       const insideLossUs = Number((state.insideLen * insideUsRate).toFixed(1));
 
-      document.getElementById('dropLossDisplay').textContent = `Loss: -${dropLossDs} dB (1G)`;
-      document.getElementById('insideLossDisplay').textContent = `Loss: -${insideLossDs} dB (1G)`;
+      document.getElementById('dropLossDisplay').textContent = `Drop Loss: -${dropLossDs} dB (1G)`;
+      document.getElementById('insideLossDisplay').textContent = `Inside Loss: -${insideLossDs} dB (1G)`;
+
+      // EXPECTED GROUND BLOCK NUMBERS (Pre-Splitter, after Drop Cable)
+      const gbRx = Number((state.tapDs - dropLossDs).toFixed(1));
+      const gbTx = Number((state.tapTx + dropLossUs).toFixed(1));
 
       // Scoring Function
       function scoreItem(item) {
@@ -1218,17 +1365,14 @@
         const sRx = (state.stbCount > 0 && item.stbLossDs !== null)
           ? Number((state.tapDs - dropLossDs - item.stbLossDs - insideLossDs).toFixed(1))
           : null;
-        const tilt = Number(((dropLossDs + insideLossDs) - (dropLossUs + insideLossUs)).toFixed(1));
 
         let penalty = Math.abs(mRx - 0.0) * 2;
         
-        // Massive penalty if splitter has fewer ports than devices
         const portShortfall = totalOutlets - item.ports;
         if (portShortfall > 0) {
           penalty += 2000 + (portShortfall * 300);
         }
 
-        // Slight penalty for excessive unused ports
         const excessPorts = item.ports - totalOutlets;
         if (excessPorts > 0) {
           penalty += excessPorts * 5;
@@ -1236,8 +1380,8 @@
 
         // Upstream penalties
         if (mTx > 48.0) penalty += (mTx - 48.0) * 25;
-        if (mTx > 53.0) penalty += 500; // Hard fail
-        if (mTx < 35.0) penalty += 200; // Low return fail
+        if (mTx > 53.0) penalty += 500;
+        if (mTx < 35.0) penalty += 200;
 
         // STB range penalty
         if (sRx !== null && (sRx < -8.0 || sRx > 8.0)) penalty += 50;
@@ -1245,17 +1389,13 @@
         // Cascade penalty
         if (item.isCascade) penalty += 400;
 
-        return { ...item, mRx, mTx, sRx, tilt, penalty, portShortfall, excessPorts };
+        return { ...item, mRx, mTx, sRx, penalty, portShortfall, excessPorts };
       }
 
-      // Candidate List (Strictly Passive)
       const candidateKeys = ['barrel', '2way', '3way_hot', '3way_weak', '4way', '8way', 'cascade'];
       const evaluated = candidateKeys.map(k => scoreItem(catalog[k]));
-
-      // Sort non-cascade options by lowest penalty for Auto mode
       const sortedForAuto = [...evaluated].filter(i => !i.isCascade).sort((a, b) => a.penalty - b.penalty);
 
-      // Determine active option
       let active;
       if (state.mode === 'auto') {
         active = sortedForAuto[0];
@@ -1307,6 +1447,15 @@
       document.getElementById('portCapacityBadge').textContent = `${active.ports}-PORT DEMARC (${totalOutlets} OUTLETS IN USE)`;
       document.getElementById('portGuideText').innerHTML = active.guide;
 
+      // Populate Dedicated Ground Block Telemetry
+      document.getElementById('valGbRx').textContent = `${gbRx > 0 ? '+' : ''}${gbRx.toFixed(1)} dBmV`;
+      document.getElementById('valGbTx').textContent = `${gbTx.toFixed(1)} dBmV`;
+
+      if (active.matrix) {
+        document.getElementById('gbMatrixCompare').textContent = 
+          `Target: Ideal ${active.matrix.rxIdeal > 0 ? '+' : ''}${active.matrix.rxIdeal.toFixed(1)} dBmV Rx | Safe: ${active.matrix.rxMin > 0 ? '+' : ''}${active.matrix.rxMin.toFixed(1)} to +${active.matrix.rxMax.toFixed(1)}`;
+      }
+
       // Unused Ports Alert
       const termAlert = document.getElementById('terminatorAlert');
       const unusedCount = Math.max(0, active.ports - totalOutlets);
@@ -1318,7 +1467,7 @@
         termAlert.style.display = 'none';
       }
 
-      // Populate Telemetry Cards
+      // Populate Delivered Device Telemetry Cards
       const rxEl = document.getElementById('valModemRx');
       const rxSub = document.getElementById('subModemRx');
       rxEl.textContent = `${active.mRx > 0 ? '+' : ''}${active.mRx.toFixed(1)} dBmV`;
@@ -1331,7 +1480,7 @@
         rxSub.textContent = 'MARGINAL (Safe: -8 to +8)';
       } else {
         rxEl.className = 't-val val-safe';
-        rxSub.textContent = 'Ideal: 0.0 (-8 to +8)';
+        rxSub.textContent = 'Target: 0.0 (-8.0 to +8.0)';
       }
 
       const txEl = document.getElementById('valModemTx');
@@ -1366,23 +1515,9 @@
         stbSub.textContent = '0 TVs connected';
       }
 
-      const tiltEl = document.getElementById('valTilt');
-      const tiltSub = document.getElementById('subTilt');
-      tiltEl.textContent = `${active.tilt.toFixed(1)} dB`;
-      if (active.tilt > 11.0) {
-        tiltEl.className = 't-val val-fail';
-        tiltSub.textContent = 'SEVERE ROLL-OFF (> 11 dB)';
-      } else if (active.tilt > 8.0) {
-        tiltEl.className = 't-val val-warn';
-        tiltSub.textContent = 'ELEVATED (> 8.0 dB)';
-      } else {
-        tiltEl.className = 't-val val-safe';
-        tiltSub.textContent = 'Limit: \u2264 8.0 dB';
-      }
-
-      // PHT Status Calculation
+      // Overall PHT Status
       const hasHardFail = (active.mRx < -15.0 || active.mRx > 15.0 || active.mTx < 35.0 || active.mTx > 53.0 || active.portShortfall > 0);
-      const hasMarginal = !hasHardFail && (active.mRx < -8.0 || active.mRx > 8.0 || active.mTx > 48.0 || active.tilt > 8.0 || (active.sRx !== null && (active.sRx < -8.0 || active.sRx > 8.0)) || active.isCascade);
+      const hasMarginal = !hasHardFail && (active.mRx < -8.0 || active.mRx > 8.0 || active.mTx > 48.0 || (active.sRx !== null && (active.sRx < -8.0 || active.sRx > 8.0)) || active.isCascade);
 
       const topBadge = document.getElementById('phtBadge');
       const heroBadge = document.getElementById('heroBadge');
@@ -1409,7 +1544,7 @@
         heroBanner.style.borderColor = 'var(--cyan)';
       }
 
-      // Populate Ranked Topologies Table
+      // Populate Evaluated List
       const topList = document.getElementById('topologiesList');
       topList.innerHTML = '';
 
@@ -1462,11 +1597,73 @@
       const title = document.getElementById('modalTitle');
       const body = document.getElementById('modalBody');
 
-      if (topic === 'rx') {
-        cat.textContent = 'PHT SPECIFICATION • DOWNSTREAM RF';
-        title.textContent = 'Downstream Power (Rx) Thresholds';
+      if (topic === 'gb') {
+        cat.textContent = 'CHEAT SHEET &bull; GROUND BLOCK MATRIX';
+        title.textContent = 'Expected Ground Block Reference';
         body.innerHTML = `
-          <p><strong>Downstream Power (Rx)</strong> measures the signal strength delivered to the modem's internal tuner across the 1.0 GHz frequency spectrum.</p>
+          <p>The <strong>Ground Block</strong> is measured at the demarcation point directly after the drop cable, <em>before</em> the demarc splitter. It verifies that incoming signal levels can properly feed the home wiring.</p>
+          <h4>Standard Ground Block Safe Windows (Calculated at 50 ft RG6 run):</h4>
+          <table>
+            <thead>
+              <tr>
+                <th>Configuration</th>
+                <th>Safe Rx Min</th>
+                <th>Ideal Rx</th>
+                <th>Safe Rx Max</th>
+                <th>Ideal Tx</th>
+                <th>Max Tx</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>1 Device (Barrel 0 dB)</strong></td>
+                <td>-5.0 dBmV</td>
+                <td style="color:var(--emerald); font-weight:bold;">+3.0 dBmV</td>
+                <td>+11.0 dBmV</td>
+                <td>37.0 dBmV</td>
+                <td>45.0 dBmV</td>
+              </tr>
+              <tr>
+                <td><strong>2 Devices (2-Way -4.5 dB)</strong></td>
+                <td>-0.5 dBmV</td>
+                <td style="color:var(--emerald); font-weight:bold;">+7.5 dBmV</td>
+                <td>+15.5 dBmV</td>
+                <td>32.5 dBmV</td>
+                <td>40.5 dBmV</td>
+              </tr>
+              <tr>
+                <td><strong>3 Devices (3-Way Hot -5.0 dB)</strong></td>
+                <td>0.0 dBmV</td>
+                <td style="color:var(--emerald); font-weight:bold;">+8.0 dBmV</td>
+                <td>+16.0 dBmV</td>
+                <td>32.0 dBmV</td>
+                <td>40.0 dBmV</td>
+              </tr>
+              <tr>
+                <td><strong>3 Devices (3-Way Weak -8.5 dB)</strong></td>
+                <td>+3.5 dBmV</td>
+                <td style="color:var(--emerald); font-weight:bold;">+11.5 dBmV</td>
+                <td>+19.5 dBmV</td>
+                <td>28.5 dBmV</td>
+                <td>36.5 dBmV</td>
+              </tr>
+              <tr>
+                <td><strong>4 Devices (4-Way -7.0 dB)</strong></td>
+                <td>+2.0 dBmV</td>
+                <td style="color:var(--emerald); font-weight:bold;">+10.0 dBmV</td>
+                <td>+18.0 dBmV</td>
+                <td>30.0 dBmV</td>
+                <td>38.0 dBmV</td>
+              </tr>
+            </tbody>
+          </table>
+          <p><strong>Field Tip:</strong> If your Ground Block Rx is lower than the Safe Min, your modem Rx will fall below -8.0 dBmV once it passes through the splitter and inside cable run.</p>
+        `;
+      } else if (topic === 'rx') {
+        cat.textContent = 'PHT SPECIFICATION &bull; DOWNSTREAM RF';
+        title.textContent = 'Delivered Modem Downstream Power (Rx)';
+        body.innerHTML = `
+          <p><strong>Downstream Power (Rx)</strong> measures the signal strength delivered to the modem's internal tuner across the 1.0 GHz spectrum.</p>
           <h4>Standard Thresholds:</h4>
           <ul>
             <li><strong>Ideal:</strong> 0.0 dBmV</li>
@@ -1475,12 +1672,12 @@
             <li><strong>Hard Fail:</strong> &lt; -15.0 dBmV OR &gt; +15.0 dBmV</li>
           </ul>
           <h4>Technical Root Causes of Failure:</h4>
-          <p><strong>Failing Low (&lt; -8.0 dBmV):</strong> Signal approaches the thermal noise floor of the coaxial cable. Signal-to-Noise Ratio (SNR) degrades below 33.0 dB, creating Correctable and Uncorrectable Codeword (FEC) errors, resulting in packet loss and modem dropouts.</p>
+          <p><strong>Failing Low (&lt; -8.0 dBmV):</strong> Signal approaches the thermal noise floor of the coaxial cable. SNR drops below 33.0 dB, triggering Correctable and Uncorrectable Codeword (FEC) errors, resulting in packet loss and modem dropouts.</p>
           <p><strong>Failing High (&gt; +8.0 dBmV):</strong> Excessive RF power saturates the Low-Noise Amplifier (LNA) in the front-end tuner. This induces amplifier clipping and non-linear intermodulation products that distort adjacent OFDM carriers.</p>
         `;
       } else if (topic === 'tx') {
-        cat.textContent = 'PHT SPECIFICATION • UPSTREAM RF';
-        title.textContent = 'Upstream Transmit (Tx) Squeeze';
+        cat.textContent = 'PHT SPECIFICATION &bull; UPSTREAM RF';
+        title.textContent = 'Required Modem Upstream Transmit (Tx)';
         body.innerHTML = `
           <p><strong>Upstream Transmit Power (Tx)</strong> is the power level the DOCSIS modem uses to communicate back to the CMTS (headend/node) across 5–85 MHz.</p>
           <h4>Standard Thresholds:</h4>
@@ -1494,23 +1691,9 @@
           <p><strong>High Transmit (&gt; 48.0 dBmV):</strong> Excessive return loss (from splitters or long drops) forces the modem to blast at maximum power. Past 53.0 dBmV, the modem hits physical power compression, causing DOCSIS T3/T4 ranging timeouts and loss of upstream channel bonding.</p>
           <p><strong>Low Transmit (&lt; 35.0 dBmV):</strong> The modem transmits too quietly, allowing premise electrical noise and ingress on the return path to corrupt upstream packets at the node.</p>
         `;
-      } else if (topic === 'tilt') {
-        cat.textContent = 'CABLE PHYSICS • COAXIAL TILT';
-        title.textContent = 'High-Frequency Roll-Off & Tilt';
-        body.innerHTML = `
-          <p><strong>Coaxial Tilt</strong> is the difference in loss between low return frequencies (55 MHz) and high downstream DOCSIS carriers (1.0–1.2 GHz).</p>
-          <h4>Thresholds:</h4>
-          <ul>
-            <li><strong>Optimal:</strong> &le; 8.0 dB</li>
-            <li><strong>Elevated Warning:</strong> 8.1 to 11.0 dB</li>
-            <li><strong>Severe Roll-Off Fail:</strong> &gt; 11.0 dB</li>
-          </ul>
-          <h4>Physics Mechanism:</h4>
-          <p>Due to the <em>Skin Effect</em>, high frequencies travel along an ultra-thin outer ring of the center conductor, encountering high AC resistance. 1.0 GHz attenuates nearly 4 times faster than 55 MHz. Excessive tilt forces the modem's internal equalizer beyond its dynamic range, degrading OFDM carrier performance.</p>
-        `;
       } else if (topic === 'pht') {
-        cat.textContent = 'COMPLIANCE AUDIT • TQI-C IMPACT';
-        title.textContent = 'PHT Failure & Craftsmanship Scoring';
+        cat.textContent = 'COMPLIANCE AUDIT &bull; TQI-C IMPACT';
+        title.textContent = 'PHT Failure &amp; Craftsmanship Scoring';
         body.innerHTML = `
           <p>Under the Comcast <strong>TQI-C (Trust Quality Interactions - Craftsmanship)</strong> standard, customer service and CPE must pass Premise Health Testing (PHT).</p>
           <h4>Scoring Mechanics:</h4>
@@ -1522,18 +1705,6 @@
           <h4>The Penalty Cascade:</h4>
           <p>Failing PHT carries an immediate <strong>8-point deduction</strong> ("Service/CPE not working properly"). This lowers the score to 92.</p>
           <p>A single minor infraction on top of this—such as an un-terminated splitter port (-7 pts) or a missing enclosure latch (-7 pts)—drops the score to <strong>85</strong>, resulting in an automatic audit failure requiring formal follow-up in the TRUST platform.</p>
-        `;
-      } else if (topic === 'cascades') {
-        cat.textContent = 'ARCHITECTURE WARNING • MOCA & RETURN';
-        title.textContent = 'Why Cascaded Splitters are Prohibited';
-        body.innerHTML = `
-          <p>Daisy-chaining or cascading splitters (e.g., 2-way into another 2-way or 4-way) is considered an anti-pattern under modern Operational Excellence Standards.</p>
-          <h4>Three Core Reasons Cascades Fail:</h4>
-          <ol>
-            <li><strong>High MoCA Isolation Loss:</strong> MoCA relies on port-to-port isolation. Traversing through multiple splitters exceeds the 45 dB MoCA link budget, causing whole-home DVR buffering and STB disconnects.</li>
-            <li><strong>Upstream Return Squeeze:</strong> Downstream legs on the second splitter suffer -11.5 dB loss, driving return Tx past 48 dBmV into warning or failure levels.</li>
-            <li><strong>Impedance & Reflections:</strong> Every splitter junction creates a point of impedance mismatch and standing wave reflections, corrupting OFDM carrier MER.</li>
-          </ol>
         `;
       }
 
@@ -1554,13 +1725,14 @@
       const dropType = state.dropType.toUpperCase();
       const dropLen = state.dropLen;
       const rec = document.getElementById('heroName').textContent;
+      const gbRx = document.getElementById('valGbRx').textContent;
+      const gbTx = document.getElementById('valGbTx').textContent;
       const rx = document.getElementById('valModemRx').textContent;
       const tx = document.getElementById('valModemTx').textContent;
       const stb = document.getElementById('valStbRx').textContent;
-      const tilt = document.getElementById('valTilt').textContent;
       const status = document.getElementById('heroBadge').textContent.replace(/[^a-zA-Z ]/g, '').trim();
 
-      const note = `[XFINITY RF TOPOLOGY AUDIT] Drop: ${dropLen}ft ${dropType} | Topology: ${rec} | Gateway: ${rx} / ${tx} | STB: ${stb} | Tilt: ${tilt} | Status: ${status}`;
+      const note = `[XFINITY RF TOPOLOGY AUDIT] Drop: ${dropLen}ft ${dropType} | Ground Block: ${gbRx} / ${gbTx} | Topology: ${rec} | Gateway: ${rx} / ${tx} | STB: ${stb} | Status: ${status}`;
       
       const el = document.createElement('textarea');
       el.value = note;
@@ -1574,7 +1746,6 @@
       setTimeout(() => { toast.style.display = 'none'; }, 3000);
     }
 
-    // Initialize on load
     window.onload = function() {
       calculate();
     };
