@@ -389,13 +389,13 @@
           <span style="font-size: 1.2rem; color: var(--text-muted);">❯</span>
         </div>
 
-        <!-- Supervisor Hub Option (Replaces direct Team Blast) -->
+        <!-- Supervisor Hub -->
         <div class="hub-tile" onclick="openSupervisorView()">
           <div class="hub-tile-left">
             <div class="hub-icon-wrap" style="background: rgba(234, 179, 8, 0.15);">👑</div>
             <div>
               <div class="hub-title" style="color: #facc15;">Supervisor Hub</div>
-              <div class="hub-sub">Management controls & direct text blast</div>
+              <div class="hub-sub">Management controls, alerts & team blasts</div>
             </div>
           </div>
           <span style="font-size: 1.2rem; color: var(--text-muted);">❯</span>
@@ -663,7 +663,7 @@
     </div>
   </div>
 
-  <!-- SCREEN 5: CUSTOMER COMMS -->
+  <!-- SCREEN 5: CUSTOMER COMMS (XFINITY BRANDED) -->
   <div id="view-comms" class="view-screen">
     <div class="nav-top-bar">
       <button type="button" class="btn-back" onclick="navigateHome()">❮ Main Menu</button>
@@ -700,7 +700,7 @@
     </div>
   </div>
 
-  <!-- SCREEN 6: SUPERVISOR HUB & TEXT BLAST -->
+  <!-- SCREEN 6: SUPERVISOR HUB & TEMPLATES -->
   <div id="view-supervisor" class="view-screen">
     <div class="nav-top-bar">
       <button type="button" class="btn-back" onclick="navigateHome()">❮ Main Menu</button>
@@ -708,38 +708,97 @@
 
     <div class="header">
       <h2 style="color: #facc15;">Supervisor Hub</h2>
-      <p>Management Direct Messaging & Alerts</p>
+      <p>Management Alerts & Team Communications</p>
     </div>
 
-    <!-- Custom Text Blast -->
+    <!-- 1. Custom Team Text -->
     <div class="card">
-      <div class="card-title">Send Custom Text Blast</div>
+      <div class="card-title">Custom Team Text</div>
       <div class="form-group" style="margin-bottom: 0;">
-        <textarea id="customBlastText" placeholder="Write custom alert text..."></textarea>
+        <textarea id="customBlastText" placeholder="Write a custom alert for the technicians..."></textarea>
       </div>
       <button type="button" class="btn" style="background-color: #eab308; color: #451a03; margin-top: 12px;" onclick="sendDirectTextBlast('custom')">
-        💬 Open In Text Messages
+        💬 Open in Messages
       </button>
     </div>
 
-    <!-- Quick SMS Templates -->
+    <!-- 2. Quality Issue Alert (Dropdown Driven) -->
     <div class="card">
-      <div class="card-title">Standard Team Alerts (Open With Text)</div>
+      <div class="card-title" style="color: #f87171;">⚠️ Quality / QA Failure Alert</div>
+      <div class="form-group">
+        <label for="qualityIssueSelect">Select Failure Category:</label>
+        <select id="qualityIssueSelect">
+          <option value="Grounding & Bonding (Missing/loose clamps, >25Ω, unbonded block)">Grounding & Bonding</option>
+          <option value="Drop Tagging (Missing address, wrong street, missing green tags)">Drop Tags & Address Identification</option>
+          <option value="Connector Craftsmanship (Loose fittings, un-torqued, bad crimps)">Connector / Fitting Craftsmanship</option>
+          <option value="House Box Standard (Not secured, unsealed holes, no drip loop)">House Box & Entry Sealing</option>
+          <option value="Splitter Termination (Unused ports left uncapped, no 75Ω terminator)">Un-Terminated Splitter Ports</option>
+          <option value="Aerial Drop Clearance (Mid-span sag, low over driveway/road)">Drop Clearance & Strand Attachment</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom: 0;">
+        <label for="qualityNotes">Specific Notes / Focus (Optional):</label>
+        <input type="text" id="qualityNotes" placeholder="e.g. Hartford route audits, verify before closing job">
+      </div>
+      <button type="button" class="btn" style="background-color: #ef4444; margin-top: 12px;" onclick="sendQualityBlast()">
+        🚨 Send QA Alert Text
+      </button>
+    </div>
+
+    <!-- 3. Metric Review Blast -->
+    <div class="card">
+      <div class="card-title" style="color: #60a5fa;">📊 Team Metric Review</div>
+      <div class="form-group" style="margin-bottom: 0;">
+        <label for="metricHighlights">Weekly / Daily Highlights (Optional):</label>
+        <textarea id="metricHighlights" placeholder="e.g. Team tNPS: 92%, Repeat TCs: 6.1%, On-Time Arrival: 98%..."></textarea>
+      </div>
+      <button type="button" class="btn" style="background-color: #3b82f6; margin-top: 12px;" onclick="sendMetricBlast()">
+        📈 Send Metric Review Text
+      </button>
+    </div>
+
+    <!-- 4. Weekly Training Update with File Upload -->
+    <div class="card">
+      <div class="card-title" style="color: #a78bfa;">📑 Weekly Training Update</div>
+      <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: -6px; margin-bottom: 12px;">
+        Select your weekly SOP / Safety PDF or picture. Tapping the button attaches the file via native device sharing and pre-fills your text into Messages.
+      </p>
+      <div class="form-group">
+        <label for="trainingTopicInput">Training Topic / Title:</label>
+        <input type="text" id="trainingTopicInput" placeholder="e.g. Mid-Split Tuning & Ladder Safety SOP">
+      </div>
+      <div class="form-group" style="margin-bottom: 0;">
+        <label for="trainingFileInput">Attach Training Document (PDF / Image):</label>
+        <input type="file" id="trainingFileInput" accept=".pdf,image/*" style="padding: 8px;">
+      </div>
+      <button type="button" class="btn" style="background-color: #8b5cf6; margin-top: 12px;" onclick="sendTrainingBlast()">
+        📎 Send Training Update & Attachment
+      </button>
+    </div>
+
+    <!-- 5. 1-Tap Operational Alerts -->
+    <div class="card">
+      <div class="card-title">1-Tap Operational Blasts</div>
       <div style="display: flex; flex-direction: column; gap: 10px;">
-        <button type="button" class="btn" style="background-color: #eab308; color: #451a03;" onclick="sendDirectTextBlast('huddle')">☕ Morning Huddle (15 Mins)</button>
-        <button type="button" class="btn" style="background-color: #ef4444;" onclick="sendDirectTextBlast('weather')">⛈️ Weather Alert (Stand Down)</button>
-        <button type="button" class="btn" style="background-color: #10b981;" onclick="sendDirectTextBlast('all_clear')">☀️ Weather All-Clear (Resume)</button>
-        <button type="button" class="btn" style="background-color: #f97316;" onclick="sendDirectTextBlast('overtime')">💰 Open Overtime Routes</button>
-        <button type="button" class="btn" style="background-color: #8b5cf6;" onclick="sendDirectTextBlast('qc_alert')">⚠️ QA / Audit Warning</button>
-        <button type="button" class="btn" style="background-color: #64748b;" onclick="sendDirectTextBlast('lost_tool')">🔍 Lost Equipment Check</button>
+        <button type="button" class="btn" style="background-color: #059669;" onclick="sendDirectTextBlast('morning')">
+          ☀️ Morning Rollout (Log In 7:30 / On Job 8:10)
+        </button>
+        <button type="button" class="btn" style="background-color: #0284c7;" onclick="sendDirectTextBlast('equip_order')">
+          📦 Equipment Order Reminder (Due 9 AM Monday)
+        </button>
+        <button type="button" class="btn" style="background-color: #f97316;" onclick="sendDirectTextBlast('extra_days')">
+          💰 Open Routes / Work Extra Days
+        </button>
       </div>
     </div>
   </div>
+
+</div>
 <script>
   const GOOGLE_FORM_VIEW_URL = "https://docs.google.com/forms/d/e/1FAIpQLSf5QkuPSaumLkF33HvlreQeTCHY5hV6Q98cswc03EbFiEo0dQ/viewform?usp=header";
   const SUPERVISOR_EMAIL = "Donald.boughton@princetown.com";
 
-  // Optional: Add default comma-separated team phone numbers if you want recipient auto-fill
+  // Optional: Add comma-separated team phone numbers to pre-fill recipients
   // e.g. const TEAM_PHONE_NUMBERS = "5082212243,3026795985,7746359784";
   const TEAM_PHONE_NUMBERS = "";
 
@@ -1341,40 +1400,165 @@
   }
 
   // ----------------------------------------------------
-  // SUPERVISOR DIRECT SMS BLAST (OPENS IN TEXT MESSAGES)
+  // SUPERVISOR TEMPLATES WITH READ-ACKNOWLEDGMENT
   // ----------------------------------------------------
   const SUPERVISOR_BLAST_TEMPLATES = {
-    huddle: "Good morning team. We are holding a mandatory morning huddle in 15 minutes. Please head to the staging area.",
-    weather: "🚨 WEATHER ALERT: Lightning/Severe weather in the area. Stand down, get off ladders/poles immediately, and wait in your trucks for the all-clear.",
-    all_clear: "✅ WEATHER ALL-CLEAR: The severe weather has passed. You may safely resume field operations.",
-    overtime: "💰 ROUTE COVERAGE: We have open routes available this Saturday. Reply directly to this text if you want the overtime hours.",
-    qc_alert: "⚠️ QC ALERT: We are seeing a spike in failed QA audits today on grounding and drop tags. Please double-check your house boxes before closing jobs.",
-    lost_tool: "🔍 LOST EQUIPMENT: A technician is missing a piece of equipment. Please check your trucks to see if you accidentally grabbed a spare meter or ladder today."
+    // 1. Morning Rollout
+    morning: 
+`☀️🚨 MANDATORY MORNING KICKOFF 🚨☀️
+
+Good morning team! Please execute the following immediately:
+
+1️⃣ 📱 Log in to your tech portals & mark EN ROUTE BEFORE 7:30 AM.
+2️⃣ 🦺 Circle of Safety complete & inspect ladder attachments.
+3️⃣ 📍 Arrive on-site & park at your first job BEFORE 8:10 AM.
+
+⚠️ SAFETY FIRST: Work safe, check your drops, and protect your routes!
+
+👉 MANDATORY: Reply to this text with "READY" and your Tech # right now to confirm receipt! ✅`,
+
+    // 2. Weekly Equipment Order
+    equip_order: 
+`📦🚨 INVENTORY / EQUIPMENT DEADLINE 🚨📦
+
+Attention Team:
+Weekly Equipment Orders are due by 9:00 AM THIS MONDAY morning sharp! ⏰
+
+📋 ACTION REQUIRED:
+• Check your truck levels today (Modems, STBs, drop wire, fittings, drop tags).
+• Submit your order using the app's Google Form link before the 9:00 AM cutoff.
+
+⚠️ Late orders will NOT be fulfilled for mid-week warehouse pickup.
+
+👉 MANDATORY: Reply with "ORDERED" once your form is submitted! 👍`,
+
+    // 3. Extra Work Days / Overtime
+    extra_days: 
+`💰📈 OPEN ROUTES / EXTRA WORK DAYS 📈💰
+
+Attention Team:
+We have heavy customer demand and extra route availability open for techs looking to earn additional hours! 💵
+
+🗓️ AVAILABLE SLOTS:
+• Mid-week extra shifts
+• Saturday & Sunday full routes
+
+👉 If you want extra days on your schedule, reply directly to this text with:
+1️⃣ Your name
+2️⃣ Which specific day(s) you want to run!
+
+First come, first served on route assignments! 🚛💨`
   };
 
+  // Base text blast launcher
   function sendDirectTextBlast(templateKey) {
     let messageBody = "";
 
     if (templateKey === 'custom') {
       const customText = document.getElementById('customBlastText').value.trim();
       if (!customText) {
-        alert("Please write a message first.");
+        alert("Please write a custom message first.");
         return;
       }
-      messageBody = `[PRINCE TELECOM ALERT]\n\n${customText}`;
+      messageBody = `[PRINCE TELECOM TEAM NOTICE]\n\n${customText}`;
     } else {
-      messageBody = `[PRINCE TELECOM ALERT]\n\n${SUPERVISOR_BLAST_TEMPLATES[templateKey]}`;
+      messageBody = `[PRINCE TELECOM TEAM NOTICE]\n\n${SUPERVISOR_BLAST_TEMPLATES[templateKey]}`;
     }
 
-    // Launch native Messages app with text prefilled
-    const recipients = TEAM_PHONE_NUMBERS ? `${TEAM_PHONE_NUMBERS}` : '';
-    window.location.href = `sms:${recipients}&body=${encodeURIComponent(messageBody)}`;
+    launchSMS(messageBody);
 
     if (templateKey === 'custom') {
       document.getElementById('customBlastText').value = '';
     }
   }
+
+  // Quality Issue Dropdown Dispatcher
+  function sendQualityBlast() {
+    const issueCategory = document.getElementById('qualityIssueSelect').value;
+    const notes = document.getElementById('qualityNotes').value.trim();
+
+    let text = `🚨⚠️ URGENT QUALITY AUDIT ALERT ⚠️🚨\n\n`;
+    text += `Team, recent field audits have identified immediate failure deductions in:\n`;
+    text += `👉 ❌ ${issueCategory}\n\n`;
+
+    if (notes) {
+      text += `📌 SUPERVISOR FOCUS:\n${notes}\n\n`;
+    }
+
+    text += `🛠️ ACTION REQUIRED:\n`;
+    text += `• Inspect every fitting, tag, and house box BEFORE leaving the driveway.\n`;
+    text += `• Take clear audit-compliant photos on your closing submissions.\n\n`;
+    text += `👉 MANDATORY: Reply to this alert with "CONFIRMED" so I know you have read and understood this standard! ✅`;
+
+    launchSMS(text);
+  }
+
+  // Team Metric Review Dispatcher
+  function sendMetricBlast() {
+    const highlights = document.getElementById('metricHighlights').value.trim();
+
+    let text = `📊🎯 PERFORMANCE & METRIC UPDATE 🎯📊\n\n`;
+    text += `Team, here is our current operational performance review:\n\n`;
+
+    if (highlights) {
+      text += `📈 HIGHLIGHTS:\n${highlights}\n\n`;
+    } else {
+      text += `📈 STATUS:\n`;
+      text += `• ⏱️ On-Time Arrival: On Target\n`;
+      text += `• 🔁 Repeat Trouble Calls: In Control\n`;
+      text += `• ⭐ Customer tNPS: Striving for 10/10 on every survey!\n\n`;
+    }
+
+    text += `💪 Keep up the strong craftsmanship and customer focus!\n\n`;
+    text += `👉 Reply with a thumbs up 👍 or your Tech # to acknowledge your metrics!`;
+
+    launchSMS(text);
+  }
+
+  // Weekly Training Update with File Attachment
+  async function sendTrainingBlast() {
+    const topic = document.getElementById('trainingTopicInput').value.trim() || 'Weekly Safety & Operations Standards';
+    const fileInput = document.getElementById('trainingFileInput');
+    const hasFile = fileInput.files && fileInput.files.length > 0;
+
+    const messageText = 
+`📑🦺 MANDATORY WEEKLY TRAINING UPDATE 🦺📑
+
+📌 TOPIC: ${topic}
+
+Please review the attached training documentation, specifications, and standard procedures immediately before beginning your next shift. 📖
+
+👉 MANDATORY: Once reviewed, reply directly to this text with "REVIEWED & UNDERSTOOD" along with your Tech #! ✅`;
+
+    if (hasFile && navigator.canShare && navigator.canShare({ files: [fileInput.files[0]] })) {
+      try {
+        await navigator.share({
+          title: `Weekly Training: ${topic}`,
+          text: messageText,
+          files: [fileInput.files[0]]
+        });
+        return;
+      } catch (err) {
+        // Fallback below
+      }
+    }
+
+    if (hasFile && (!navigator.canShare || !navigator.canShare({ files: [fileInput.files[0]] }))) {
+      alert("Attachment copied to clipboard! You can paste the text and attach your file in Messages.");
+    }
+
+    if (navigator.clipboard && window.isSecureContext) {
+      try { await navigator.clipboard.writeText(messageText); } catch (e) {}
+    }
+
+    launchSMS(messageText);
+  }
+
+  // Helper to open native Messages
+  function launchSMS(message) {
+    const recipients = (typeof TEAM_PHONE_NUMBERS !== 'undefined' && TEAM_PHONE_NUMBERS) ? TEAM_PHONE_NUMBERS : '';
+    window.location.href = `sms:${recipients}&body=${encodeURIComponent(message)}`;
+  }
 </script>
 </body>
 </html>
-</div>
