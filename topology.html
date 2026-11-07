@@ -887,22 +887,31 @@
           Tap &amp; Drop Specification
         </div>
 
-        <div class="input-row">
-          <div class="input-group">
-            <label for="tapDs">Tap 1 GHz Rx (dBmV)</label>
-            <div class="stepper-input">
-              <button class="step-btn" onclick="adjustStep('tapDs', -0.5)">-</button>
-              <input type="number" id="tapDs" value="15.0" step="0.5" oninput="calculate()">
-              <button class="step-btn" onclick="adjustStep('tapDs', 0.5)">+</button>
-            </div>
+        <!-- Tap 1 GHz Rx Slider -->
+        <div class="slider-wrap" style="margin-top: 0; margin-bottom: 14px;">
+          <div class="slider-header">
+            <span>Tap 1 GHz Rx (Downstream)</span>
+            <span class="slider-val"><span id="tapDsVal">+15.0</span> dBmV</span>
           </div>
-          <div class="input-group">
-            <label for="tapTx">Tap US Tx (dBmV)</label>
-            <div class="stepper-input">
-              <button class="step-btn" onclick="adjustStep('tapTx', -0.5)">-</button>
-              <input type="number" id="tapTx" value="38.0" step="0.5" oninput="calculate()">
-              <button class="step-btn" onclick="adjustStep('tapTx', 0.5)">+</button>
-            </div>
+          <input type="range" id="tapDs" min="-15.0" max="30.0" step="0.5" value="15.0" oninput="handleTapDs(this.value)">
+          <div class="slider-header" style="font-size: 0.65rem; color: var(--text-sub);">
+            <span>-15.0 dBmV</span>
+            <span>Step: 0.5 dB</span>
+            <span>+30.0 dBmV</span>
+          </div>
+        </div>
+
+        <!-- Tap US Tx Slider -->
+        <div class="slider-wrap" style="margin-top: 0; margin-bottom: 14px;">
+          <div class="slider-header">
+            <span>Tap US Tx (Upstream Return)</span>
+            <span class="slider-val" style="color: var(--amber);"><span id="tapTxVal">38.0</span> dBmV</span>
+          </div>
+          <input type="range" id="tapTx" min="20.0" max="50.0" step="0.5" value="38.0" style="accent-color: var(--amber);" oninput="handleTapTx(this.value)">
+          <div class="slider-header" style="font-size: 0.65rem; color: var(--text-sub);">
+            <span>20.0 dBmV</span>
+            <span>Target: ~38-40</span>
+            <span>50.0 dBmV</span>
           </div>
         </div>
 
@@ -944,22 +953,35 @@
           Premise Devices &amp; Inside Run
         </div>
 
-        <div class="input-row">
-          <div class="input-group">
-            <label>DOCSIS Gateway</label>
-            <input type="text" value="1 Gateway (Modem)" disabled style="cursor: not-allowed; opacity: 0.75; font-weight: 700;">
+        <!-- Modem Toggle / Slider -->
+        <div class="slider-wrap" style="margin-top: 0; margin-bottom: 14px;">
+          <div class="slider-header">
+            <span>DOCSIS Gateway (Modem)</span>
+            <span class="slider-val" style="color: var(--cyan);"><span id="modemCountVal">1 Modem Active</span></span>
           </div>
-          <div class="input-group">
-            <label>Connected TV Boxes (STBs)</label>
-            <div class="counter-wrap">
-              <button class="counter-btn" onclick="adjustTvs(-1)">-</button>
-              <span id="tvCountVal" class="counter-val">2 TVs</span>
-              <button class="counter-btn" onclick="adjustTvs(1)">+</button>
-            </div>
+          <input type="range" id="modemCount" min="0" max="1" step="1" value="1" oninput="handleModemCount(this.value)">
+          <div class="slider-header" style="font-size: 0.65rem; color: var(--text-sub);">
+            <span>0 (No Modem / TV Only)</span>
+            <span>1 Gateway (DOCSIS)</span>
           </div>
         </div>
 
-        <div class="slider-wrap" style="margin-top: 14px;">
+        <!-- TV Box Slider (0 to 7) -->
+        <div class="slider-wrap" style="margin-top: 0; margin-bottom: 14px;">
+          <div class="slider-header">
+            <span>Connected TV Boxes (STBs)</span>
+            <span class="slider-val" style="color: var(--emerald);"><span id="tvCountVal">2 TVs</span></span>
+          </div>
+          <input type="range" id="tvCountSlider" min="0" max="7" step="1" value="2" style="accent-color: var(--emerald);" oninput="handleTvSlider(this.value)">
+          <div class="slider-header" style="font-size: 0.65rem; color: var(--text-sub);">
+            <span>0 TVs</span>
+            <span>Slide 0 to 7</span>
+            <span>7 TVs</span>
+          </div>
+        </div>
+
+        <!-- Inside Cable Slider -->
+        <div class="slider-wrap" style="margin-top: 0;">
           <div class="slider-header">
             <span>Average Inside Cable Run</span>
             <span class="slider-val" style="color: var(--amber);"><span id="insideLenVal">50</span> ft</span>
@@ -1135,6 +1157,7 @@
       tapTx: 38.0,
       dropType: 'rg6',
       dropLen: 100,
+      modemCount: 1,
       stbCount: 2,
       insideLen: 50
     };
@@ -1227,77 +1250,44 @@
         stbLossDs: 7.0,
         desc: 'All 4 outlets receive equal -7.0 dB attenuation. Standard balanced demarc architecture.',
         guide: '&bull; <strong>Port 1 (-7.0 dB):</strong> DOCSIS Gateway.<br>&bull; <strong>Ports 2-4 (-7.0 dB):</strong> TV Outlets.',
-        isCascade: false,
-        matrix: {
-          rxMin: 2.0,
-          rxIdeal: 10.0,
-          rxMax: 18.0,
-          txIdeal: 30.0,
-          txMax: 38.0
-        }
-      },
-      '8way': {
-        id: '8way',
-        name: 'Single Balanced 8-Way Splitter (-11.0 dB)',
-        short: 'Balanced 8-Way',
-        ports: 8,
-        lossDs: 11.0,
-        lossUs: 11.0,
-        stbLossDs: 11.0,
-        desc: 'Central demarc splitter for high outlet count. All unused ports must be capped with 75Ω terminators.',
-        guide: '&bull; <strong>Port 1 (-11.0 dB):</strong> DOCSIS Gateway.<br>&bull; <strong>Active Ports (-11.0 dB):</strong> TV Outlets.<br>&bull; <strong>Unused Ports:</strong> Capped with 75&Omega; locking terminators.',
-        isCascade: false,
-        matrix: {
-          rxMin: 6.0,
-          rxIdeal: 14.0,
-          rxMax: 22.0,
-          txIdeal: 26.0,
-          txMax: 34.0
-        }
-      },
-      cascade: {
-        id: 'cascade',
-        name: 'Cascaded Splitter (⚠️ Anti-Pattern / Avoid)',
-        short: 'Cascade ⚠️',
-        ports: 6,
-        lossDs: 4.5,
-        lossUs: 4.5,
-        stbLossDs: 11.5,
-        desc: '2-Way feeding another splitter in series. Causes severe MoCA isolation loss, micro-reflections & return squeeze.',
-        guide: '&bull; <strong>Primary 2-Way:</strong> Leg 1 to Gateway (-4.5 dB), Leg 2 to Secondary Splitter.<br>&bull; <strong>Secondary Splitter:</strong> TVs suffer -11.5 dB with high MoCA isolation penalty.',
-        isCascade: true,
-        matrix: {
-          rxMin: 6.5,
-          rxIdeal: 14.5,
-          rxMax: 22.5,
-          txIdeal: 25.5,
-          txMax: 33.5
-        }
-      }
-    };
-
-    function adjustStep(id, delta) {
-      const el = document.getElementById(id);
-      let val = Number((parseFloat(el.value) + delta).toFixed(1));
-      el.value = val.toFixed(1);
+    function handleTapDs(val) {
+      state.tapDs = parseFloat(val);
+      document.getElementById('tapDsVal').textContent = (state.tapDs > 0 ? '+' : '') + state.tapDs.toFixed(1);
       calculate();
     }
 
-    function adjustTvs(delta) {
-      state.stbCount = Math.max(0, Math.min(7, state.stbCount + delta));
+    function handleTapTx(val) {
+      state.tapTx = parseFloat(val);
+      document.getElementById('tapTxVal').textContent = state.tapTx.toFixed(1);
+      calculate();
+    }
+
+    function handleModemCount(val) {
+      state.modemCount = parseInt(val, 10);
+      document.getElementById('modemCountVal').textContent = state.modemCount === 1 ? '1 Modem Active' : 'No Modem (TV Only)';
+      autoAdjustManualId();
+      calculate();
+    }
+
+    function handleTvSlider(val) {
+      state.stbCount = parseInt(val, 10);
       document.getElementById('tvCountVal').textContent = `${state.stbCount} TV${state.stbCount === 1 ? '' : 's'}`;
-      
-      const totalOutlets = state.stbCount + 1;
+      autoAdjustManualId();
+      calculate();
+    }
+
+    function autoAdjustManualId() {
+      const totalOutlets = state.modemCount + state.stbCount;
       if (state.mode === 'manual') {
         const cur = catalog[state.manualId];
         if (cur && cur.ports < totalOutlets) {
-          if (totalOutlets === 2) state.manualId = '2way';
-          else if (totalOutlets === 3) state.manualId = '3way_hot';
+          if (totalOutlets <= 1) state.manualId = 'barrel';
+          else if (totalOutlets === 2) state.manualId = '2way';
+          else if (totalOutlets === 3) state.manualId = state.modemCount === 1 ? '3way_hot' : '4way';
           else if (totalOutlets === 4) state.manualId = '4way';
           else state.manualId = '8way';
         }
       }
-      calculate();
     }
 
     function handleDropLen(val) {
@@ -1328,13 +1318,12 @@
 
     // Calculation Engine
     function calculate() {
-      state.tapDs = parseFloat(document.getElementById('tapDs').value) || 0;
-      state.tapTx = parseFloat(document.getElementById('tapTx').value) || 0;
       state.dropType = document.getElementById('dropType').value;
       
-      const totalOutlets = state.stbCount + 1;
+      const totalOutlets = state.modemCount + state.stbCount;
+      const modemLabel = state.modemCount === 1 ? '1 DOCSIS Modem' : '0 Modems';
       document.getElementById('deviceSummaryText').innerHTML = 
-        `Total House Outlets: <strong>${totalOutlets}</strong> (1 DOCSIS Modem + ${state.stbCount} TV Outlet${state.stbCount === 1 ? '' : 's'}).`;
+        `Total House Outlets: <strong>${totalOutlets}</strong> (${modemLabel} + ${state.stbCount} TV Outlet${state.stbCount === 1 ? '' : 's'}).`;
 
       // OES Drop Rule: Series 6 max 150 ft
       const isOesViolation = (state.dropType === 'rg6' && state.dropLen > 150);
@@ -1360,28 +1349,39 @@
 
       // Scoring Function
       function scoreItem(item) {
-        const mRx = Number((state.tapDs - dropLossDs - item.lossDs - insideLossDs).toFixed(1));
-        const mTx = Number((state.tapTx + dropLossUs + item.lossUs + insideLossUs).toFixed(1));
-        const sRx = (state.stbCount > 0 && item.stbLossDs !== null)
-          ? Number((state.tapDs - dropLossDs - item.stbLossDs - insideLossDs).toFixed(1))
+        const mRx = state.modemCount === 1 
+          ? Number((state.tapDs - dropLossDs - item.lossDs - insideLossDs).toFixed(1)) 
+          : null;
+        const mTx = state.modemCount === 1 
+          ? Number((state.tapTx + dropLossUs + item.lossUs + insideLossUs).toFixed(1)) 
+          : null;
+        
+        // If no modem, STBs take primary/balanced ports or item.stbLossDs
+        const stbLossToUse = (state.modemCount === 0) ? item.lossDs : (item.stbLossDs !== null ? item.stbLossDs : item.lossDs);
+        const sRx = (state.stbCount > 0)
+          ? Number((state.tapDs - dropLossDs - stbLossToUse - insideLossDs).toFixed(1))
           : null;
 
-        let penalty = Math.abs(mRx - 0.0) * 2;
+        let penalty = 0;
         
-        const portShortfall = totalOutlets - item.ports;
+        if (state.modemCount === 1 && mRx !== null) {
+          penalty += Math.abs(mRx - 0.0) * 2;
+          if (mTx > 48.0) penalty += (mTx - 48.0) * 25;
+          if (mTx > 53.0) penalty += 500;
+          if (mTx < 35.0) penalty += 200;
+        } else if (sRx !== null) {
+          penalty += Math.abs(sRx - 0.0) * 2;
+        }
+
+        const portShortfall = Math.max(0, totalOutlets - item.ports);
         if (portShortfall > 0) {
           penalty += 2000 + (portShortfall * 300);
         }
 
-        const excessPorts = item.ports - totalOutlets;
+        const excessPorts = Math.max(0, item.ports - totalOutlets);
         if (excessPorts > 0) {
           penalty += excessPorts * 5;
         }
-
-        // Upstream penalties
-        if (mTx > 48.0) penalty += (mTx - 48.0) * 25;
-        if (mTx > 53.0) penalty += 500;
-        if (mTx < 35.0) penalty += 200;
 
         // STB range penalty
         if (sRx !== null && (sRx < -8.0 || sRx > 8.0)) penalty += 50;
@@ -1470,32 +1470,42 @@
       // Populate Delivered Device Telemetry Cards
       const rxEl = document.getElementById('valModemRx');
       const rxSub = document.getElementById('subModemRx');
-      rxEl.textContent = `${active.mRx > 0 ? '+' : ''}${active.mRx.toFixed(1)} dBmV`;
-
-      if (active.mRx < -15.0 || active.mRx > 15.0) {
-        rxEl.className = 't-val val-fail';
-        rxSub.textContent = 'HARD FAIL (< -15 or > +15)';
-      } else if (active.mRx < -8.0 || active.mRx > 8.0) {
-        rxEl.className = 't-val val-warn';
-        rxSub.textContent = 'MARGINAL (Safe: -8 to +8)';
+      if (state.modemCount === 1 && active.mRx !== null) {
+        rxEl.textContent = `${active.mRx > 0 ? '+' : ''}${active.mRx.toFixed(1)} dBmV`;
+        if (active.mRx < -15.0 || active.mRx > 15.0) {
+          rxEl.className = 't-val val-fail';
+          rxSub.textContent = 'HARD FAIL (< -15 or > +15)';
+        } else if (active.mRx < -8.0 || active.mRx > 8.0) {
+          rxEl.className = 't-val val-warn';
+          rxSub.textContent = 'MARGINAL (Safe: -8 to +8)';
+        } else {
+          rxEl.className = 't-val val-safe';
+          rxSub.textContent = 'Target: 0.0 (-8.0 to +8.0)';
+        }
       } else {
-        rxEl.className = 't-val val-safe';
-        rxSub.textContent = 'Target: 0.0 (-8.0 to +8.0)';
+        rxEl.textContent = 'N/A';
+        rxEl.className = 't-val';
+        rxSub.textContent = 'No Modem (TV Only)';
       }
 
       const txEl = document.getElementById('valModemTx');
       const txSub = document.getElementById('subModemTx');
-      txEl.textContent = `${active.mTx.toFixed(1)} dBmV`;
-
-      if (active.mTx < 35.0 || active.mTx > 53.0) {
-        txEl.className = 't-val val-fail';
-        txSub.textContent = 'HARD FAIL (< 35 or > 53)';
-      } else if (active.mTx > 48.0) {
-        txEl.className = 't-val val-warn';
-        txSub.textContent = 'MARGINAL (> 48.0 dBmV)';
+      if (state.modemCount === 1 && active.mTx !== null) {
+        txEl.textContent = `${active.mTx.toFixed(1)} dBmV`;
+        if (active.mTx < 35.0 || active.mTx > 53.0) {
+          txEl.className = 't-val val-fail';
+          txSub.textContent = 'HARD FAIL (< 35 or > 53)';
+        } else if (active.mTx > 48.0) {
+          txEl.className = 't-val val-warn';
+          txSub.textContent = 'MARGINAL (> 48.0 dBmV)';
+        } else {
+          txEl.className = 't-val val-ideal';
+          txSub.textContent = 'Safe: 35.0 to 48.0';
+        }
       } else {
-        txEl.className = 't-val val-ideal';
-        txSub.textContent = 'Safe: 35.0 to 48.0';
+        txEl.textContent = 'N/A';
+        txEl.className = 't-val';
+        txSub.textContent = 'No Modem (TV Only)';
       }
 
       const stbEl = document.getElementById('valStbRx');
@@ -1516,8 +1526,13 @@
       }
 
       // Overall PHT Status
-      const hasHardFail = (active.mRx < -15.0 || active.mRx > 15.0 || active.mTx < 35.0 || active.mTx > 53.0 || active.portShortfall > 0);
-      const hasMarginal = !hasHardFail && (active.mRx < -8.0 || active.mRx > 8.0 || active.mTx > 48.0 || (active.sRx !== null && (active.sRx < -8.0 || active.sRx > 8.0)) || active.isCascade);
+      const modemHardFail = state.modemCount === 1 && (active.mRx < -15.0 || active.mRx > 15.0 || active.mTx < 35.0 || active.mTx > 53.0);
+      const stbHardFail = active.sRx !== null && (active.sRx < -15.0 || active.sRx > 15.0);
+      const hasHardFail = modemHardFail || stbHardFail || active.portShortfall > 0;
+
+      const modemMarginal = state.modemCount === 1 && (active.mRx < -8.0 || active.mRx > 8.0 || active.mTx > 48.0);
+      const stbMarginal = active.sRx !== null && (active.sRx < -8.0 || active.sRx > 8.0);
+      const hasMarginal = !hasHardFail && (modemMarginal || stbMarginal || active.isCascade);
 
       const topBadge = document.getElementById('phtBadge');
       const heroBadge = document.getElementById('heroBadge');
@@ -1563,11 +1578,17 @@
           selectManualSplitter(item.id);
         };
 
+        const isOverallPass = (state.modemCount === 0 || (item.mTx <= 48.0 && item.mRx >= -8.0 && item.mRx <= 8.0)) &&
+                              (item.sRx === null || (item.sRx >= -8.0 && item.sRx <= 8.0)) && !item.isCascade;
+
         const passBadge = (!hasPorts && !item.isCascade)
           ? `<span style="font-size:0.65rem; color:var(--rose); font-weight:800;">[SHORTFALL]</span>`
-          : (item.mTx <= 48.0 && item.mRx >= -8.0 && item.mRx <= 8.0 && !item.isCascade)
+          : isOverallPass
             ? `<span style="font-size:0.65rem; color:var(--emerald); font-weight:800;">[PASS]</span>`
             : `<span style="font-size:0.65rem; color:var(--amber); font-weight:800;">[MARGINAL]</span>`;
+
+        const displayRx = state.modemCount === 1 ? item.mRx : item.sRx;
+        const displayTx = state.modemCount === 1 ? item.mTx : null;
 
         row.innerHTML = `
           <div class="row-info">
@@ -1578,13 +1599,15 @@
             <div class="row-meta">${item.desc}</div>
           </div>
           <div class="row-metrics">
-            <span style="color:${item.mRx >= -8 && item.mRx <= 8 ? 'var(--cyan)' : 'var(--amber)'}">
-              ${item.mRx > 0 ? '+' : ''}${item.mRx.toFixed(1)} Rx
+            <span style="color:${displayRx !== null && displayRx >= -8 && displayRx <= 8 ? 'var(--cyan)' : 'var(--amber)'}">
+              ${displayRx !== null ? ((displayRx > 0 ? '+' : '') + displayRx.toFixed(1) + ' Rx') : 'N/A'}
             </span>
-            <span style="color:var(--text-sub)">|</span>
-            <span style="color:${item.mTx <= 48 ? 'var(--emerald)' : 'var(--rose)'}">
-              ${item.mTx.toFixed(1)} Tx
-            </span>
+            ${displayTx !== null ? `
+              <span style="color:var(--text-sub)">|</span>
+              <span style="color:${displayTx <= 48 ? 'var(--emerald)' : 'var(--rose)'}">
+                ${displayTx.toFixed(1)} Tx
+              </span>
+            ` : ''}
           </div>
         `;
         topList.appendChild(row);
