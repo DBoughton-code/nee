@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Outside-Only SRO MoPr</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .table-stripe tbody tr:nth-child(odd) { background-color: #f8fafc; }
+        .table-stripe tbody tr:hover { background-color: #f1f5f9; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased flex flex-col min-h-screen">
+
+    <!-- Mobile Header -->
+    <header class="md:hidden bg-slate-900 text-white p-4 sticky top-0 z-50 shadow-md flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <i class="ph ph-hard-hat text-2xl text-blue-400"></i>
+            <span class="font-bold text-lg">Outside-Only SRO</span>
+        </div>
+        <button id="mobile-menu-btn" class="text-slate-300 hover:text-white focus:outline-none">
+            <i class="ph ph-list text-3xl"></i>
+        </button>
+    </header>
+
+    <div class="flex flex-1 relative">
+        
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 z-40 w-64 bg-slate-900 text-slate-300 transition-transform duration-300 ease-in-out border-r border-slate-800 flex flex-col h-screen md:sticky md:top-0">
+            <div class="p-6 hidden md:flex items-center gap-3 border-b border-slate-800">
+                <i class="ph ph-hard-hat text-3xl text-blue-400"></i>
+                <h1 class="text-lg font-bold text-white tracking-wide leading-tight">Outside-Only SRO<br><span class="text-xs text-slate-400 font-normal">Residential MoPr</span></h1>
+            </div>
+            <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-2 text-sm font-medium">
+                <a href="#overview" class="block px-4 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition-colors" onclick="closeSidebar()">Overview & Guidelines</a>
+                <a href="#preparation" class="block px-4 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition-colors" onclick="closeSidebar()">Preparation</a>
+                <a href="#validation" class="block px-4 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition-colors" onclick="closeSidebar()">Outside Drop Validation</a>
+                <a href="#tap-procedures" class="block px-4 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition-colors" onclick="closeSidebar()">Tap Procedures</a>
+                <a href="#exterior-wrapup" class="block px-4 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition-colors" onclick="closeSidebar()">Exterior Network & Wrap-up</a>
+                <a href="#appendix" class="block px-4 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition-colors" onclick="closeSidebar()">Appendix: Job Types</a>
+            </nav>
+            <div class="p-4 border-t border-slate-800 text-xs text-slate-500 text-center">
+                OES Standards &copy; 2026
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 p-6 md:p-10 w-full overflow-x-hidden">
+            <div class="max-w-4xl mx-auto space-y-12 pb-20">
+
+                <!-- 1. Overview & General Requirements -->
+                <section id="overview" class="scroll-mt-24">
+                    <div class="mb-6">
+                        <h2 class="text-3xl font-bold text-slate-900 mb-2">Overview & General Requirements</h2>
+                        <p class="text-slate-600">Protocols and expectations for outside-only SRO customer visits where all work is outside the home and does not require customer interaction.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-6">
+                        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+                            <h3 class="font-bold text-blue-900 flex items-center gap-2"><i class="ph ph-warning"></i> Safety First</h3>
+                            <p class="text-sm text-blue-800 mt-1">If you encounter any situation or interaction where you feel unsafe, immediately remove yourself and contact your supervisor. All current safety processes and procedures must be followed.</p>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="font-bold text-slate-800 mb-2">Standards & Deviations</h4>
+                                <ul class="list-disc pl-5 text-sm text-slate-600 space-y-1">
+                                    <li>Steps outlined in this document are the standard and may not be modified.</li>
+                                    <li>Any deviations must be approved by Corporate Technical Operations.</li>
+                                    <li>Existing OES materials govern drop networks and CPE.</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-800 mb-2">Workmanship & Work Area</h4>
+                                <ul class="list-disc pl-5 text-sm text-slate-600 space-y-1">
+                                    <li>All work performed will be of the highest possible workmanship.</li>
+                                    <li>Must adhere to local, state, federal codes, and landlord stipulations.</li>
+                                    <li>Work area must be kept clean, orderly, and free of trash/debris.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold text-slate-800 mb-2">Approved Materials</h4>
+                            <p class="text-sm text-slate-600">Only products approved by Corporate Engineering shall be used in the RF and optical drop system. Optical passives must meet NGAN or XNET guidelines.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. Preparation -->
+                <section id="preparation" class="scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                        <i class="ph ph-clipboard-text text-blue-600"></i> Preparation & Arrival
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                            <div class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-600 mb-4">
+                                <i class="ph ph-magnifying-glass text-xl"></i>
+                            </div>
+                            <h4 class="font-bold text-slate-800 mb-2">Pre-Job Preparation</h4>
+                            <ul class="list-disc pl-5 text-sm text-slate-600 space-y-1">
+                                <li>Review PHT (Premise Health Test) results if available.</li>
+                                <li>Review job notes and expectations.</li>
+                                <li>Follow other key elements defined in ULearn training and OES.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                            <div class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-600 mb-4">
+                                <i class="ph ph-car text-xl"></i>
+                            </div>
+                            <h4 class="font-bold text-slate-800 mb-2">Arrival</h4>
+                            <ul class="list-disc pl-5 text-sm text-slate-600 space-y-1">
+                                <li>Perform the Circle of Safety.</li>
+                                <li>Check personal appearance.</li>
+                                <li>Conduct a jobsite survey.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                            <div class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-600 mb-4">
+                                <i class="ph ph-users text-xl"></i>
+                            </div>
+                            <h4 class="font-bold text-slate-800 mb-2">Customer Awareness</h4>
+                            <ul class="list-disc pl-5 text-sm text-slate-600 space-y-1">
+                                <li>Attempt to contact the customer. (If unreachable, try again at wrap-up).</li>
+                                <li>Set clear expectations.</li>
+                                <li>Inform them work is outside only and if service interruption is possible.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. Outside Drop System Validation -->
+                <section id="validation" class="scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                        <i class="ph ph-shield-check text-blue-600"></i> Outside Drop System Validation
+                    </h2>
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-6">
+                        <p class="text-slate-700 text-sm">All work is to begin at the bondblock/service distribution point.</p>
+                        
+                        <div class="border-l-2 border-blue-500 pl-4 py-1">
+                            <h4 class="font-bold text-slate-800 mb-2">1. Visual Inspection & Safety</h4>
+                            <ul class="list-disc pl-5 text-sm text-slate-600 space-y-1">
+                                <li>Use Foreign Voltage Detector (FVD) to ensure no voltage present. (If present, follow foreign voltage safety procedures).</li>
+                                <li>Utilize amp clamp to ensure current is below threshold (< 1 amp).</li>
+                            </ul>
+                        </div>
+
+                        <div class="border-l-2 border-blue-500 pl-4 py-1">
+                            <h4 class="font-bold text-slate-800 mb-2">2. Bonding Validation</h4>
+                            <ul class="list-disc pl-5 text-sm text-slate-600 space-y-1">
+                                <li>Validate bonding meets OES requirements (Bondblock, ground wire, electrical connection).</li>
+                                <li>Perform ohm test to ensure bonding is <strong>< 25 ohms</strong>.</li>
+                                <li>Utilize Bonding Validation Tool (BVT) application.</li>
+                                <li>Verify POE is present or installed per MoCA standard.</li>
+                            </ul>
+                        </div>
+
+                        <div class="border-l-2 border-blue-500 pl-4 py-1">
+                            <h4 class="font-bold text-slate-800 mb-2">3. Signal Testing (At Bondblock)</h4>
+                            <p class="text-sm text-slate-600 mb-2">If drop is active, proceed. If not, terminate drop and move to tap. All signal testing uses the XM Meter platform (save results to cloud).</p>
+                            <ul class="list-disc pl-5 text-sm text-slate-600 space-y-1">
+                                <li><strong>DS Spectrum Test:</strong> Verify forward levels are within OES thresholds.</li>
+                                <li><strong>DOCSIS Test:</strong> Verify US and DS levels are within OES RF thresholds.</li>
+                                <li>Complete any other testing required by Division Tech Ops.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. Tap Procedures -->
+                <section id="tap-procedures" class="scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                        <i class="ph ph-broadcast text-blue-600"></i> Tap Procedures
+                    </h2>
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="font-bold text-slate-800 mb-2">Inspection at the Tap</h4>
+                                <ul class="list-disc pl-5 text-sm text-slate-600 space-y-1">
+                                    <li>Follow all safety procedures. Use FVD to ensure no voltage.</li>
+                                    <li>Ensure all cables, connectors, fasteners, and drop components follow OES and are approved by Corporate Engineering.</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-800 mb-2">Signal Level Testing</h4>
+                                <ul class="list-disc pl-5 text-sm text-slate-600 space-y-1">
+                                    <li><strong>DS Spectrum & DOCSIS Test:</strong> Verify levels within thresholds.</li>
+                                    <li><strong>Ingress Test:</strong> Scan drop; must meet XM Ingress compliance. <strong>Any spike over -30dB must be corrected.</strong></li>
+                                    <li>Perform Leakage or other required testing.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 mt-4">
+                            <h4 class="font-bold text-slate-800 mb-2">Certify, Repair, Replace, or RTM</h4>
+                            <p class="text-sm text-slate-600 mb-2">Based on inspection and testing results:</p>
+                            <ul class="list-disc pl-5 text-sm text-slate-600 space-y-1 mb-3">
+                                <li>Certify the drop is within specification.</li>
+                                <li>Replace the drop if it does not meet minimum specifications.</li>
+                                <li>Submit an RTM if levels from the tap are not within spec (follow OES Fulfillment RTM).</li>
+                            </ul>
+                            <p class="text-sm text-slate-600">After tap certification, return to the bondblock to complete testing.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 5. Exterior Home Network Distribution & Wrap-up -->
+                <section id="exterior-wrapup" class="scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                        <i class="ph ph-house-line text-blue-600"></i> Exterior Network & Wrap-up
+                    </h2>
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-6">
+                        
+                        <div class="border-b border-slate-100 pb-4">
+                            <h4 class="font-bold text-slate-800 mb-2">Home Network Distribution - Exterior</h4>
+                            <ul class="list-disc pl-5 text-sm text-slate-600 space-y-1">
+                                <li><strong>Visual Inspection:</strong> Inspect all active cables on the outside of the home.</li>
+                                <li><strong>Ingress Test:</strong> Perform scan on home drop system. Any spike over -30dB must be corrected or mitigated.</li>
+                                <li>If ingress cannot be corrected from outside, contact supervisor and follow division/regional processes.</li>
+                                <li>Validate, repair, or replace as needed.</li>
+                            </ul>
+                        </div>
+
+                        <div class="border-b border-slate-100 pb-4">
+                            <h4 class="font-bold text-slate-800 mb-2">Job Wrap-up</h4>
+                            <ul class="list-disc pl-5 text-sm text-slate-600 space-y-1">
+                                <li>Ensure cable routing, fasteners, and materials follow OES requirements.</li>
+                                <li>Verify the reason for the SRO is resolved (e.g., leakage repaired).</li>
+                                <li>Verify services restored using PHT to ensure equipment is reporting and in spec.</li>
+                            </ul>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <h4 class="font-bold text-slate-800 mb-2">Customer Awareness</h4>
+                                <ul class="list-disc pl-5 text-sm text-slate-600 space-y-1">
+                                    <li>Attempt contact again.</li>
+                                    <li>Verify restoration, apologize for inconvenience, and thank them.</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-800 mb-2">Complete the Job</h4>
+                                <ul class="list-disc pl-5 text-sm text-slate-600 space-y-1">
+                                    <li>Verify tools/equipment returned to vehicle.</li>
+                                    <li>Ensure follow-ups (One Drop, RTM) are complete.</li>
+                                    <li>Utilize proper coding to close. Complete Circle of Safety.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- 6. Appendix -->
+                <section id="appendix" class="scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                        <i class="ph ph-table text-blue-600"></i> Appendix: Job Types
+                    </h2>
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto max-h-[500px] overflow-y-auto">
+                            <table class="w-full text-left text-sm table-stripe">
+                                <thead class="bg-slate-100 text-slate-700 border-b border-slate-200 sticky top-0 shadow-sm">
+                                    <tr>
+                                        <th class="p-3 font-semibold whitespace-nowrap w-1/4">CDE_TBL_VAL_C32</th>
+                                        <th class="p-3 font-semibold w-1/2">JOB_TYP_DESCR_C32</th>
+                                        <th class="p-3 font-semibold w-1/4">In or out</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100 text-slate-700">
+                                    <tr><td class="p-3 font-mono font-medium">2Z</td><td class="p-3">BC RPL AER DRP</td><td class="p-3"><span class="px-2 py-1 bg-slate-200 text-slate-800 rounded-md text-xs font-semibold">Outside</span></td></tr>
+                                    <tr><td class="p-3 font-mono font-medium">3G</td><td class="p-3">RESI GROUND REPAIR</td><td class="p-3"><span class="px-2 py-1 bg-slate-200 text-slate-800 rounded-md text-xs font-semibold">Outside</span></td></tr>
+                                    <tr><td class="p-3 font-mono font-medium">3I</td><td class="p-3">BC GROUND RPR</td><td class="p-3"><span class="px-2 py-1 bg-slate-200 text-slate-800 rounded-md text-xs font-semibold">Outside</span></td></tr>
+                                    <tr><td class="p-3 font-mono font-medium">4M</td><td class="p-3">REMOVE DRP CUT OVR</td><td class="p-3"><span class="px-2 py-1 bg-slate-200 text-slate-800 rounded-md text-xs font-semibold">Outside</span></td></tr>
+                                    <tr><td class="p-3 font-mono font-medium">7G</td><td class="p-3">GO128</td><td class="p-3"><span class="px-2 py-1 bg-slate-200 text-slate-800 rounded-md text-xs font-semibold">Outside</span></td></tr>
+                                    <tr><td class="p-3 font-mono font-medium">7L</td><td class="p-3">PRP INITIAL PASS</td><td class="p-3"><span class="px-2 py-1 bg-slate-200 text-slate-800 rounded-md text-xs font-semibold">Outside</span></td></tr>
+                                    <tr><td class="p-3 font-mono font-medium">CO</td><td class="p-3">MDU/BLK CLEANUP</td><td class="p-3"><span class="px-2 py-1 bg-slate-200 text-slate-800 rounded-md text-xs font-semibold">Outside</span></td></tr>
+                                    <tr><td class="p-3 font-mono font-medium">C9</td><td class="p-3">CONCRETE CUT</td><td class="p-3"><span class="px-2 py-1 bg-slate-200 text-slate-800 rounded-md text-xs font-semibold">Outside</span></td></tr>
+                                    <tr><td class="p-3 font-mono font-medium">DQ</td><td class="p-3">REPLACE DROP FIBER</td><td class="p-3"><span class="px-2 py-1 bg-slate-200 text-slate-800 rounded-md text-xs font-semibold">Outside</span></td></tr>
+                                    <tr><td class="p-3 font-mono font-medium">IA</td><td class="p-3">CABLE LOCATES</td><td class="p-3"><span class="px-2 py-1 bg-slate-200 text-slate-800 rounded-md text-xs font-semibold">Outside</span></td></tr>
+                                    <tr><td class="p-3 font-mono font-medium">IT</td><td class="p-3">BLOW CONDUIT</td><td class="p-3"><span class="px-2 py-1 bg-slate-200 text-slate-800 rounded-md text-xs font-semibold">Outside</span></td></tr>
+                                    <tr><td class="p-3 font-mono font-medium">IW</td><td class="p-3">LEAKAGE</td><td class="p-3"><span class="px-2 py-1 bg-slate-200 text-slate-800 rounded-md text-xs font-semibold">Outside</span></td></tr>
+                                    <tr><td class="p-3 font-mono font-medium">IZ</td><td class="p-3">OUTSDE DROP-AERIAL</td><td class="p-3"><span class="px-2 py-1 bg-slate-200 text-slate-800 rounded-md text-xs font-semibold">Outside</span></td></tr>
+                                    <tr><td class="p-3 font-mono font-medium">JS</td><td class="p-3">OUTSDE DROP-UNDERG</td><td class="p-3"><span class="px-2 py-1 bg-slate-200 text-slate-800 rounded-md text-xs font-semibold">Outside</span></td></tr>
+                                    <tr><td class="p-3 font-mono font-medium">KA</td><td class="p-3">PED REPAIR/REPLACE</td><td class="p-3"><span class="px-2 py-1 bg-slate-200 text-slate-800 rounded-md text-xs font-semibold">Outside</span></td></tr>
+                                    <tr><td class="p-3 font-mono font-medium">KV</td><td class="p-3">MARKET HEALTH</td><td class="p-3"><span class="px-2 py-1 bg-slate-200 text-slate-800 rounded-md text-xs font-semibold">Outside</span></td></tr>
+                                    <tr><td class="p-3 font-mono font-medium">KX</td><td class="p-3">STORM RELATED DROP</td><td class="p-3"><span class="px-2 py-1 bg-slate-200 text-slate-800 rounded-md text-xs font-semibold">Outside</span></td></tr>
+                                    <tr><td class="p-3 font-mono font-medium">LA</td><td class="p-3">PRIORITY LEAKAGE</td><td class="p-3"><span class="px-2 py-1 bg-slate-200 text-slate-800 rounded-md text-xs font-semibold">Outside</span></td></tr>
+                                    <tr><td class="p-3 font-mono font-medium">LC</td><td class="p-3">LEAKAGE RPT</td><td class="p-3"><span class="px-2 py-1 bg-slate-200 text-slate-800 rounded-md text-xs font-semibold">Outside</span></td></tr>
+                                    <tr><td class="p-3 font-mono font-medium">LL</td><td class="p-3">NOT HOME INSTALL</td><td class="p-3"><span class="px-2 py-1 bg-slate-200 text-slate-800 rounded-md text-xs font-semibold">Outside</span></td></tr>
+                                    <tr><td class="p-3 font-mono font-medium">LN</td><td class="p-3">GO 95-PUBLIC</td><td class="p-3"><span class="px-2 py-1 bg-slate-200 text-slate-800 rounded-md text-xs font-semibold">Outside</span></td></tr>
+                                    <tr><td class="p-3 font-mono font-medium">LO</td><td class="p-3">GO 95-FULFILLMENT</td><td class="p-3"><span class="px-2 py-1 bg-slate-200 text-slate-800 rounded-md text-xs font-semibold">Outside</span></td></tr>
+                                    <tr><td class="p-3 font-mono font-medium">LS</td><td class="p-3">GO 95-NETWORK</td><td class="p-3"><span class="px-2 py-1 bg-slate-200 text-slate-800 rounded-md text-xs font-semibold">Outside</span></td></tr>
+                                    <tr><td class="p-3 font-mono font-medium">LU</td><td class="p-3">GO 95-UTILITY</td><td class="p-3"><span class="px-2 py-1 bg-slate-200 text-slate-800 rounded-md text-xs font-semibold">Outside</span></td></tr>
+                                    <tr><td class="p-3 font-mono font-medium">PD</td><td class="p-3">PROACTIVE DRP HLTH</td><td class="p-3"><span class="px-2 py-1 bg-slate-200 text-slate-800 rounded-md text-xs font-semibold">Outside</span></td></tr>
+                                    <tr><td class="p-3 font-mono font-medium">PF</td><td class="p-3">PROACT XIT OUTSIDE</td><td class="p-3"><span class="px-2 py-1 bg-slate-200 text-slate-800 rounded-md text-xs font-semibold">Outside</span></td></tr>
+                                    <tr><td class="p-3 font-mono font-medium">RA</td><td class="p-3">EPON LONG DROP AER</td><td class="p-3"><span class="px-2 py-1 bg-slate-200 text-slate-800 rounded-md text-xs font-semibold">Outside</span></td></tr>
+                                    <tr><td class="p-3 font-mono font-medium">RB</td><td class="p-3">EPON LONG DROP UG</td><td class="p-3"><span class="px-2 py-1 bg-slate-200 text-slate-800 rounded-md text-xs font-semibold">Outside</span></td></tr>
+                                    <tr><td class="p-3 font-mono font-medium">YW</td><td class="p-3">FIBER SRO</td><td class="p-3"><span class="px-2 py-1 bg-slate-200 text-slate-800 rounded-md text-xs font-semibold">Outside</span></td></tr>
+                                    <tr><td class="p-3 font-mono font-medium">YY</td><td class="p-3">FIBER DROP BURY</td><td class="p-3"><span class="px-2 py-1 bg-slate-200 text-slate-800 rounded-md text-xs font-semibold">Outside</span></td></tr>
+                                    <tr><td class="p-3 font-mono font-medium">Z2</td><td class="p-3">EPNDRPBRY 0-600 FT</td><td class="p-3"><span class="px-2 py-1 bg-slate-200 text-slate-800 rounded-md text-xs font-semibold">Outside</span></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+                
+            </div>
+        </main>
+    </div>
+
+    <!-- Mobile Menu Script -->
+    <script>
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.getElementById('sidebar');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('-translate-x-full');
+        });
+
+        function closeSidebar() {
+            if(window.innerWidth < 768) {
+                sidebar.classList.add('-translate-x-full');
+            }
+        }
+    </script>
+</body>
+</html>

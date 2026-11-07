@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trouble Calls (TCs) Standard Policy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .table-hover tbody tr:hover { background-color: #f8fafc; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased">
+
+    <!-- Header -->
+    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <i class="ph ph-wrench text-3xl text-blue-400"></i>
+                    <span class="font-bold text-xl text-white tracking-wide">TC Standard Policy</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col md:flex-row gap-8">
+        
+        <!-- Sticky Sidebar Navigation -->
+        <aside class="md:w-64 flex-shrink-0">
+            <div class="sticky top-24 bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+                <h3 class="text-xs uppercase font-bold tracking-wider text-slate-500 mb-4 px-2">Navigation</h3>
+                <nav class="flex flex-col gap-1 text-sm font-medium">
+                    <a href="#overview" class="px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-100 hover:text-blue-600 transition-colors">Overview / At a Glance</a>
+                    <a href="#completion-codes" class="px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-100 hover:text-blue-600 transition-colors">Completion Codes</a>
+                    <a href="#exceptions" class="px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-100 hover:text-blue-600 transition-colors">Exceptions</a>
+                    <a href="#no-access" class="px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-100 hover:text-blue-600 transition-colors">Not Home / No Access</a>
+                    <a href="#system-lob" class="px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-100 hover:text-blue-600 transition-colors">Outages & CoS / LOB</a>
+                    <a href="#no-cancel" class="px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-100 hover:text-blue-600 transition-colors">When TC Cannot Be Canceled</a>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="flex-1 space-y-12 pb-20">
+
+            <!-- 1. Overview / At a Glance -->
+            <section id="overview" class="scroll-mt-24">
+                <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+                        <i class="ph ph-info text-blue-600"></i> Overview & At a Glance
+                    </h2>
+                    <p class="mb-4 text-slate-700 leading-relaxed">
+                        A <strong>Trouble Call (TC)</strong> is a job created in response to a customer-reported service issue, whether real or perceived. TCs may be new, repeat, chronic, or install-related. 
+                    </p>
+                    <div class="bg-blue-50 border-l-4 border-blue-600 p-4 rounded-r-lg">
+                        <p class="text-blue-900 text-sm">
+                            <strong>Core Presumption & Rule:</strong> TCs are created with the presumption that the customer's services have been installed and working properly but now need repair. <strong>All TCs must be rolled upon and completed as scheduled.</strong>
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. Truck Roll Completion Codes -->
+            <section id="completion-codes" class="scroll-mt-24">
+                <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                    <i class="ph ph-list-numbers text-blue-600"></i> Truck Roll Completion Codes
+                </h2>
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="p-4 bg-slate-50 border-b border-slate-200">
+                        <p class="text-sm text-slate-600">
+                            Technicians must enter the fix code that best describes the <strong>primary action taken</strong> to resolve the issue. Secondary codes may be added in positions #2 through #6. Note: AM codes (* marked) should only be used as secondary codes.
+                        </p>
+                    </div>
+                    <div class="overflow-x-auto max-h-[600px] overflow-y-auto">
+                        <table class="w-full text-left text-sm table-hover">
+                            <thead class="bg-slate-100 text-slate-700 border-b border-slate-200 sticky top-0 shadow-sm">
+                                <tr>
+                                    <th class="p-3 font-semibold whitespace-nowrap">Code</th>
+                                    <th class="p-3 font-semibold">Short Description</th>
+                                    <th class="p-3 font-semibold">Detailed Description & When to Use</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 text-slate-700">
+                                <tr>
+                                    <td class="p-3 font-bold text-slate-900">AM1*</td>
+                                    <td class="p-3">AMPLEGCY-ID'fd</td>
+                                    <td class="p-3"><strong>Legacy Unity Gain Amp Identified:</strong> Used when tech verifies a legacy house amp exists at the premise (already installed).</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-slate-900">AM2*</td>
+                                    <td class="p-3">AMPMOCAID'fd</td>
+                                    <td class="p-3"><strong>MoCA Unity Gain Amp Identified:</strong> Verifies a MoCA Unity Gain Amp exists (already installed).</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-slate-900">AM3* / AM4*</td>
+                                    <td class="p-3">AMP/PAS-MOCA-INS/RPL</td>
+                                    <td class="p-3"><strong>MoCA Amp/Passive Installed/Replace:</strong> Tech installs or replaces a MoCA house amp or passive device.</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-slate-900">AM5* / AM9*</td>
+                                    <td class="p-3">PAS-MOCAID'fd / AMP-REMOVED</td>
+                                    <td class="p-3"><strong>Passive Identified / Amp Removed:</strong> Passive exists, or an amp is permanently removed from the premise.</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-slate-900">B20</td>
+                                    <td class="p-3">BIZ-ADV CPE</td>
+                                    <td class="p-3"><strong>Advanced Services CPE replace & provision:</strong> For Business Services (BVE, Metro E, PRI, SDWAN, Wi-Fi Pro, etc.).</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-slate-900">E03</td>
+                                    <td class="p-3">CUST ED</td>
+                                    <td class="p-3"><strong>Customer Education:</strong> When educating a customer at any point (chargeable code).</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-slate-900">H22</td>
+                                    <td class="p-3">INT-GW MTA RPRV</td>
+                                    <td class="p-3"><strong>Gateway/eMTA Reprovisioned:</strong> When provisioning a device that lost provisioning, or loading Static IPs.</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-slate-900">ME1 / O01</td>
+                                    <td class="p-3">ME-OPTIC RPL / DRP-CONN REPL</td>
+                                    <td class="p-3"><strong>Metro E Optical Replace / Connector Replaced:</strong> Swapping optical device or replacing coax/fiber connectors.</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-slate-900">S32 / S33</td>
+                                    <td class="p-3">XH-Sensor RPL / XH-TS RPL/PRV</td>
+                                    <td class="p-3"><strong>Security Sensor / Touchscreen:</strong> Replacing sensors, lifestyle devices, or touchscreens for Xfinity Home/SmartOffice.</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-slate-900">S35 / S43</td>
+                                    <td class="p-3">XH-CAM RPL / XH-Other</td>
+                                    <td class="p-3"><strong>Security Camera / Other:</strong> Replacing/resetting cameras, panel swaps, or fire code alarms.</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-slate-900">T01 / T03</td>
+                                    <td class="p-3">DRP-OH / DRP-UG RPL</td>
+                                    <td class="p-3"><strong>Overhead / Underground Drop Replaced:</strong> Replacing aerial or underground drops.</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-slate-900">T04 / T05</td>
+                                    <td class="p-3">DRP-RAN TEMP UG / DRP-CUT RPR</td>
+                                    <td class="p-3"><strong>Temp UG / Cut Drop Repaired:</strong> Laid temporary above-ground line, or spliced/fixed damaged drop.</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-slate-900">T12 / T13</td>
+                                    <td class="p-3">DRP-GND BLK / DRP-SPLTTR RPLC</td>
+                                    <td class="p-3"><strong>Ground Block / Splitter Replaced:</strong> Bringing home to code or replacing a splitter.</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-slate-900">T15 / T22</td>
+                                    <td class="p-3">DRP-TRAP IN/RPL / WRONG RATE CODE</td>
+                                    <td class="p-3"><strong>Trap Installed/Replaced / Wrong Service Code:</strong> Installed a filter (noise/ingress) or corrected account codes.</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-slate-900">T24 / T25</td>
+                                    <td class="p-3">REPLACE CPE / NON CPE SWAP</td>
+                                    <td class="p-3"><strong>Replaced CPE / Non-CPE:</strong> Replacing Video/Data/Voice CPE or peripherals.</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-slate-900">T34 / T53</td>
+                                    <td class="p-3">CUST EQP / IW-CABLE RPL</td>
+                                    <td class="p-3"><strong>Customer Equipment Problem / Inside Wiring Replaced:</strong> Customer-owned issue or replacing coax/ethernet (chargeable).</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-slate-900">T74 / T92</td>
+                                    <td class="p-3">INT-HN CONFIG / DV-TELE WIRING</td>
+                                    <td class="p-3"><strong>Home Network Config / Phone Wiring:</strong> Wireless/network configurations or repairing phone jacks/wiring (chargeable).</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-slate-900">U31 / U32</td>
+                                    <td class="p-3">REF TO MAINT / REF TO CONST</td>
+                                    <td class="p-3"><strong>Refer to Maintenance / Construction:</strong> Needs RTM form+JB number, or needs construction (wall outlet, MDU rewire).</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-slate-900">U36 / U44</td>
+                                    <td class="p-3">REF TO SUPER / REF TO UNDGRND</td>
+                                    <td class="p-3"><strong>Refer to Supervisor / Underground:</strong> Escalate to leadership, or refer to Underground team via One Drop App.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. Exceptions -->
+            <section id="exceptions" class="scroll-mt-24">
+                <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+                        <i class="ph ph-warning-circle text-blue-600"></i> Exceptions
+                    </h2>
+                    <p class="mb-4 text-slate-700">
+                        All TCs must be rolled upon and completed as scheduled, with exceptions allowed <strong>only</strong> for the following scenarios:
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="p-4 border border-slate-200 rounded-lg">
+                            <h4 class="font-bold text-slate-800 mb-2">Sanctioned "Scrubbing"</h4>
+                            <p class="text-sm text-slate-600">Specialized teams may contact customers to resolve issues faster than the scheduled TC. Call-aheads are only for authorized centers.</p>
+                        </div>
+                        <div class="p-4 border border-slate-200 rounded-lg">
+                            <h4 class="font-bold text-slate-800 mb-2">Failed Getting Started Kit</h4>
+                            <p class="text-sm text-slate-600">If a tech arrives and finds a GSK activation happened within the last 30 days, the TC should be canceled and replaced by a <strong>Tech Recovery</strong> job type.</p>
+                        </div>
+                        <div class="p-4 border border-slate-200 rounded-lg">
+                            <h4 class="font-bold text-slate-800 mb-2">Install-Related</h4>
+                            <p class="text-sm text-slate-600">If no service issues are present and the customer instead wants additional services (device/outlet changes), contact CommOps to cancel the TC and create a CoS order.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. Not Home / No Access -->
+            <section id="no-access" class="scroll-mt-24">
+                <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                    <i class="ph ph-door text-blue-600"></i> Not Home / No Access (Table 2-1)
+                </h2>
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="p-4 bg-amber-50 border-b border-amber-200">
+                        <p class="text-sm text-amber-900">
+                            <strong>Critical:</strong> TCs must <strong>not</strong> be rescheduled in cases where the customer is not home or the technician has no access. The job must be completed with the proper resolution code.
+                        </p>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm table-hover">
+                            <thead class="bg-slate-100 text-slate-700 border-b border-slate-200">
+                                <tr>
+                                    <th class="p-3 font-semibold w-24">Code</th>
+                                    <th class="p-3 font-semibold w-64">Short Description</th>
+                                    <th class="p-3 font-semibold">Use Case</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 text-slate-700">
+                                <tr>
+                                    <td class="p-3 font-bold text-slate-900">U10</td>
+                                    <td class="p-3">Not Home - Checked outside only</td>
+                                    <td class="p-3">Customer is not home, and technician was able to check outside connections at the premise.</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-slate-900">U11</td>
+                                    <td class="p-3">Customer Home - No Access</td>
+                                    <td class="p-3">Technician contacted customer but could not access a location/room, preventing resolution.</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-slate-900">U12</td>
+                                    <td class="p-3">Not Home and No Outside Check</td>
+                                    <td class="p-3">Customer not home, and technician unable to check/verify outside connections.</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-slate-900">U14</td>
+                                    <td class="p-3">Customer Refused Entry</td>
+                                    <td class="p-3">Customer cancels upon technician arrival and does not allow any work to be completed.</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-slate-900">U21</td>
+                                    <td class="p-3">Okay on Arrival</td>
+                                    <td class="p-3">After troubleshooting, technician determines customer has no service issues and passes PHT score.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. Outages, CoS, LOB -->
+            <section id="system-lob" class="scroll-mt-24">
+                <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+                        <i class="ph ph-plugs-connected text-blue-600"></i> Outages, CoS & LOB Errors
+                    </h2>
+                    <div class="space-y-6">
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-lg mb-1">System Outage</h3>
+                            <p class="text-sm text-slate-600">If scheduled during an active outage or system issue (billing system) that impacts the job, the TC should be rescheduled with a system outage reschedule reason. The customer must be notified prior. Make every effort to reschedule for the same day.</p>
+                        </div>
+                        <hr class="border-slate-100">
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-lg mb-1">Converting TC to CoS</h3>
+                            <p class="text-sm text-slate-600">If the technician determines services need to be added or installed (instead of repaired), the TC can be canceled by the TSC and the correct Change of Service (CoS) order keyed to generate appropriate installation fees and recurring charges.</p>
+                        </div>
+                        <hr class="border-slate-100">
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-lg mb-1">Line of Business (LOB) Error</h3>
+                            <p class="text-sm text-slate-600">If the TC is for the wrong line of business (e.g., Commercial, SmartOffice) and the tech lacks the skill set, request CommOps for a same-day tech assist. If unavailable, complete to the best of the technician's capability and create a Special Request Order (SRO) for additional work.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. When TC Cannot Be Canceled -->
+            <section id="no-cancel" class="scroll-mt-24">
+                <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                    <i class="ph ph-prohibit text-blue-600"></i> Cases When TC Cannot Be Canceled (Table 6-1)
+                </h2>
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="p-4 bg-slate-50 border-b border-slate-200">
+                        <p class="text-sm text-slate-600">
+                            <strong>Note:</strong> Work orders should not be canceled after 9:00 p.m. unless requested by the customer.
+                        </p>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm table-hover">
+                            <thead class="bg-slate-100 text-slate-700 border-b border-slate-200">
+                                <tr>
+                                    <th class="p-3 font-semibold w-1/3">Scenario</th>
+                                    <th class="p-3 font-semibold w-1/3">Action</th>
+                                    <th class="p-3 font-semibold w-1/3">Fix Codes</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 text-slate-700">
+                                <tr>
+                                    <td class="p-3 font-medium">Technician rolls to home, but customer refuses entry stating no further issues.</td>
+                                    <td class="p-3">Once rolled, the work order must be completed and counted as a TC. Technician should complete with a Customer Home - No Access code.</td>
+                                    <td class="p-3"><strong class="text-slate-900">U14:</strong> Cust Refused Entry<br><span class="text-xs text-slate-500">Note: Verify with TLC in certain regions.</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-medium">No one over 18 is home; tech cannot access premises.</td>
+                                    <td class="p-3">Must be completed and counted as a TC. Follow local policy. Either check outside or immediately complete with No Adult codes.</td>
+                                    <td class="p-3">
+                                        <strong class="text-slate-900">U10:</strong> NH-Checked Outside<br>
+                                        <strong class="text-slate-900">U12:</strong> NH No Outside CHECK
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-medium">Technician rolls to customer's home, but the customer is not home.</td>
+                                    <td class="p-3">Must be completed and counted as a TC. Reach out to supervisor and dispatcher to confirm. Complete with Not Home codes.</td>
+                                    <td class="p-3">
+                                        <strong class="text-slate-900">U10:</strong> NH-Checked Outside<br>
+                                        <strong class="text-slate-900">U12:</strong> NH No Outside CHECK
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <footer class="bg-slate-900 border-t border-slate-800 py-8 text-center mt-8">
+        <p class="text-slate-400 text-sm">TechOps Internal Policy Portal &copy; 2026. Official Use Only.</p>
+    </footer>
+
+</body>
+</html>

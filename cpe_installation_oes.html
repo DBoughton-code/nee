@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OES - CPE Installation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .table-stripe tbody tr:nth-child(odd) { background-color: #f8fafc; }
+        .table-stripe tbody tr:hover { background-color: #f1f5f9; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased flex flex-col min-h-screen">
+
+    <!-- Mobile Header -->
+    <header class="md:hidden bg-slate-900 text-white p-4 sticky top-0 z-50 shadow-md flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <i class="ph ph-router text-2xl text-blue-400"></i>
+            <span class="font-bold text-lg">CPE Installation</span>
+        </div>
+        <button id="mobile-menu-btn" class="text-slate-300 hover:text-white focus:outline-none">
+            <i class="ph ph-list text-3xl"></i>
+        </button>
+    </header>
+
+    <div class="flex flex-1 relative">
+        
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 z-40 w-64 bg-slate-900 text-slate-300 transition-transform duration-300 ease-in-out border-r border-slate-800 flex flex-col h-screen md:sticky md:top-0">
+            <div class="p-6 hidden md:flex items-center gap-3 border-b border-slate-800">
+                <i class="ph ph-router text-3xl text-blue-400"></i>
+                <h1 class="text-lg font-bold text-white tracking-wide leading-tight">OES Standards<br><span class="text-xs text-slate-400 font-normal">CPE Installation</span></h1>
+            </div>
+            <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-2 text-sm font-medium">
+                <a href="#at-a-glance" class="block px-4 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition-colors" onclick="closeSidebar()">At a Glance</a>
+                <a href="#location" class="block px-4 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition-colors" onclick="closeSidebar()">Location Considerations</a>
+                <a href="#interference" class="block px-4 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition-colors" onclick="closeSidebar()">Limiting Interference</a>
+                <a href="#guidelines" class="block px-4 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition-colors" onclick="closeSidebar()">Installation Guidelines</a>
+                <a href="#mounting-table" class="block px-4 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition-colors" onclick="closeSidebar()">Mounting Options</a>
+                <a href="#wall-mount" class="block px-4 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition-colors" onclick="closeSidebar()">Wall Mounting</a>
+                <a href="#rack-mount" class="block px-4 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition-colors" onclick="closeSidebar()">Rack Mounting</a>
+            </nav>
+            <div class="p-4 border-t border-slate-800 text-xs text-slate-500 text-center">
+                OES Standards &copy; 2026
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 p-6 md:p-10 w-full overflow-x-hidden">
+            <div class="max-w-5xl mx-auto space-y-12 pb-20">
+
+                <!-- 1. At a Glance -->
+                <section id="at-a-glance" class="scroll-mt-24">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-4">Customer Premise Equipment (CPE)</h2>
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-blue-600">
+                        <h3 class="font-bold text-slate-800 mb-2 flex items-center gap-2">
+                            <i class="ph ph-info text-blue-600 text-xl"></i> At a Glance
+                        </h3>
+                        <p class="text-slate-700 leading-relaxed">
+                            This document covers the requirements for CPE installation to deliver the products and services that a customer has subscribed to. This standard provides guidelines for the installation of both customer-owned and Comcast-owned CPE. <strong>All CPE connected to Comcast's network must be approved by Comcast Corporate Engineering.</strong>
+                        </p>
+                    </div>
+                </section>
+
+                <!-- 2. Location Considerations -->
+                <section id="location" class="scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                        <i class="ph ph-map-pin text-blue-600"></i> CPE Location Considerations
+                    </h2>
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                        <ul class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-700">
+                            <li class="flex items-start gap-3 bg-slate-50 p-4 rounded-lg border border-slate-100">
+                                <i class="ph ph-wind text-xl text-slate-500 flex-shrink-0"></i>
+                                <span>Do not place CPE in an enclosed area where the cooling vents are blocked or impede the flow of air.</span>
+                            </li>
+                            <li class="flex items-start gap-3 bg-slate-50 p-4 rounded-lg border border-slate-100">
+                                <i class="ph ph-armchair text-xl text-slate-500 flex-shrink-0"></i>
+                                <span>Do not place CPE on a soft surface such as a sofa, rug, or similar surface that could block ventilation.</span>
+                            </li>
+                            <li class="flex items-start gap-3 bg-slate-50 p-4 rounded-lg border border-slate-100">
+                                <i class="ph ph-fire text-xl text-red-500 flex-shrink-0"></i>
+                                <span>Install CPE away from heat sources such as radiators, heat registers, and stoves.</span>
+                            </li>
+                            <li class="flex items-start gap-3 bg-slate-50 p-4 rounded-lg border border-slate-100">
+                                <i class="ph ph-plugs-connected text-xl text-green-500 flex-shrink-0"></i>
+                                <span>Installation near other electronic devices is permitted if the location provides adequate air circulation.</span>
+                            </li>
+                            <li class="flex items-start gap-3 bg-slate-50 p-4 rounded-lg border border-slate-100">
+                                <i class="ph ph-arrows-out-line-horizontal text-xl text-slate-500 flex-shrink-0"></i>
+                                <span>Place CPE on a flat surface not prone to vibration or impact.</span>
+                            </li>
+                            <li class="flex items-start gap-3 bg-slate-50 p-4 rounded-lg border border-slate-100">
+                                <i class="ph ph-drop text-xl text-blue-500 flex-shrink-0"></i>
+                                <span>Install inside a premise where condensation will not occur. Do not install near a water source (sink, bathtub, etc.).</span>
+                            </li>
+                            <li class="flex items-start gap-3 bg-slate-50 p-4 rounded-lg border border-slate-100">
+                                <i class="ph ph-power text-xl text-red-500 flex-shrink-0"></i>
+                                <span>Do not install CPE on a switched power outlet.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- 3. Limiting Potential Interference -->
+                <section id="interference" class="scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                        <i class="ph ph-warning-octagon text-blue-600"></i> Limiting Potential Interference
+                    </h2>
+                    <div class="bg-amber-50 p-6 rounded-xl border border-amber-200 shadow-sm text-amber-900">
+                        <ul class="list-disc pl-5 space-y-3">
+                            <li>Do not place devices with WiFi technology on top of or right next to other devices with WiFi technology. Radiating devices may impact each other's performance.</li>
+                            <li>Keep all WiFi technology devices out of cabinets that have doors and out of shelving that is all metal.</li>
+                            <li>Only place WiFi technology devices in media panels designed for WiFi. These are made of <strong>plastic, never metal</strong>.</li>
+                            <li>Avoid placing WiFi technology devices next to mirrors, glass, and/or fish tanks.</li>
+                            <li>Do not place devices with WiFi technology next to large appliances or microwaves.</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- 4. CPE Installation Guidelines -->
+                <section id="guidelines" class="scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                        <i class="ph ph-list-checks text-blue-600"></i> CPE Installation Guidelines
+                    </h2>
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h3 class="font-bold text-slate-800 mb-3 border-b pb-2">Wiring & Connections</h3>
+                                <ul class="list-disc pl-5 text-sm text-slate-700 space-y-2">
+                                    <li>Use Comcast-approved cords and cables to complete all connections.</li>
+                                    <li>Verify that the correct power cord/adapter is used for the equipment (check the manufacturer's label on the device).</li>
+                                    <li>Ensure all RF connectors are tightened to specifications.</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-slate-800 mb-3 border-b pb-2">Safety & Aesthetics</h3>
+                                <ul class="list-disc pl-5 text-sm text-slate-700 space-y-2">
+                                    <li>Install all wiring in a neat and tidy fashion.</li>
+                                    <li>Ensure that cords are not crossing walkways or posing a tripping hazard.</li>
+                                    <li><strong>Power cords must never be routed/fished through a wall or in a wall cavity.</strong></li>
+                                    <li>Cords are not to be placed under rugs or carpeting.</li>
+                                    <li>Protect the cords from being pinched, particularly at plugs/wall plates and connection points.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 5. CPE Mounting Options Table -->
+                <section id="mounting-table" class="scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                        <i class="ph ph-table text-blue-600"></i> CPE Mounting Options
+                    </h2>
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="p-4 bg-slate-50 border-b border-slate-200 text-sm text-slate-600">
+                            Some CPE may be designed to be mounted on a wall, or in a rack. Reference the table below for equipment types and approved mounting configurations.
+                        </div>
+                        <div class="overflow-x-auto max-h-[500px] overflow-y-auto">
+                            <table class="w-full text-left text-sm table-stripe">
+                                <thead class="bg-slate-100 text-slate-700 border-b border-slate-200 sticky top-0 shadow-sm z-10">
+                                    <tr>
+                                        <th class="p-3 font-semibold whitespace-nowrap">Equipment Model</th>
+                                        <th class="p-3 font-semibold text-center">Wall</th>
+                                        <th class="p-3 font-semibold text-center">Mini-rack</th>
+                                        <th class="p-3 font-semibold text-center whitespace-nowrap">Head-end rack</th>
+                                        <th class="p-3 font-semibold">Comments</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100 text-slate-700">
+                                    <tr>
+                                        <td class="p-3 font-medium">Xi5 / Xi6</td>
+                                        <td class="p-3 text-center text-green-600"><i class="ph ph-check text-lg"></i></td>
+                                        <td class="p-3 text-center"></td>
+                                        <td class="p-3 text-center"></td>
+                                        <td class="p-3 text-slate-500">Requires cradle</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 font-medium">XB7 / XB8</td>
+                                        <td class="p-3 text-center text-green-600"><i class="ph ph-check text-lg"></i></td>
+                                        <td class="p-3 text-center"></td>
+                                        <td class="p-3 text-center"></td>
+                                        <td class="p-3 text-slate-500">Requires a bracket or shelf for a media panel installation</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 font-medium">CBR / CBR2</td>
+                                        <td class="p-3 text-center text-green-600"><i class="ph ph-check text-lg"></i></td>
+                                        <td class="p-3 text-center"></td>
+                                        <td class="p-3 text-center text-green-600"><i class="ph ph-check text-lg"></i></td>
+                                        <td class="p-3 text-slate-500">Head-end bracket provided separately</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 font-medium">AER1650</td>
+                                        <td class="p-3 text-center text-green-600"><i class="ph ph-check text-lg"></i></td>
+                                        <td class="p-3 text-center"></td>
+                                        <td class="p-3 text-center"></td>
+                                        <td class="p-3 text-slate-500">Connection Pro 1 Gateway</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 font-medium">E110-C4D</td>
+                                        <td class="p-3 text-center text-green-600"><i class="ph ph-check text-lg"></i></td>
+                                        <td class="p-3 text-center"></td>
+                                        <td class="p-3 text-center"></td>
+                                        <td class="p-3 text-slate-500">Connection Pro 2 Gateway</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 font-medium">100 / 130 / 200 / C-75</td>
+                                        <td class="p-3 text-center text-green-600"><i class="ph ph-check text-lg"></i></td>
+                                        <td class="p-3 text-center"></td>
+                                        <td class="p-3 text-center"></td>
+                                        <td class="p-3 text-slate-500">WiFi Pro</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 font-medium">Juniper SRX320</td>
+                                        <td class="p-3 text-center text-green-600"><i class="ph ph-check text-lg"></i></td>
+                                        <td class="p-3 text-center text-green-600"><i class="ph ph-check text-lg"></i></td>
+                                        <td class="p-3 text-center text-green-600"><i class="ph ph-check text-lg"></i></td>
+                                        <td class="p-3 text-slate-500"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 font-medium">Juniper SRX345</td>
+                                        <td class="p-3 text-center"></td>
+                                        <td class="p-3 text-center"></td>
+                                        <td class="p-3 text-center text-green-600"><i class="ph ph-check text-lg"></i></td>
+                                        <td class="p-3 text-slate-500">Rack mountable only/bottom of the rack</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 font-medium">Juniper SRX1500</td>
+                                        <td class="p-3 text-center"></td>
+                                        <td class="p-3 text-center"></td>
+                                        <td class="p-3 text-center text-green-600"><i class="ph ph-check text-lg"></i></td>
+                                        <td class="p-3 text-slate-500">Rack mountable only/bottom of the rack</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 font-medium">Cisco C1111-8P</td>
+                                        <td class="p-3 text-center text-green-600"><i class="ph ph-check text-lg"></i></td>
+                                        <td class="p-3 text-center"></td>
+                                        <td class="p-3 text-center text-green-600"><i class="ph ph-check text-lg"></i></td>
+                                        <td class="p-3 text-slate-500"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 font-medium">Cisco ISR4461/K9</td>
+                                        <td class="p-3 text-center"></td>
+                                        <td class="p-3 text-center"></td>
+                                        <td class="p-3 text-center text-green-600"><i class="ph ph-check text-lg"></i></td>
+                                        <td class="p-3 text-slate-500">Requires three rack units</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 font-medium">Cisco ISR4331/K9</td>
+                                        <td class="p-3 text-center text-green-600"><i class="ph ph-check text-lg"></i></td>
+                                        <td class="p-3 text-center"></td>
+                                        <td class="p-3 text-center text-green-600"><i class="ph ph-check text-lg"></i></td>
+                                        <td class="p-3 text-slate-500"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 font-medium">Advantech FWA-1012VC-8C</td>
+                                        <td class="p-3 text-center"></td>
+                                        <td class="p-3 text-center"></td>
+                                        <td class="p-3 text-center text-green-600"><i class="ph ph-check text-lg"></i></td>
+                                        <td class="p-3 text-slate-500">Used for SD router and SDWAN</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 font-medium">Advantech FWA-3260</td>
+                                        <td class="p-3 text-center"></td>
+                                        <td class="p-3 text-center"></td>
+                                        <td class="p-3 text-center text-green-600"><i class="ph ph-check text-lg"></i></td>
+                                        <td class="p-3 text-slate-500"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 6. Wall & Rack Mounting -->
+                <section class="grid grid-cols-1 md:grid-cols-2 gap-6 scroll-mt-24">
+                    
+                    <!-- Wall Mount -->
+                    <div id="wall-mount" class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm scroll-mt-24">
+                        <h3 class="font-bold text-lg text-slate-800 mb-3 border-b pb-2 flex items-center gap-2">
+                            <i class="ph ph-squares-four text-blue-600"></i> When Wall Mounting CPE
+                        </h3>
+                        <ul class="list-disc pl-5 text-sm text-slate-700 space-y-2 mt-4">
+                            <li>Do not mount the device near HVAC outlets, radiators, or any other source of heat.</li>
+                            <li>Do not mount the device near any object(s) that could restrict air flow to the device.</li>
+                            <li>All wiring and cables need to be neat and secured.</li>
+                            <li><strong>Wall anchors must be used</strong> for all hollow wall installations.</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Rack Mount -->
+                    <div id="rack-mount" class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm scroll-mt-24">
+                        <h3 class="font-bold text-lg text-slate-800 mb-3 border-b pb-2 flex items-center gap-2">
+                            <i class="ph ph-server text-blue-600"></i> When Rack Mounting CPE
+                        </h3>
+                        <ul class="list-disc pl-5 text-sm text-slate-700 space-y-2 mt-4">
+                            <li>Be sure to follow guidance on rack positioning and required space (e.g. rack units required).</li>
+                            <li>CPE must be secured properly in the rack.</li>
+                            <li>All wiring and cables need to be routed properly, secured, and labeled.</li>
+                        </ul>
+                    </div>
+
+                </section>
+                
+            </div>
+        </main>
+    </div>
+
+    <!-- Mobile Menu Script -->
+    <script>
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.getElementById('sidebar');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('-translate-x-full');
+        });
+
+        function closeSidebar() {
+            if(window.innerWidth < 768) {
+                sidebar.classList.add('-translate-x-full');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OES - Mid-Split Troubleshooting</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .table-stripe tbody tr:nth-child(odd) { background-color: #f8fafc; }
+        .table-stripe tbody tr:hover { background-color: #f1f5f9; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .section-anchor { scroll-margin-top: 6rem; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased flex flex-col min-h-screen">
+
+    <!-- Mobile Header -->
+    <header class="md:hidden bg-slate-900 text-white p-4 sticky top-0 z-50 shadow-md flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <i class="ph ph-broadcast text-2xl text-blue-400"></i>
+            <span class="font-bold text-lg">Mid-Split T&R</span>
+        </div>
+        <button id="mobile-menu-btn" class="text-slate-300 hover:text-white focus:outline-none">
+            <i class="ph ph-list text-3xl"></i>
+        </button>
+    </header>
+
+    <div class="flex flex-1 relative">
+        
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 z-40 w-64 bg-slate-900 text-slate-300 transition-transform duration-300 ease-in-out border-r border-slate-800 flex flex-col h-screen md:sticky md:top-0">
+            <div class="p-6 hidden md:flex items-center gap-3 border-b border-slate-800">
+                <i class="ph ph-broadcast text-3xl text-blue-400"></i>
+                <h1 class="text-lg font-bold text-white tracking-wide leading-tight">OES Standards<br><span class="text-xs text-slate-400 font-normal">Mid-Split T&R</span></h1>
+            </div>
+            <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-2 text-sm font-medium">
+                <a href="#overview" class="block px-4 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition-colors" onclick="closeSidebar()">Overview & Tools</a>
+                <a href="#ihat" class="block px-4 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition-colors" onclick="closeSidebar()">iHAT Tool</a>
+                <a href="#eligibility" class="block px-4 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition-colors" onclick="closeSidebar()">Eligibility</a>
+                <a href="#tiling" class="block px-4 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition-colors" onclick="closeSidebar()">TC Flow: Tiling</a>
+                <a href="#ofdma" class="block px-4 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition-colors" onclick="closeSidebar()">TC Flow: OFDMA Partial</a>
+                <a href="#matrix" class="block px-4 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition-colors" onclick="closeSidebar()">Drop Amp Matrix</a>
+            </nav>
+            <div class="p-4 border-t border-slate-800 text-xs text-slate-500 text-center">
+                OES Standards &copy; 2026
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 p-6 md:p-10 w-full overflow-x-hidden">
+            <div class="max-w-4xl mx-auto space-y-12 pb-20">
+
+                <!-- 1. Overview & Required Tools -->
+                <section id="overview" class="section-anchor">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-4">Mid-Split Troubleshooting & Remediation</h2>
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-blue-600">
+                        <h3 class="font-bold text-slate-800 mb-2 flex items-center gap-2">
+                            <i class="ph ph-info text-blue-600 text-xl"></i> Overview
+                        </h3>
+                        <p class="text-slate-700 leading-relaxed mb-6">
+                            This document defines the actions and tools needed to properly identify and remediate issues regarding mid-split activation.
+                        </p>
+                        
+                        <h3 class="font-bold text-slate-800 mb-2 flex items-center gap-2">
+                            <i class="ph ph-wrench text-blue-600 text-xl"></i> Required Tools & Hardware
+                        </h3>
+                        <ul class="list-disc pl-5 text-sm text-slate-700">
+                            <li>ABS mid-split compliant Unity Gain Amplifier &mdash; <strong>CIFA number: 306293</strong></li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- 2. iHAT Tool -->
+                <section id="ihat" class="section-anchor">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                        <i class="ph ph-activity text-blue-600"></i> In-Home Assessment Test (iHAT) Tool
+                    </h2>
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                        <p class="text-sm text-slate-700 mb-6">
+                            iHAT is a CONNECT tool developed to help determine whether a premise can support mid-split. When a node is converted to mid-split, iHAT determines which homes can activate spectrum without interruption and which need remediation.
+                        </p>
+                        <div class="overflow-x-auto rounded-lg border border-slate-200">
+                            <table class="w-full text-left text-sm table-stripe">
+                                <thead class="bg-slate-100 text-slate-700 border-b border-slate-200">
+                                    <tr>
+                                        <th class="p-3 font-semibold w-1/3">Identified Issue</th>
+                                        <th class="p-3 font-semibold">Definition / Solution</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100 text-slate-700">
+                                    <tr>
+                                        <td class="p-3 font-bold text-slate-900">OFDMA Ranging Issue / Blocked Carrier</td>
+                                        <td class="p-3">The most likely cause is a drop amplifier blocking the mid-split spectrum, making it unusable by the gateway. Requires a TC to remove or replace with a mid-split drop amplifier.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 font-bold text-slate-900">Video Interference</td>
+                                        <td class="p-3">Interference from an XG device in the home. Caused by low port-to-port isolation in the soft drop system. Requires a TC to ensure the passive drop network meets specs.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 font-bold text-slate-900">No XG Devices</td>
+                                        <td class="p-3">iHAT performs the test but will not be able to provide video interference information.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 font-bold text-slate-900">XB3 / BWG or older model</td>
+                                        <td class="p-3 text-red-600">Customer does not meet the minimum requirements to perform a test.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. Eligibility -->
+                <section id="eligibility" class="section-anchor">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                        <i class="ph ph-check-circle text-blue-600"></i> Eligibility Requirements
+                    </h2>
+                    <div class="bg-green-50 p-6 rounded-xl border border-green-200 shadow-sm text-green-900">
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li>Customers must have a Comcast approved <strong>DOCSIS 3.1 or greater</strong> DOCSIS device able to tune to the mid-split upstream (OFDMA) spectrum (39.4-85 MHz).</li>
+                            <li>To ensure that the home is mid-split compliant, a series of actions and validations must occur to ensure a great customer experience.</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- 4. TC Flow: Tiling -->
+                <section id="tiling" class="section-anchor">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                        <i class="ph ph-television text-blue-600"></i> TC Flow: Tiling
+                    </h2>
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-6">
+                        
+                        <div class="space-y-3">
+                            <h3 class="font-bold text-slate-800 text-lg border-b pb-2">Diagnostic Steps</h3>
+                            <ol class="list-decimal pl-5 text-sm text-slate-700 space-y-2">
+                                <li>Verify the customer's complaint.</li>
+                                <li>Verify the customer is in an enabled mid-split node (Check Plant Info in Tech360).</li>
+                                <li>Verify the customer has a Comcast-approved DOCSIS 3.1+ device.</li>
+                                <li>Verify that tiling is present at a lower channel, <strong>less than 200 MHz</strong>.</li>
+                                <li><strong>Power off the mid-split capable gateway/modem:</strong>
+                                    <ul class="list-disc pl-5 mt-1 text-slate-600">
+                                        <li>If tiling is still present: Not caused by mid-split. Troubleshoot normally.</li>
+                                        <li>If no tiling: Caused by mid-split device. Proceed below.</li>
+                                    </ul>
+                                </li>
+                                <li>Follow M&P for TC resolution. Correct the drop network to meet OES.</li>
+                                <li>Troubleshoot existing PHT failures. If PHT fails for OFDMA, run the OFDMA widget on XM Meter. If failing at the tap, submit an RTM SA.</li>
+                                <li>Once PHT is Pass or Pass w/ Overrides, Mid-split testing becomes available.</li>
+                            </ol>
+                        </div>
+
+                        <div class="space-y-4">
+                            <h3 class="font-bold text-slate-800 text-lg border-b pb-2 mt-6">Remediation Options</h3>
+                            
+                            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                                <h4 class="font-bold text-blue-800 mb-2">Option 1 - Passive Network or Amplifier</h4>
+                                <ul class="list-disc pl-5 text-sm text-slate-700 space-y-2">
+                                    <li><strong>Passive Network:</strong> Lower loss to common splitter (lowers TX power of XB, raises RX power of STB/XG). Remove unused splitters, terminate ports. Increase port-to-port isolation using OES 1.2 GHz splitters. Consider MoCA passives for multiple XGs.</li>
+                                    <li><strong>Amplifier Present:</strong> Determine if needed. If possible, remove and replace with passive splitter/MoCA passive. If an amp is absolutely needed, replace sub-split amp with a <strong>mid-split amplifier</strong>.</li>
+                                </ul>
+                                <p class="text-sm italic text-slate-500 mt-2">If this does not resolve tiling, proceed to Option 2.</p>
+                            </div>
+
+                            <div class="bg-red-50 p-4 rounded-lg border border-red-200">
+                                <h4 class="font-bold text-red-800 mb-2">Option 2 - STB Adjustments & Notch Filters</h4>
+                                <ul class="list-disc pl-5 text-sm text-red-900 space-y-2">
+                                    <li><strong>QAM X1 Customers:</strong> Convert to All IP (if enabled). 4K customers may need XiD temp + GSK for 4K wireless device.</li>
+                                    <li>If unwilling to give up QAM X1 (XG1/XG2), use a <strong>mid-split notch filter</strong> connected directly to the QAM X1 device.</li>
+                                    <li><strong>Multiple QAM X1s:</strong> Replace extras with XiDs, or place a notch filter on each affected XG device.</li>
+                                    <li><strong>Legacy/TiVo:</strong> Place notch filter directly on STB.</li>
+                                    <li class="font-bold">CRITICAL: Do NOT connect to MoCA devices (XiD/Xi3) or to any XB device.</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="bg-amber-50 p-4 rounded-lg border border-amber-200">
+                                <h4 class="font-bold text-amber-900 mb-1">Limit Notch Filters</h4>
+                                <p class="text-sm text-amber-800">Notch filters are a last resort (<1% of customers). Only fixes tiling < 200 MHz, not slow speeds/latency. Use code: <code class="font-mono bg-white px-1 rounded">INST MIDSPLIT FILTER</code>.</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- 5. TC Flow: OFDMA Partial Bonding -->
+                <section id="ofdma" class="section-anchor">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                        <i class="ph ph-warning-octagon text-blue-600"></i> TC Flow: OFDMA Partial Bonding
+                    </h2>
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                        <p class="text-sm text-slate-700 mb-4">Formerly known as "Blocked Carrier".</p>
+                        <ol class="list-decimal pl-5 text-sm text-slate-700 space-y-2 mb-6">
+                            <li>Verify customer's issue.</li>
+                            <li>Verify enabled mid-split node.</li>
+                            <li>Verify DOCSIS 3.1+ device (tunes to 39.4-85 MHz).</li>
+                            <li>Follow M&P for TC resolution.</li>
+                            <li>Verify & correct drop network to OES.</li>
+                            <li>Troubleshoot PHT failures.</li>
+                        </ol>
+
+                        <h3 class="font-bold text-slate-800 text-md border-b pb-2 mb-3">Mitigation Order of Preference</h3>
+                        <div class="space-y-2 text-sm text-slate-700">
+                            <p><strong>Option 1:</strong> Remove the drop amplifier and reconfigure the customer's network using only passive splitters.</p>
+                            <p><strong>Option 2:</strong> Remove the drop amplifier and reconfigure using a MoCA passive splitter (follow OES MoCA specs).</p>
+                            <p><strong>Option 3:</strong> Replace the existing sub-split amplifier with a mid-split amplifier.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 6. Drop Amp Matrix -->
+                <section id="matrix" class="section-anchor">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                        <i class="ph ph-matrix text-blue-600"></i> Drop Amp Matrix
+                    </h2>
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm table-stripe">
+                                <thead class="bg-slate-100 text-slate-700 border-b border-slate-200">
+                                    <tr>
+                                        <th class="p-3 font-semibold w-1/4">Amp Type</th>
+                                        <th class="p-3 font-semibold">Unity Gain Port Limitations</th>
+                                        <th class="p-3 font-semibold">Passive Port Limitations</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100 text-slate-700">
+                                    <tr>
+                                        <td class="p-3 font-bold text-slate-900">Passive ports only (Gen 1)</td>
+                                        <td class="p-3 text-slate-400 italic">N/A</td>
+                                        <td class="p-3">Will not pass MoCA signals between unity gain ports and passive port.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 font-bold text-slate-900">Partial MOCA (Gen 1.5)</td>
+                                        <td class="p-3">Will not pass mid-split upstream (OFDMA) signal to the unity gain ports.</td>
+                                        <td class="p-3">Will pass MoCA signals between select unity gain ports and passive port.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 font-bold text-slate-900">Full MOCA (Gen 2)</td>
+                                        <td class="p-3 text-slate-400 italic">N/A</td>
+                                        <td class="p-3">Will pass MoCA signals between unity gain ports and passive port.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 font-bold text-blue-700">Mid-split amps</td>
+                                        <td class="p-3 font-bold text-green-600">None</td>
+                                        <td class="p-3 font-bold text-green-600">None</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Mobile Menu Script -->
+    <script>
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.getElementById('sidebar');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('-translate-x-full');
+        });
+
+        function closeSidebar() {
+            if(window.innerWidth < 768) {
+                sidebar.classList.add('-translate-x-full');
+            }
+        }
+    </script>
+</body>
+</html>

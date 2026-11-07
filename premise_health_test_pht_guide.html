@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premise Health Test (PHT) Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .table-dark tbody tr:nth-child(even) { background-color: #1f2937; }
+        .table-dark tbody tr:nth-child(odd) { background-color: #111827; }
+        /* Custom scrollbar for dark mode */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1f2937; }
+        ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-300 antialiased">
+
+    <!-- Header -->
+    <header class="bg-gray-950 border-b border-gray-800 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <i class="ph ph-heartbeat text-3xl text-blue-500"></i>
+                    <span class="font-bold text-xl text-white tracking-wide">PHT Resource Hub</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col md:flex-row gap-8">
+        
+        <!-- Sticky Sidebar Navigation -->
+        <aside class="md:w-64 flex-shrink-0">
+            <div class="sticky top-24 bg-gray-800 rounded-xl border border-gray-700 p-4 shadow-lg">
+                <h3 class="text-xs uppercase font-bold tracking-wider text-gray-500 mb-4 px-2">Navigation</h3>
+                <nav class="flex flex-col gap-1 text-sm font-medium">
+                    <a href="#overview" class="px-3 py-2 rounded-lg hover:bg-gray-700 hover:text-white transition-colors">Overview</a>
+                    <a href="#metrics" class="px-3 py-2 rounded-lg hover:bg-gray-700 hover:text-white transition-colors">Metrics & Thresholds</a>
+                    <a href="#us-tx" class="px-3 py-2 rounded-lg hover:bg-gray-700 hover:text-white transition-colors">Actual US TX</a>
+                    <a href="#partial-bonding" class="px-3 py-2 rounded-lg hover:bg-gray-700 hover:text-white transition-colors">Partial Bonding</a>
+                    <a href="#icfr" class="px-3 py-2 rounded-lg hover:bg-gray-700 hover:text-white transition-colors">FLUX ICFR</a>
+                    <a href="#fbc" class="px-3 py-2 rounded-lg hover:bg-gray-700 hover:text-white transition-colors">FBC Impairments</a>
+                    <a href="#moca" class="px-3 py-2 rounded-lg hover:bg-gray-700 hover:text-white transition-colors">MoCA PHY Rates</a>
+                    <a href="#fm-ingress" class="px-3 py-2 rounded-lg hover:bg-gray-700 hover:text-white transition-colors">FM Ingress</a>
+                    <a href="#throttle" class="px-3 py-2 rounded-lg hover:bg-gray-700 hover:text-white transition-colors">PHT Pause</a>
+                    <a href="#devices" class="px-3 py-2 rounded-lg hover:bg-gray-700 hover:text-white transition-colors">Unresponsive Devices</a>
+                    <a href="#analysis" class="px-3 py-2 rounded-lg hover:bg-gray-700 hover:text-white transition-colors">Analysis Types</a>
+                    <a href="#troubleshooting" class="px-3 py-2 rounded-lg hover:bg-gray-700 hover:text-white transition-colors">Troubleshooting</a>
+                    <a href="#overrides" class="px-3 py-2 rounded-lg hover:bg-gray-700 hover:text-white transition-colors">Overrides</a>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="flex-1 space-y-12 pb-20">
+
+            <!-- Overview -->
+            <section id="overview" class="scroll-mt-24">
+                <div class="bg-gray-800 rounded-xl border border-gray-700 p-6 shadow-md">
+                    <h2 class="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+                        <i class="ph ph-info text-blue-500"></i> Overview
+                    </h2>
+                    <p class="mb-4 text-gray-300 leading-relaxed">
+                        PHT (Premise Health Test) is a tool to assist technicians in the diagnosis of any premise. It is an enhancement over the Home Integrity Check (HIC). PHT validates both DOCSIS parameters and video devices (if FBC capable).
+                    </p>
+                    <ul class="list-disc pl-5 space-y-2 text-gray-400">
+                        <li>Full band spectrum visibility for capable chipsets.</li>
+                        <li>Multimedia over Coax Alliance (MoCA) scoring.</li>
+                        <li>In-depth FLUX/ICFR graphs to help locate network impairments in the home.</li>
+                        <li>OFDM and OFDMA measurements.</li>
+                        <li>Integration with National Watchtower (NWT) to identify open tickets or network events.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Metrics & Thresholds -->
+            <section id="metrics" class="scroll-mt-24">
+                <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                    <i class="ph ph-chart-bar text-blue-500"></i> PHT Metrics and Thresholds
+                </h2>
+                <div class="overflow-x-auto rounded-xl border border-gray-700 shadow-md">
+                    <table class="w-full text-left text-sm table-dark">
+                        <thead class="bg-gray-950 text-gray-400 border-b border-gray-700">
+                            <tr>
+                                <th class="p-4 font-semibold">Metric</th>
+                                <th class="p-4 font-semibold">Upper Fail</th>
+                                <th class="p-4 font-semibold">Lower Fail</th>
+                                <th class="p-4 font-semibold">Single Threshold Fail</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-gray-300 divide-y divide-gray-800">
+                            <tr>
+                                <td class="p-4 font-medium text-white">Actual US TX</td>
+                                <td class="p-4">> 54 dBmV</td>
+                                <td class="p-4">< 25 dBmV</td>
+                                <td class="p-4">-</td>
+                            </tr>
+                            <tr>
+                                <td class="p-4 font-medium text-white">US TX vBng EPON</td>
+                                <td class="p-4">> -4.0 dBmV</td>
+                                <td class="p-4">< -28 dBmV</td>
+                                <td class="p-4">-</td>
+                            </tr>
+                            <tr>
+                                <td class="p-4 font-medium text-white">Partial Bonding</td>
+                                <td class="p-4" colspan="3">Reg state <> 4 | DS state <> 1 | OFDMA ranging status <> 4</td>
+                            </tr>
+                            <tr>
+                                <td class="p-4 font-medium text-white">FLUX ICFR</td>
+                                <td class="p-4">-</td>
+                                <td class="p-4">-</td>
+                                <td class="p-4 text-red-400">>= 3 dB ICFR</td>
+                            </tr>
+                            <tr>
+                                <td class="p-4 font-medium text-white">DS RX</td>
+                                <td class="p-4">> 13 dBmV</td>
+                                <td class="p-4">< -13 dBmV</td>
+                                <td class="p-4">-</td>
+                            </tr>
+                            <tr>
+                                <td class="p-4 font-medium text-white">DS RX EPON</td>
+                                <td class="p-4">> -10 dBmV</td>
+                                <td class="p-4">< -28 dBmV</td>
+                                <td class="p-4">See RTM process</td>
+                            </tr>
+                            <tr>
+                                <td class="p-4 font-medium text-white">DS SNR</td>
+                                <td class="p-4">-</td>
+                                <td class="p-4">-</td>
+                                <td class="p-4 text-red-400">< 33 dB</td>
+                            </tr>
+                            <tr>
+                                <td class="p-4 font-medium text-white">MoCA PHY Rate</td>
+                                <td class="p-4">-</td>
+                                <td class="p-4">-</td>
+                                <td class="p-4 text-red-400">< 200 Mbps (Gateway to Client)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Actual US TX & Partial Bonding -->
+            <section class="grid grid-cols-1 md:grid-cols-2 gap-8 scroll-mt-24">
+                <div id="us-tx" class="bg-gray-800 rounded-xl border border-gray-700 p-6 shadow-md scroll-mt-24">
+                    <h3 class="text-xl font-bold text-white mb-3">Actual US TX</h3>
+                    <p class="text-sm text-gray-400 mb-4">
+                        Accounts for Upstream Extended Transmit (UET) capabilities and compression. If a device transmits at max power and still cannot reach the CMTS at the requested input level (generally 0 dBmV), it goes into compression.
+                    </p>
+                    <div class="bg-gray-900 p-4 rounded-lg border border-gray-700 text-sm">
+                        <strong class="text-blue-400 block mb-1">Calculation:</strong>
+                        Actual US TX = Current transmit level + |CMTS RX Level|<br>
+                        <em>Example: 51 dBmV (TX) + |-3.5 dBmV (RX)| = 54.5 dBmV (Fails > 54)</em>
+                    </div>
+                </div>
+
+                <div id="partial-bonding" class="bg-gray-800 rounded-xl border border-gray-700 p-6 shadow-md scroll-mt-24">
+                    <h3 class="text-xl font-bold text-white mb-3">Partial Bonding</h3>
+                    <p class="text-sm text-gray-400 mb-4">
+                        If any US or DS channel becomes impaired, the device stops using it ("partial bonding"), triggering a failure.
+                    </p>
+                    <ul class="text-sm space-y-2 text-gray-400">
+                        <li><strong class="text-white">DOCSIS 3.0:</strong> Registration state of 4 indicates healthy usage. State 1, 2, 3, or 5 = impaired/partial.</li>
+                        <li><strong class="text-white">DOCSIS 3.1:</strong> OFDMA Ranging Status of 4 is required.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- FLUX ICFR -->
+            <section id="icfr" class="scroll-mt-24">
+                <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                    <i class="ph ph-wave-sine text-blue-500"></i> FLUX ICFR Indicators (>= 3 dB)
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="bg-gray-800 p-5 rounded-xl border border-gray-700 hover:border-red-500 transition-colors">
+                        <h4 class="font-bold text-red-400 mb-2">OUTLET (Fail)</h4>
+                        <p class="text-sm text-gray-400">Fault isolated to a specific outlet feeding the device. The fault is unique to this outlet.</p>
+                    </div>
+                    <div class="bg-gray-800 p-5 rounded-xl border border-gray-700 hover:border-red-500 transition-colors">
+                        <h4 class="font-bold text-red-400 mb-2">HOME (Fail)</h4>
+                        <p class="text-sm text-gray-400">Fault isolated to a common point in the home feeding multiple (but not all) devices.</p>
+                    </div>
+                    <div class="bg-gray-800 p-5 rounded-xl border border-gray-700 hover:border-red-500 transition-colors">
+                        <h4 class="font-bold text-red-400 mb-2">DROP (Fail)</h4>
+                        <p class="text-sm text-gray-400">Fault isolated to a common point feeding all devices. Neighbors checked clean.</p>
+                    </div>
+                    <div class="bg-gray-800 p-5 rounded-xl border border-gray-700 hover:border-red-500 transition-colors">
+                        <h4 class="font-bold text-red-400 mb-2">SOLO (Fail)</h4>
+                        <p class="text-sm text-gray-400">Cannot isolate to specific location or drop. Neighbors checked clean (not a network issue).</p>
+                    </div>
+                    <div class="bg-gray-800 p-5 rounded-xl border border-green-700 bg-opacity-50 sm:col-span-2 hover:border-green-500 transition-colors">
+                        <h4 class="font-bold text-green-400 mb-2">NETWORK (Pass w/ Override)</h4>
+                        <p class="text-sm text-gray-300">Fault isolated to the network. At least 2 of 10 neighboring accounts have a matching ICFR signature. No RTM required unless other signal thresholds fail.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FBC & MoCA & FM Ingress -->
+            <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 scroll-mt-24">
+                <div id="fbc" class="bg-gray-800 rounded-xl border border-gray-700 p-6 scroll-mt-24">
+                    <h3 class="text-lg font-bold text-white mb-2">FBC Impairments</h3>
+                    <p class="text-sm text-gray-400 mb-3">Full Band Capture identifies frequency-specific issues in the DS spectrum.</p>
+                    <div class="p-3 bg-gray-900 border border-gray-700 rounded text-sm text-gray-300">
+                        <strong class="text-yellow-500">Suckout:</strong> A sharp dip in the spectrum graph. Any impairment other than Adjacent Channel Power will fail PHT unless overridden by NWT.
+                    </div>
+                </div>
+
+                <div id="moca" class="bg-gray-800 rounded-xl border border-gray-700 p-6 scroll-mt-24">
+                    <h3 class="text-lg font-bold text-white mb-2">MoCA PHY Rates</h3>
+                    <p class="text-sm text-gray-400 mb-3">Actual physical layer bit rate between nodes.</p>
+                    <ul class="text-sm text-gray-300 space-y-2">
+                        <li><strong class="text-red-400">Fail:</strong> &lt; 200 Mbps (Gateway to Client).</li>
+                        <li><strong class="text-yellow-500">Segmented:</strong> Missing expected devices.</li>
+                        <li><strong class="text-red-400">Bridged:</strong> Devices from different accounts communicating (requires POE filter).</li>
+                    </ul>
+                </div>
+
+                <div id="fm-ingress" class="bg-gray-800 rounded-xl border border-gray-700 p-6 scroll-mt-24">
+                    <h3 class="text-lg font-bold text-white mb-2">FM Ingress</h3>
+                    <p class="text-sm text-gray-400 mb-3">Checks for noise spikes in the 88-108MHz band (requires 5+ spikes).</p>
+                    <ul class="text-sm text-gray-300 space-y-2">
+                        <li><strong class="text-green-400">Moderate (Pass):</strong> Spikes &gt;= 10dB above average amplitude.</li>
+                        <li><strong class="text-red-400">Severe (Fail):</strong> Any spike &gt;= 15dB above average amplitude.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Device States & PHT Throttle -->
+            <section class="grid grid-cols-1 md:grid-cols-2 gap-8 scroll-mt-24">
+                <div id="throttle" class="bg-gray-800 rounded-xl border border-gray-700 p-6 shadow-md scroll-mt-24">
+                    <h3 class="text-xl font-bold text-white mb-3 flex items-center gap-2"><i class="ph ph-hourglass-high text-blue-500"></i> PHT Pause (Throttling)</h3>
+                    <p class="text-sm text-gray-400">
+                        PHT throttles tests to prevent unresponsive responses from polling too rapidly. 
+                        <strong>Limit: 1 test every 90 seconds per account.</strong>
+                    </p>
+                    <p class="text-sm text-gray-400 mt-2">
+                        You will receive a Buzz alert if paused. If remaining time is &lt; 3 seconds, a retry is allowed without an alert.
+                    </p>
+                </div>
+                
+                <div id="devices" class="bg-gray-800 rounded-xl border border-gray-700 p-6 shadow-md scroll-mt-24">
+                    <h3 class="text-xl font-bold text-white mb-3 flex items-center gap-2"><i class="ph ph-warning-circle text-yellow-500"></i> Device States</h3>
+                    <ul class="text-sm text-gray-400 space-y-3">
+                        <li><strong class="text-white">Unresponsive Device:</strong> Expected to be online, offline for <strong>&lt; 24 hours</strong>. Verify power and billing match.</li>
+                        <li><strong class="text-white">Unrecognizable Device:</strong> Active in billing but offline for <strong>&gt; 24 hours</strong>. Verify if it's still in the home. Move to disabled status if unused.</li>
+                        <li><strong class="text-white">Incomplete D3P Data:</strong> Missing data due to poor cell connectivity. Re-run test.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Analysis Types -->
+            <section id="analysis" class="scroll-mt-24">
+                <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                    <i class="ph ph-magnifying-glass text-blue-500"></i> Analysis Types
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-gray-800 p-4 border border-gray-700 rounded-lg">
+                        <strong class="text-blue-400 block mb-1">Filter</strong>
+                        <span class="text-sm text-gray-400">Possible noise filter blocking an upstream. Check tap and ensure home is ingress-free before removing.</span>
+                    </div>
+                    <div class="bg-gray-800 p-4 border border-gray-700 rounded-lg">
+                        <strong class="text-blue-400 block mb-1">Outage</strong>
+                        <span class="text-sm text-gray-400">All DOCSIS devices unresponsive AND a matching NWT outage event is in progress.</span>
+                    </div>
+                    <div class="bg-gray-800 p-4 border border-gray-700 rounded-lg">
+                        <strong class="text-blue-400 block mb-1">POE Filter</strong>
+                        <span class="text-sm text-gray-400">Foreign devices communicating on the MoCA network. Likely a missing or improperly placed POE filter.</span>
+                    </div>
+                    <div class="bg-gray-800 p-4 border border-gray-700 rounded-lg">
+                        <strong class="text-blue-400 block mb-1">SNR Delta</strong>
+                        <span class="text-sm text-gray-400">CM US SNR is > 5 dB lower than the port level US SNR, indicating a device or in-home issue.</span>
+                    </div>
+                    <div class="bg-gray-800 p-4 border border-gray-700 rounded-lg">
+                        <strong class="text-blue-400 block mb-1">True Node</strong>
+                        <span class="text-sm text-gray-400">CMTS/US interfaces used by devices do not match billing/NCP listings. Indicates a billing error.</span>
+                    </div>
+                    <div class="bg-gray-800 p-4 border border-gray-700 rounded-lg">
+                        <strong class="text-blue-400 block mb-1">ALL OUT</strong>
+                        <span class="text-sm text-gray-400">2 or more devices all unresponsive/offline, with NO matching NWT outage event. Check main signal feed.</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Troubleshooting & Overrides -->
+            <section id="troubleshooting" class="scroll-mt-24">
+                <div class="bg-gray-800 rounded-xl border border-gray-700 p-6 shadow-md">
+                    <h2 class="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+                        <i class="ph ph-wrench text-blue-500"></i> Troubleshooting & Overrides
+                    </h2>
+                    
+                    <div class="mb-6">
+                        <h3 class="text-lg font-bold text-white mb-2">General RTM Submission Guidelines</h3>
+                        <p class="text-sm text-gray-400 mb-4">
+                            Before submitting a Refer To Maintenance (RTM) ticket, ensure testing is done directly at the customer's tap to prove the issue originates from the network and not the premise wiring.
+                        </p>
+                        <ul class="list-disc pl-5 text-sm text-gray-400 space-y-1">
+                            <li><strong class="text-white">Actual US TX:</strong> Verify levels fail at the tap.</li>
+                            <li><strong class="text-white">Partial Bonding:</strong> Lock meter in DOCSIS 3.0/3.1 directly at tap; must fail bonding at the tap to RTM.</li>
+                            <li><strong class="text-white">FLUX ICFR:</strong> Run a test lead directly from tap to device. If ICFR fails directly from the tap, submit RTM.</li>
+                            <li><strong class="text-white">MoCA:</strong> You CANNOT enter a network maintenance RTM for MoCA failures.</li>
+                        </ul>
+                    </div>
+
+                    <div id="overrides" class="bg-gray-900 border border-gray-700 rounded-lg p-5 scroll-mt-24">
+                        <h3 class="text-lg font-bold text-green-400 mb-2">Pass w/ Override Conditions</h3>
+                        <p class="text-sm text-gray-400 mb-3">
+                            If an account fails PHT, it can be overridden if it is listed as an affected account in an ongoing NWT (National Watchtower) event that matches the exact failure reason.
+                        </p>
+                        <table class="w-full text-left text-sm text-gray-400 border-collapse">
+                            <tbody>
+                                <tr class="border-b border-gray-800">
+                                    <td class="py-2 pr-4 font-semibold text-white">US TX / DS SNR / DS RX</td>
+                                    <td class="py-2">Overridden if NWT event matches failure type (e.g. Node-wide DS SNR issue).</td>
+                                </tr>
+                                <tr class="border-b border-gray-800">
+                                    <td class="py-2 pr-4 font-semibold text-white">Spectra Suckout / Wave</td>
+                                    <td class="py-2">Overridden if known HFC network event is active in NWT.</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2 pr-4 font-semibold text-white">US SNR</td>
+                                    <td class="py-2 text-red-400">Does <strong>NOT</strong> trigger a Pass w/ Override condition. Work with local maintenance team.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <footer class="bg-gray-950 border-t border-gray-800 py-8 text-center">
+        <p class="text-gray-500 text-sm">TechOps Internal Resource Hub &copy; 2026. For official use only.</p>
+    </footer>
+
+</body>
+</html>

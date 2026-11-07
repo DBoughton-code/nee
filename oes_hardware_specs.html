@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OES - Cables, Connectors & Hardware</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased flex flex-col min-h-screen">
+
+    <!-- Mobile Header -->
+    <header class="md:hidden bg-slate-900 text-white p-4 sticky top-0 z-50 shadow-md flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <i class="ph ph-plug text-2xl text-blue-400"></i>
+            <span class="font-bold text-lg">Hardware Specs</span>
+        </div>
+        <button id="mobile-menu-btn" class="text-slate-300 hover:text-white focus:outline-none">
+            <i class="ph ph-list text-3xl"></i>
+        </button>
+    </header>
+
+    <div class="flex flex-1 relative">
+        
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 z-40 w-64 bg-slate-900 text-slate-300 transition-transform duration-300 ease-in-out border-r border-slate-800 flex flex-col h-screen md:sticky md:top-0">
+            <div class="p-6 hidden md:flex items-center gap-3 border-b border-slate-800">
+                <i class="ph ph-plug text-3xl text-blue-400"></i>
+                <h1 class="text-lg font-bold text-white tracking-wide leading-tight">OES Standards<br><span class="text-xs text-slate-400 font-normal">Cables & Hardware</span></h1>
+            </div>
+            <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-2 text-sm font-medium">
+                <a href="#general" class="block px-4 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition-colors" onclick="closeSidebar()">General Products</a>
+                <a href="#bandwidth" class="block px-4 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition-colors" onclick="closeSidebar()">Bandwidth Ranges</a>
+                <a href="#cables" class="block px-4 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition-colors" onclick="closeSidebar()">Cable Specifications</a>
+                <a href="#connectors" class="block px-4 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition-colors" onclick="closeSidebar()">Connectors</a>
+                <a href="#prep-tools" class="block px-4 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition-colors" onclick="closeSidebar()">Prep Tools</a>
+                <a href="#hardware" class="block px-4 py-2.5 rounded-lg hover:bg-slate-800 hover:text-white transition-colors" onclick="closeSidebar()">Hardware / Components</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 p-6 md:p-10 w-full overflow-x-hidden">
+            <div class="max-w-5xl mx-auto space-y-12 pb-20">
+
+                <!-- 1. General Products -->
+                <section id="general" class="scroll-mt-24">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-4">General Products and Supplies</h2>
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-blue-600">
+                        <ul class="list-disc pl-5 text-slate-700 space-y-2">
+                            <li>Only products approved by Comcast Corporate Engineering shall be used in the RF, Category/twisted pair, and/or optical wiring system.</li>
+                            <li>All optical passive and active devices must meet Comcast NGAN Corporate Engineering guidelines.</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- 2. Bandwidth Frequency Ranges -->
+                <section id="bandwidth" class="scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                        <i class="ph ph-wave-sine text-blue-600"></i> Bandwidth Frequency Ranges
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                            <h3 class="font-bold text-lg text-slate-800 mb-3 border-b pb-2">RF Bandwidth</h3>
+                            <ul class="space-y-3 text-sm text-slate-700">
+                                <li><strong>54 MHz to 1.2 GHz (Sub-split):</strong> Minimum return RF bandwidth of 5-42 MHz. Must accommodate MoCA up to 1.2 GHz.</li>
+                                <li><strong>85 MHz to 1.2 GHz (Mid-split):</strong> Minimum forward RF 85 MHz-1.2 GHz. Minimum return 5-85 MHz. Must accommodate MoCA up to 1.2 GHz.</li>
+                                <li><strong>108 MHz to 684 MHz (FDX):</strong> Forward RF 108 MHz-1.2 GHz. Full duplex bandwidth 108-684 MHz. Return path 5-85 MHz.</li>
+                            </ul>
+                        </div>
+                        <div class="space-y-6">
+                            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                                <h3 class="font-bold text-lg text-slate-800 mb-3 border-b pb-2">Ethernet Bandwidth</h3>
+                                <ul class="list-disc pl-5 text-sm text-slate-700 space-y-1">
+                                    <li><strong>Cat5e:</strong> Minimum 1 MHz to 100 MHz.</li>
+                                    <li><strong>Cat6:</strong> 1 MHz to 550 MHz.</li>
+                                </ul>
+                            </div>
+                            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                                <h3 class="font-bold text-lg text-slate-800 mb-3 border-b pb-2">Optical Bandwidth</h3>
+                                <ul class="list-disc pl-5 text-sm text-slate-700 space-y-1">
+                                    <li>Drop fiber must pass all required optical wavelengths (CWDM/DWDM).</li>
+                                    <li><strong>Single mode fiber:</strong> Used for the drop. Wavelengths passed: 1260 nm to 1625 nm.</li>
+                                    <li>Optical wavelength filtering used in RFoG and EPON networks.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. Cable Type and Specifications -->
+                <section id="cables" class="scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                        <i class="ph ph-share-network text-blue-600"></i> Cable Type & Specifications
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+                        <div class="bg-slate-50 p-5 rounded-lg border border-slate-200">
+                            <h4 class="font-bold text-slate-800 mb-2">RF Cables</h4>
+                            <p class="text-sm text-slate-600 mb-2">Must meet ANSI/SCTE 74 2011.</p>
+                            <p class="text-sm text-slate-600">Minimum size of <strong>Series 6</strong> with foil-braid-foil, tri-shield configuration (bonded inner foil, outer foil bonded to jacket, at least 77% braid coverage).</p>
+                        </div>
+                        <div class="bg-slate-50 p-5 rounded-lg border border-slate-200">
+                            <h4 class="font-bold text-slate-800 mb-2">Unshielded Network (UTP)</h4>
+                            <p class="text-sm text-slate-600 mb-2">Must meet ANSI/TIA/EIA-568-B.</p>
+                            <p class="text-sm text-slate-600">All new installations must be a minimum of <strong>Category 6 (Cat6)</strong>.</p>
+                        </div>
+                        <div class="bg-slate-50 p-5 rounded-lg border border-slate-200">
+                            <h4 class="font-bold text-slate-800 mb-2">Shielded Network (STP)</h4>
+                            <p class="text-sm text-slate-600 mb-2">Used in high ingress potential environments / OSP.</p>
+                            <p class="text-sm text-slate-600">Minimum <strong>Category 6</strong>. Must meet ANSI/TIA/EIA-568-B, B2, B3.</p>
+                        </div>
+                        <div class="bg-slate-50 p-5 rounded-lg border border-slate-200">
+                            <h4 class="font-bold text-slate-800 mb-2">Fiber Optic Cable</h4>
+                            <p class="text-sm text-slate-600 mb-2">Must meet ANSI/ICEA S-110-717-2013.</p>
+                            <p class="text-sm text-slate-600">Must be pushable, flat, or round depending on drop. Must have a CIFA number.</p>
+                        </div>
+                        <div class="bg-slate-50 p-5 rounded-lg border border-slate-200 md:col-span-2">
+                            <h4 class="font-bold text-slate-800 mb-2">Plenum & Riser Cables</h4>
+                            <p class="text-sm text-slate-600">Must meet fire safety test standards in accordance with NFPA 262 and outlined in NFPA 90A.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. Connectors & Specs -->
+                <section id="connectors" class="scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                        <i class="ph ph-plugs text-blue-600"></i> Connectors & Weatherproofing
+                    </h2>
+                    
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-8">
+                        <div>
+                            <h3 class="font-bold text-lg text-slate-800 mb-3 border-b pb-2">F Connectors</h3>
+                            <ul class="list-disc pl-5 text-sm text-slate-700 space-y-2">
+                                <li>Prep drop cable to <strong>1/4" x 1/4"</strong> dimensions for Series 6.</li>
+                                <li>Must meet SCTE 123 2011 or SCTE 124 2021 specifications.</li>
+                                <li>Must be <strong>compression-type</strong> with 360-degree retention of the cable.</li>
+                                <li>All new outdoor F connectors must have a thread protector attached or pre-installed.</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h3 class="font-bold text-lg text-slate-800 mb-3 border-b pb-2">Tightening Specifications</h3>
+                                <ul class="list-disc pl-5 text-sm text-slate-700 space-y-2">
+                                    <li>Drop system components (splitters, traps, terminators, wall plates) tightened to <strong>30 inch-pounds</strong> using a torque-limiting wrench.</li>
+                                    <li>F connectors on <strong>CPE</strong> tightened not to exceed <strong>10 inch-pounds</strong> (except when using certified prepackaged quick-tight jumpers).</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg text-slate-800 mb-3 border-b pb-2">Weatherproofing</h3>
+                                <ul class="list-disc pl-5 text-sm text-slate-700 space-y-2">
+                                    <li>Protect outdoor interfaces to prevent moisture contamination.</li>
+                                    <li><strong class="text-red-600">Never</strong> use silicone compounds or heat-shrinkable tubing on drop cable/F connectors.</li>
+                                    <li>Thread protectors must not be used on indoor connectors or CPE.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="font-bold text-lg text-slate-800 mb-3 border-b pb-2">Fiber Optic Connectors</h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-3">
+                                <div class="p-4 bg-green-50 border border-green-200 rounded-lg">
+                                    <h4 class="font-bold text-green-800 mb-1">SC/APC & LC/APC (Green)</h4>
+                                    <p class="text-sm text-green-900">8-degree angle polish. Used for analog optical solutions (RFoG) requiring high Optical Return Loss (ORL). LC/APC used in MetroE.</p>
+                                </div>
+                                <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                                    <h4 class="font-bold text-blue-800 mb-1">SC/UPC (Blue)</h4>
+                                    <p class="text-sm text-blue-900">Polished flat end face across the core. Digital applications work well using UPC. Used in EPON installations.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 5. Prep Tools -->
+                <section id="prep-tools" class="scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                        <i class="ph ph-wrench text-blue-600"></i> Connector Prep Tools
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                            <h4 class="font-bold text-slate-800 mb-2">RF Cable Tools</h4>
+                            <ul class="list-disc pl-5 text-sm text-slate-600 space-y-1">
+                                <li>Fixed blade prep tool (no field adjustments).</li>
+                                <li>Replace cutting blades <strong>monthly</strong>.</li>
+                                <li>Must have a notch to prevent nicking the center conductor.</li>
+                                <li>Compression tools must match connector style and be inspected monthly.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                            <h4 class="font-bold text-slate-800 mb-2">Network Tools</h4>
+                            <ul class="list-disc pl-5 text-sm text-slate-600 space-y-1">
+                                <li>Must meet ANSI/TIA-568 specs for cable and connector type.</li>
+                                <li>Feed-through connectors are permitted.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                            <h4 class="font-bold text-slate-800 mb-2">Optical Fiber</h4>
+                            <ul class="list-disc pl-5 text-sm text-slate-600 space-y-1">
+                                <li>Splicing/connectorization performed by <strong>qualified personnel</strong> only.</li>
+                                <li>RFoG and Metro E must be fusion spliced.</li>
+                                <li>EPON can be fusion, mechanical, or field installable.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 6. Hardware for Making Connections -->
+                <section id="hardware" class="scroll-mt-24">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                        <i class="ph ph-hard-drives text-blue-600"></i> Hardware for Connections
+                    </h2>
+                    
+                    <div class="space-y-6">
+                        <!-- Filters & Terminators -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                                <h3 class="font-bold text-lg text-slate-800 mb-3 border-b pb-2">Filters</h3>
+                                <ul class="list-disc pl-5 text-sm text-slate-700 space-y-1">
+                                    <li>Must be weatherproofed with correct size thread protection on both ends.</li>
+                                    <li>If no pre-installed protector exists, use a separate one for the 0.500" port length.</li>
+                                    <li>In aerial installations with jumpers, filters must be attached to the strand or hanger bracket (no strain on drop, maintain bend radius).</li>
+                                </ul>
+                            </div>
+                            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                                <h3 class="font-bold text-lg text-slate-800 mb-3 border-b pb-2">RF Port Termination</h3>
+                                <ul class="list-disc pl-5 text-sm text-slate-700 space-y-1">
+                                    <li>All unused ports must be terminated using <strong>75-ohm resistors</strong>.</li>
+                                    <li>Terminators on tap ports shall have a nonconductive port saver + thread protection.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Barrels & Bond Blocks -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                                <h3 class="font-bold text-lg text-slate-800 mb-3 border-b pb-2">Barrel Connectors (F-81)</h3>
+                                <ul class="list-disc pl-5 text-sm text-slate-700 space-y-1">
+                                    <li><strong>Outdoor:</strong> Must meet ANSI/SCTE 01 2015. Requires non-threaded area at base for weatherproofing.</li>
+                                    <li><strong>Indoor:</strong> Must meet ANSI/SCTE 02 2015. Threads all the way to base for panel nuts. <strong class="text-red-600">Never use outdoors.</strong></li>
+                                </ul>
+                            </div>
+                            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                                <h3 class="font-bold text-lg text-slate-800 mb-3 border-b pb-2">Bond Blocks</h3>
+                                <ul class="list-disc pl-5 text-sm text-slate-700 space-y-1">
+                                    <li>Must meet ANSI/SCTE 129 2017.</li>
+                                    <li>Must accommodate wire sizes from <strong>#10 AWG to #12 AWG</strong>.</li>
+                                    <li>Installation of MoCA ground block or PoE filter is mandatory (except FDX customers).</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Fasteners & Clamps -->
+                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                            <h3 class="font-bold text-lg text-slate-800 mb-3 border-b pb-2">Drop Clamps & Fasteners</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-3">
+                                <div>
+                                    <ul class="list-disc pl-5 text-sm text-slate-700 space-y-1">
+                                        <li>Drop clamps use only the messenger wire to support the drop (must not crush/deform coax).</li>
+                                        <li>Install clamps where tension is introduced (Tap, premise). Mid-span is optional.</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <ul class="list-disc pl-5 text-sm text-slate-700 space-y-1">
+                                        <li><strong class="text-red-600">No metal staples</strong> on coaxial cables.</li>
+                                        <li>Clip guns must use a half-round plastic insert.</li>
+                                        <li>Plastic fasteners must be UV and ozone stable.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Active/Passive Hardware -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                                <h3 class="font-bold text-lg text-slate-800 mb-3 border-b pb-2">Splitters, Couplers & Amps</h3>
+                                <ul class="list-disc pl-5 text-sm text-slate-700 space-y-1">
+                                    <li>Passive devices must meet ANSI/SCTE 153 2016. Drop amps meet ANSI/SCTE 161 2016.</li>
+                                    <li>All RF splitters and amplifiers must be <strong>MoCA compliant</strong>.</li>
+                                    <li>Amplification on the forward path must provide unity gain.</li>
+                                    <li>Optical couplers/splitters are not to be used after the demarcation enclosure.</li>
+                                </ul>
+                            </div>
+                            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                                <h3 class="font-bold text-lg text-slate-800 mb-3 border-b pb-2">Wall Plates & Jacks</h3>
+                                <ul class="list-disc pl-5 text-sm text-slate-700 space-y-1">
+                                    <li><strong>Coaxial:</strong> Must have a 7/16-inch hex recess to hold the F-81 and prevent turning.</li>
+                                    <li><strong>Network:</strong> Must meet ANSI/TIA-568 specs.</li>
+                                    <li><strong>Optical:</strong> Must use an SC type bulkhead adapter with an auto-shutter/angled port to restrict laser light exposure.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+                
+            </div>
+        </main>
+    </div>
+
+    <!-- Mobile Menu Script -->
+    <script>
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.getElementById('sidebar');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('-translate-x-full');
+        });
+
+        function closeSidebar() {
+            if(window.innerWidth < 768) {
+                sidebar.classList.add('-translate-x-full');
+            }
+        }
+    </script>
+</body>
+</html>
