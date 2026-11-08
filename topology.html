@@ -907,11 +907,11 @@
             <span>Tap US Tx (Upstream Return)</span>
             <span class="slider-val" style="color: var(--amber);"><span id="tapTxVal">38.0</span> dBmV</span>
           </div>
-          <input type="range" id="tapTx" min="20.0" max="50.0" step="0.5" value="38.0" style="accent-color: var(--amber);" oninput="handleTapTx(this.value)">
+          <input type="range" id="tapTx" min="20.0" max="54.0" step="0.5" value="38.0" style="accent-color: var(--amber);" oninput="handleTapTx(this.value)">
           <div class="slider-header" style="font-size: 0.65rem; color: var(--text-sub);">
             <span>20.0 dBmV</span>
             <span>Target: ~38-40</span>
-            <span>50.0 dBmV</span>
+            <span>54.0 dBmV</span>
           </div>
         </div>
 
@@ -1162,7 +1162,7 @@
       insideLen: 50
     };
 
-    // Master Catalog of Strictly Passive Splitters (With Updated Wide Ground Block Matrices)
+    // Master Catalog of Strictly Passive Splitters
     const catalog = {
       barrel: {
         id: 'barrel',
@@ -1365,7 +1365,7 @@
       calculate();
     }
 
-    // Calculation Engine - Updated with WIDENED PASS (-10 to +10 Rx / 36 to 50 Tx)
+    // Calculation Engine - Thresholds: Hard Fail at +/-15 Rx and 54 Tx
     function calculate() {
       const dropTypeSelect = document.getElementById('dropType');
       if (dropTypeSelect) {
@@ -1405,7 +1405,7 @@
       const gbRx = Number((state.tapDs - dropLossDs).toFixed(1));
       const gbTx = Number((state.tapTx + dropLossUs).toFixed(1));
 
-      // Scoring Function - WIDENED PASS
+      // Scoring Function - Evaluated with Rx Hard Fail +/-15 & Tx 54
       function scoreItem(item) {
         const mRx = state.modemCount === 1 
           ? Number((state.tapDs - dropLossDs - item.lossDs - insideLossDs).toFixed(1)) 
@@ -1422,14 +1422,12 @@
         let penalty = 0;
         
         if (state.modemCount === 1 && mRx !== null) {
-          // Ideal target 0.0 dBmV
           penalty += Math.abs(mRx - 0.0) * 1.5;
           
-          // Tx penalties with new wider envelope
-          if (mTx > 50.0) penalty += (mTx - 50.0) * 40; // marginal border
-          if (mTx > 52.0) penalty += 600; // hard fail
-          if (mTx < 36.0) penalty += (36.0 - mTx) * 15; // low marginal
-          if (mTx < 34.0) penalty += 400; // low hard fail
+          if (mTx > 50.0) penalty += (mTx - 50.0) * 30; // marginal border
+          if (mTx >= 54.0) penalty += 750; // HARD FAIL at 54 dBmV
+          if (mTx < 36.0) penalty += (36.0 - mTx) * 15;
+          if (mTx < 34.0) penalty += 500;
         } else if (sRx !== null) {
           penalty += Math.abs(sRx - 0.0) * 1.5;
         }
@@ -1444,8 +1442,9 @@
           penalty += excessPorts * 5;
         }
 
-        // STB Rx bounds (-10 to +10)
-        if (sRx !== null && (sRx < -10.0 || sRx > 10.0)) penalty += 75;
+        // Rx Hard Fail at +/-15
+        if (mRx !== null && (mRx <= -15.0 || mRx >= 15.0)) penalty += 750;
+        if (sRx !== null && (sRx <= -15.0 || sRx >= 15.0)) penalty += 750;
         if (item.isCascade) penalty += 400;
 
         return { ...item, mRx, mTx, sRx, penalty, portShortfall, excessPorts };
@@ -1545,18 +1544,18 @@
         }
       }
 
-      // Populate Delivered Device Telemetry Cards (WIDENED PASS)
+      // Populate Delivered Device Telemetry Cards (Hard Fail: Rx <= -15 or >= 15; Tx >= 54)
       const rxEl = document.getElementById('valModemRx');
       const rxSub = document.getElementById('subModemRx');
       if (rxEl && rxSub) {
         if (state.modemCount === 1 && active.mRx !== null) {
           rxEl.textContent = `${active.mRx > 0 ? '+' : ''}${active.mRx.toFixed(1)} dBmV`;
-          if (active.mRx < -12.0 || active.mRx > 12.0) {
+          if (active.mRx <= -15.0 || active.mRx >= 15.0) {
             rxEl.className = 't-val val-fail';
-            rxSub.textContent = 'HARD FAIL (< -12 or > +12)';
+            rxSub.textContent = 'HARD FAIL (≤ -15 or ≥ +15)';
           } else if (active.mRx < -10.0 || active.mRx > 10.0) {
             rxEl.className = 't-val val-warn';
-            rxSub.textContent = 'MARGINAL (-12 to -10 / +10 to +12)';
+            rxSub.textContent = 'MARGINAL (-15 to -10 / +10 to +15)';
           } else {
             rxEl.className = 't-val val-safe';
             rxSub.textContent = 'Target: 0.0 (-10.0 to +10.0)';
@@ -1573,12 +1572,12 @@
       if (txEl && txSub) {
         if (state.modemCount === 1 && active.mTx !== null) {
           txEl.textContent = `${active.mTx.toFixed(1)} dBmV`;
-          if (active.mTx < 34.0 || active.mTx > 52.0) {
+          if (active.mTx < 34.0 || active.mTx >= 54.0) {
             txEl.className = 't-val val-fail';
-            txSub.textContent = 'HARD FAIL (< 34 or > 52)';
+            txSub.textContent = 'HARD FAIL (< 34 or ≥ 54)';
           } else if (active.mTx < 36.0 || active.mTx > 50.0) {
             txEl.className = 't-val val-warn';
-            txSub.textContent = 'MARGINAL (34-36 / 50-52)';
+            txSub.textContent = 'MARGINAL (34-36 / 50-54)';
           } else {
             txEl.className = 't-val val-ideal';
             txSub.textContent = 'Safe: 36.0 to 50.0';
@@ -1595,12 +1594,12 @@
       if (stbEl && stbSub) {
         if (active.sRx !== null) {
           stbEl.textContent = `${active.sRx > 0 ? '+' : ''}${active.sRx.toFixed(1)} dBmV`;
-          if (active.sRx < -12.0 || active.sRx > 12.0) {
+          if (active.sRx <= -15.0 || active.sRx >= 15.0) {
             stbEl.className = 't-val val-fail';
-            stbSub.textContent = 'HARD FAIL (< -12 or > +12)';
+            stbSub.textContent = 'HARD FAIL (≤ -15 or ≥ +15)';
           } else if (active.sRx < -10.0 || active.sRx > 10.0) {
             stbEl.className = 't-val val-warn';
-            stbSub.textContent = 'MARGINAL (Safe: -10 to +10)';
+            stbSub.textContent = 'MARGINAL (-15 to -10 / +10 to +15)';
           } else {
             stbEl.className = 't-val val-safe';
             stbSub.textContent = 'Safe: -10.0 to +10.0';
@@ -1612,9 +1611,9 @@
         }
       }
 
-      // Overall PHT Status (WIDENED PASS TOLERANCE)
-      const modemHardFail = state.modemCount === 1 && (active.mRx < -12.0 || active.mRx > 12.0 || active.mTx < 34.0 || active.mTx > 52.0);
-      const stbHardFail = active.sRx !== null && (active.sRx < -12.0 || active.sRx > 12.0);
+      // Overall PHT Status
+      const modemHardFail = state.modemCount === 1 && (active.mRx <= -15.0 || active.mRx >= 15.0 || active.mTx < 34.0 || active.mTx >= 54.0);
+      const stbHardFail = active.sRx !== null && (active.sRx <= -15.0 || active.sRx >= 15.0);
       const hasHardFail = modemHardFail || stbHardFail || active.portShortfall > 0;
 
       const modemMarginal = state.modemCount === 1 && (active.mRx < -10.0 || active.mRx > 10.0 || active.mTx < 36.0 || active.mTx > 50.0);
@@ -1658,7 +1657,7 @@
         if (heroBanner) heroBanner.style.borderColor = 'var(--cyan)';
       }
 
-      // Populate Evaluated List (WIDENED PASS)
+      // Populate Evaluated List
       const topList = document.getElementById('topologiesList');
       if (topList) {
         topList.innerHTML = '';
@@ -1704,7 +1703,7 @@
               </span>
               ${displayTx !== null ? `
                 <span style="color:var(--text-sub)">|</span>
-                <span style="color:${displayTx >= 36 && displayTx <= 50 ? 'var(--emerald)' : 'var(--rose)'}">
+                <span style="color:${displayTx >= 36 && displayTx <= 50 ? 'var(--emerald)' : (displayTx >= 54 ? 'var(--rose)' : 'var(--amber)')}">
                   ${displayTx.toFixed(1)} Tx
                 </span>
               ` : ''}
@@ -1715,14 +1714,14 @@
       }
     }
 
-    // Modal Content Generator (Updated Specifications)
+    // Modal Content Generator (Exact Threshold Explanations)
     function openModal(topic) {
       const cat = document.getElementById('modalCat');
       const title = document.getElementById('modalTitle');
       const body = document.getElementById('modalBody');
 
       if (topic === 'gb') {
-        cat.textContent = 'CHEAT SHEET &bull; GROUND BLOCK MATRIX';
+        cat.textContent = 'CHEAT SHEET • GROUND BLOCK MATRIX';
         title.textContent = 'Expected Ground Block Reference';
         body.innerHTML = `
           <p>The <strong>Ground Block</strong> is measured at the demarcation point directly after the drop cable, <em>before</em> the demarc splitter. It verifies that incoming signal levels can properly feed the home wiring.</p>
@@ -1784,40 +1783,40 @@
           <p><strong>Field Tip:</strong> If your Ground Block Rx is lower than the Safe Min, your modem Rx will fall below -10.0 dBmV once it passes through the splitter and inside cable run.</p>
         `;
       } else if (topic === 'rx') {
-        cat.textContent = 'PHT SPECIFICATION &bull; DOWNSTREAM RF';
+        cat.textContent = 'PHT SPECIFICATION • DOWNSTREAM RF';
         title.textContent = 'Delivered Modem Downstream Power (Rx)';
         body.innerHTML = `
           <p><strong>Downstream Power (Rx)</strong> measures the signal strength delivered to the modem's internal tuner across the 1.0 GHz spectrum.</p>
-          <h4>Wider Pass Standard Thresholds:</h4>
+          <h4>Threshold Bands:</h4>
           <ul>
-            <li><strong>Ideal:</strong> 0.0 dBmV</li>
-            <li><strong>Safe Pass Window:</strong> -10.0 to +10.0 dBmV</li>
-            <li><strong>Marginal Warning:</strong> -12.0 to -10.0 dBmV OR +10.0 to +12.0 dBmV</li>
-            <li><strong>Hard Fail:</strong> &lt; -12.0 dBmV OR &gt; +12.0 dBmV</li>
+            <li><strong>Ideal Target:</strong> 0.0 dBmV</li>
+            <li><strong>Pass Window:</strong> -10.0 to +10.0 dBmV</li>
+            <li><strong>Marginal Window:</strong> -15.0 to -10.0 dBmV OR +10.0 to +15.0 dBmV</li>
+            <li><strong>Hard Fail:</strong> &le; -15.0 dBmV OR &ge; +15.0 dBmV</li>
           </ul>
-          <h4>Technical Root Causes of Failure:</h4>
-          <p><strong>Failing Low (&lt; -12.0 dBmV):</strong> Signal drops into the thermal noise floor of the coaxial cable. SNR collapses below 33.0 dB, triggering Correctable and Uncorrectable Codeword (FEC) errors, resulting in packet loss and modem dropouts.</p>
-          <p><strong>Failing High (&gt; +12.0 dBmV):</strong> Excessive RF power saturates the Low-Noise Amplifier (LNA) in the front-end tuner. This induces amplifier clipping and non-linear intermodulation products that distort adjacent OFDM carriers.</p>
+          <h4>Technical Root Causes:</h4>
+          <p><strong>Low Rx (&le; -15.0 dBmV):</strong> Signal drops directly into the thermal noise floor. MER/SNR collapses below 33.0 dB, creating severe FEC uncorrectable codeword packet loss.</p>
+          <p><strong>High Rx (&ge; +15.0 dBmV):</strong> Over-amplification over-drives the tuner front-end, inducing non-linear harmonic distortion and OFDM carrier dropouts.</p>
         `;
       } else if (topic === 'tx') {
-        cat.textContent = 'PHT SPECIFICATION &bull; UPSTREAM RF';
+        cat.textContent = 'PHT SPECIFICATION • UPSTREAM RF';
         title.textContent = 'Required Modem Upstream Transmit (Tx)';
         body.innerHTML = `
-          <p><strong>Upstream Transmit Power (Tx)</strong> is the power level the DOCSIS modem uses to communicate back to the CMTS (headend/node) across 5–85 MHz.</p>
-          <h4>Wider Pass Standard Thresholds:</h4>
+          <p><strong>Upstream Transmit Power (Tx)</strong> is the RF level the DOCSIS modem requires to communicate back to the node/CMTS across 5–85 MHz.</p>
+          <h4>Threshold Bands:</h4>
           <ul>
-            <li><strong>Ideal:</strong> ~40.0 dBmV</li>
-            <li><strong>Safe Pass Window:</strong> 36.0 to 50.0 dBmV</li>
-            <li><strong>Marginal Warning:</strong> 34.0 to 36.0 dBmV OR 50.0 to 52.0 dBmV</li>
-            <li><strong>Hard Fail:</strong> &lt; 34.0 dBmV OR &gt; 52.0 dBmV</li>
+            <li><strong>Ideal Target:</strong> ~40.0 dBmV</li>
+            <li><strong>Pass Window:</strong> 36.0 to 50.0 dBmV</li>
+            <li><strong>Marginal Warning:</strong> 34.0 to 36.0 dBmV OR 50.0 to 53.9 dBmV</li>
+            <li><strong>Hard Fail:</strong> &lt; 34.0 dBmV OR &ge; 54.0 dBmV</li>
           </ul>
-          <h4>Technical Root Causes of Failure:</h4>
-          <p><strong>High Transmit (&gt; 50.0 dBmV):</strong> Excessive return loss (from splitters or long drops) forces the modem to blast at maximum power. Past 53.0 dBmV, the modem hits physical power compression, causing DOCSIS T3/T4 ranging timeouts and loss of upstream channel bonding.</p>
-          <p><strong>Low Transmit (&lt; 36.0 dBmV):</strong> The modem transmits too quietly, allowing premise electrical noise and ingress on the return path to corrupt upstream packets at the node.</p>
+          <h4>Technical Root Causes:</h4>
+          <p><strong>High Transmit (&ge; 54.0 dBmV):</strong> Upstream hits the physical power amplifier compression limit of the modem. Triggers continuous T3/T4 timeouts and drops upstream channel bonding.</p>
+          <p><strong>Low Transmit (&lt; 34.0 dBmV):</strong> The modem cannot overpower premise return noise ingress, allowing ingress packets to disrupt the node upstream receiver.</p>
         `;
       } else if (topic === 'pht') {
-        cat.textContent = 'COMPLIANCE AUDIT &bull; TQI-C IMPACT';
-        title.textContent = 'PHT Failure &amp; Craftsmanship Scoring';
+        cat.textContent = 'COMPLIANCE AUDIT • TQI-C IMPACT';
+        title.textContent = 'PHT Failure & Craftsmanship Scoring';
         body.innerHTML = `
           <p>Under the Comcast <strong>TQI-C (Trust Quality Interactions - Craftsmanship)</strong> standard, customer service and CPE must pass Premise Health Testing (PHT).</p>
           <h4>Scoring Mechanics:</h4>
