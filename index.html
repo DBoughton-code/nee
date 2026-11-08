@@ -101,9 +101,7 @@
       align-items: center;
     }
 
-    /* ========================================================
-       OPTION 1: HERO ACTION CARD STYLES FOR COMCAST JOB QC
-       ======================================================== */
+    /* HERO ACTION CARD (QC FOCUS) */
     .hub-tile-hero {
       background: linear-gradient(135deg, #1e3a8a 0%, #1e293b 85%);
       border: 2px solid #3b82f6;
@@ -211,7 +209,7 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
 
-    /* Standard Hub Grid */
+    /* STANDARD HUB TILES */
     .hub-grid {
       display: flex;
       flex-direction: column;
@@ -412,7 +410,7 @@
       <p>Technician Action Hub & Mobile Logging</p>
     </div>
 
-    <!-- MAJOR FOCUS: HERO QC CARD (OPTION 1) -->
+    <!-- MAJOR FOCUS: HERO QC CARD -->
     <div class="hub-tile-hero" onclick="openQCView()">
       <div class="hero-top-badge">
         <span class="pulse-dot"></span>
@@ -948,13 +946,31 @@
   const rtmExtraPhotos = [];
   let rtmExtraCounter = 0;
 
-  // View Navigation
-  function navigateHome() { switchView('view-dashboard'); }
-  function openQCView() { switchView('view-qc'); }
-  function openDownedView() { switchView('view-downed'); }
-  function openRTMView() { switchView('view-rtm'); }
-  function openCommsView() { switchView('view-comms'); }
-  function openSupervisorView() { switchView('view-supervisor'); }
+  // View Navigation with URL Hash Syncing
+  function navigateHome() { 
+    switchView('view-dashboard');
+    history.replaceState(null, null, ' ');
+  }
+  function openQCView() { 
+    switchView('view-qc'); 
+    location.hash = 'view-qc';
+  }
+  function openDownedView() { 
+    switchView('view-downed'); 
+    location.hash = 'view-downed';
+  }
+  function openRTMView() { 
+    switchView('view-rtm'); 
+    location.hash = 'view-rtm';
+  }
+  function openCommsView() { 
+    switchView('view-comms'); 
+    location.hash = 'view-comms';
+  }
+  function openSupervisorView() { 
+    switchView('view-supervisor'); 
+    location.hash = 'view-supervisor';
+  }
 
   function switchView(targetId) {
     document.querySelectorAll('.view-screen').forEach(el => el.classList.remove('view-active'));
@@ -987,6 +1003,22 @@
     localStorage.setItem('qc_state', val);
   }
 
+  // Handle URL Direct Linking (e.g. index.html#view-qc)
+  function handleInitialHash() {
+    const hash = window.location.hash;
+    if (hash === '#view-qc') {
+      openQCView();
+    } else if (hash === '#view-downed') {
+      openDownedView();
+    } else if (hash === '#view-rtm') {
+      openRTMView();
+    } else if (hash === '#view-comms') {
+      openCommsView();
+    } else if (hash === '#view-supervisor') {
+      openSupervisorView();
+    }
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     syncTechNum(localStorage.getItem('qc_tech_num') || '');
     syncCity(localStorage.getItem('qc_city') || '');
@@ -997,7 +1029,10 @@
     updateNetworkStatus();
 
     renderRequiredPhotoGrid();
+    handleInitialHash();
   });
+
+  window.addEventListener('hashchange', handleInitialHash);
 
   function updateNetworkStatus() {
     const banner = document.getElementById('offlineBanner');
