@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Xfinity Field Tech Demarc & Topology Calculator</title>
+  <title>PHT Pass Checker - Xfinity Field Tech Demarc & Topology</title>
   <style>
     /* CSS Reset & Design Tokens */
     *, *::before, *::after {
@@ -49,6 +49,35 @@
     .container {
       max-width: 940px;
       margin: 0 auto;
+    }
+
+    /* Navigation Bar */
+    .nav-top-bar {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #18233a;
+      color: var(--text-main);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+      padding: 8px 14px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-back:hover {
+      background: #243452;
+      border-color: var(--cyan);
+      color: var(--cyan);
     }
 
     /* Header */
@@ -272,43 +301,6 @@
       border: 1px solid var(--rose);
       color: #fda4af;
       margin-top: 10px;
-    }
-
-    /* Counter */
-    .counter-wrap {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: #090e17;
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius-md);
-      padding: 4px;
-    }
-
-    .counter-btn {
-      background: #18233a;
-      border: 1px solid var(--card-border);
-      color: white;
-      width: 36px;
-      height: 36px;
-      border-radius: var(--radius-sm);
-      font-size: 1.1rem;
-      font-weight: bold;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .counter-btn:hover {
-      background: #243452;
-    }
-
-    .counter-val {
-      font-size: 1rem;
-      font-weight: 800;
-      color: var(--emerald);
-      text-align: center;
     }
 
     /* Mode Selection Bar */
@@ -862,11 +854,16 @@
 
   <div class="container">
 
+    <!-- Nav Bar -->
+    <div class="nav-top-bar">
+      <a href="index.html" class="btn-back">❮ Main Menu</a>
+    </div>
+
     <!-- Top Header -->
     <header>
       <div>
         <div class="brand-title">
-          <span>📶</span> XFINITY FIELD TECH DEMARC &amp; TOPOLOGY
+          <span>📶</span> PHT PASS CHECKER
         </div>
         <div class="brand-subtitle">
           Expected Ground Block Levels &bull; Single-Demarc Topologies &bull; Zero Cascades
@@ -1456,7 +1453,12 @@
 
       let active;
       if (state.mode === 'auto') {
-        active = sortedForAuto[0];
+        // 1 device must ALWAYS auto-recommend Direct Barrel (No Splitters)
+        if (totalOutlets <= 1) {
+          active = evaluated.find(i => i.id === 'barrel') || sortedForAuto[0];
+        } else {
+          active = sortedForAuto[0];
+        }
       } else {
         active = evaluated.find(i => i.id === state.manualId) || evaluated[0];
       }
