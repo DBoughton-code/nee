@@ -3,614 +3,1910 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RF Topology & Demarc Optimizer - Prince Telecom</title>
-
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#0f172a">
-
+  <title>Xfinity Field Tech Demarc & Topology Calculator</title>
   <style>
+    /* CSS Reset & Design Tokens */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     :root {
-      --bg: #0f172a;
-      --card-bg: #1e293b;
-      --card-border: #334155;
-      --text: #f8fafc;
+      --bg-main: #0b0f19;
+      --card-bg: #131c2e;
+      --card-hover: #18233a;
+      --card-border: #1e293b;
+      --text-main: #f1f5f9;
       --text-muted: #94a3b8;
-      --primary: #38bdf8;
-      --primary-hover: #0284c7;
-      --success: #22c55e;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --input-bg: #0f172a;
-      --input-border: #475569;
+      --text-sub: #64748b;
+      
+      --cyan: #06b6d4;
+      --cyan-glow: rgba(6, 182, 212, 0.15);
+      --emerald: #10b981;
+      --emerald-glow: rgba(16, 185, 129, 0.15);
+      --amber: #f59e0b;
+      --amber-glow: rgba(245, 158, 11, 0.15);
+      --rose: #f43f5e;
+      --rose-glow: rgba(244, 63, 94, 0.15);
+      --purple: #a855f7;
+
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --radius-full: 9999px;
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-      margin: 0;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.5;
       padding: 16px;
-      display: flex;
-      justify-content: center;
+      padding-bottom: 60px;
     }
 
     .container {
-      width: 100%;
-      max-width: 520px;
+      max-width: 940px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    header {
       display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .header {
-      text-align: center;
-      padding: 4px 0 6px 0;
-    }
-    .header h2 {
-      margin: 0;
-      color: var(--primary);
-      font-size: 1.35rem;
-    }
-    .header p {
-      margin: 4px 0 0 0;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
-
-    .nav-top-bar {
-      display: flex;
-      justify-content: flex-start;
-      align-items: center;
-      margin-bottom: 2px;
-    }
-
-    .btn-back {
-      background: #334155;
-      color: var(--text);
-      border: 1px solid var(--card-border);
-      border-radius: 8px;
-      padding: 8px 12px;
-      font-size: 0.85rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      text-decoration: none;
-    }
-
-    .card {
-      background: var(--card-bg);
-      border-radius: 12px;
-      padding: 16px;
-      border: 1px solid var(--card-border);
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-    }
-
-    .card-title {
-      font-size: 0.95rem;
-      font-weight: 700;
-      margin-bottom: 12px;
-      color: var(--text);
-      border-bottom: 1px solid var(--card-border);
-      padding-bottom: 8px;
-      display: flex;
+      flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
+      gap: 12px;
+      padding-bottom: 16px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--card-border);
     }
 
-    .tolerance-legend {
-      background: rgba(15, 23, 42, 0.7);
-      border: 1px solid var(--card-border);
-      border-radius: 8px;
-      padding: 10px;
-      font-size: 0.73rem;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      line-height: 1.4;
-    }
-    .legend-row {
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      color: var(--cyan);
       display: flex;
       align-items: center;
-      gap: 6px;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-bottom: 12px;
-    }
-
-    label {
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--text-muted);
-    }
-
-    input, select {
-      padding: 10px 12px;
-      border-radius: 8px;
-      border: 1px solid var(--input-border);
-      background-color: var(--input-bg);
-      color: var(--text);
-      font-size: 0.95rem;
-      box-sizing: border-box;
-      width: 100%;
-    }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-    .grid-3 {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
       gap: 8px;
     }
 
-    .drop-preset-btns {
-      display: flex;
-      gap: 6px;
-      margin-top: 4px;
-    }
-    .drop-btn {
-      flex: 1;
-      background: #0f172a;
-      border: 1px solid var(--card-border);
-      color: var(--text-muted);
-      padding: 6px;
-      border-radius: 6px;
+    .brand-subtitle {
       font-size: 0.75rem;
-      font-weight: 700;
-      cursor: pointer;
-    }
-    .drop-btn.active {
-      background: rgba(56, 189, 248, 0.15);
-      border-color: var(--primary);
-      color: var(--primary);
-    }
-
-    /* Results Cards */
-    .result-box {
-      border-radius: 10px;
-      padding: 14px;
-      margin-bottom: 10px;
-      background: #0f172a;
-      border: 1.5px solid var(--card-border);
-      transition: border-color 0.2s, background-color 0.2s;
-    }
-    .result-box.pass {
-      border-color: var(--success);
-      background: rgba(34, 197, 94, 0.08);
-    }
-    .result-box.marginal {
-      border-color: var(--warning);
-      background: rgba(245, 158, 11, 0.08);
-    }
-    .result-box.fail {
-      border-color: var(--danger);
-      background: rgba(239, 68, 68, 0.08);
-    }
-
-    .result-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-    .result-title {
-      font-weight: 800;
-      font-size: 0.95rem;
-    }
-    .status-badge {
-      font-size: 0.72rem;
-      font-weight: 900;
-      padding: 3px 8px;
-      border-radius: 9999px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-    .badge-pass { background: var(--success); color: #022c22; }
-    .badge-marginal { background: var(--warning); color: #451a03; }
-    .badge-fail { background: var(--danger); color: #ffffff; }
-
-    .metrics-readout {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 6px;
-      text-align: center;
-    }
-    .metric-cell {
-      background: rgba(15, 23, 42, 0.6);
-      border-radius: 6px;
-      padding: 8px 4px;
-    }
-    .metric-num {
-      font-size: 1.15rem;
-      font-weight: 800;
-      color: var(--text);
-    }
-    .metric-lbl {
-      font-size: 0.68rem;
       color: var(--text-muted);
       margin-top: 2px;
     }
 
-    .recommendation-box {
-      border-left: 4px solid var(--primary);
-      background: rgba(56, 189, 248, 0.08);
-      border-radius: 6px;
-      padding: 10px 12px;
+    .pht-header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+    }
+
+    .badge-pass {
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--emerald);
+      border-color: var(--emerald);
+    }
+
+    .badge-marginal {
+      background: rgba(245, 158, 11, 0.12);
+      color: var(--amber);
+      border-color: var(--amber);
+    }
+
+    .badge-fail {
+      background: rgba(244, 63, 94, 0.12);
+      color: var(--rose);
+      border-color: var(--rose);
+    }
+
+    /* Layout Grid */
+    .grid-2col {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    @media (min-width: 700px) {
+      .grid-2col {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    /* Cards */
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+    }
+
+    .card-title {
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .card-title .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    /* Inputs & Steppers */
+    .input-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .input-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .stepper-input {
+      display: flex;
+      align-items: center;
+      background: #090e17;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .step-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      padding: 8px 12px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .step-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    input[type="number"], select {
+      width: 100%;
+      background: #090e17;
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 8px 10px;
+      border-radius: var(--radius-md);
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .stepper-input input[type="number"] {
+      border: none;
+      background: transparent;
+    }
+
+    input[type="number"]:focus, select:focus {
+      outline: none;
+      border-color: var(--cyan);
+    }
+
+    /* Sliders */
+    .slider-wrap {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    .slider-val {
+      font-weight: 800;
+      color: var(--cyan);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--cyan);
+      cursor: pointer;
+    }
+
+    /* Alerts */
+    .alert-banner {
+      margin-top: 10px;
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 0.72rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+    }
+
+    .alert-oes {
+      background: rgba(244, 63, 94, 0.12);
+      border: 1px solid var(--rose);
+      color: #fda4af;
+    }
+
+    .alert-terminator {
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid var(--amber);
+      color: #fde68a;
+      margin-top: 12px;
+    }
+
+    .alert-shortfall {
+      background: rgba(244, 63, 94, 0.12);
+      border: 1px solid var(--rose);
+      color: #fda4af;
+      margin-top: 10px;
+    }
+
+    /* Counter */
+    .counter-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #090e17;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+      padding: 4px;
+    }
+
+    .counter-btn {
+      background: #18233a;
+      border: 1px solid var(--card-border);
+      color: white;
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .counter-btn:hover {
+      background: #243452;
+    }
+
+    .counter-val {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--emerald);
+      text-align: center;
+    }
+
+    /* Mode Selection Bar */
+    .mode-bar {
+      display: flex;
+      background: #090e17;
+      padding: 4px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--card-border);
+      margin-bottom: 16px;
+      gap: 6px;
+    }
+
+    .mode-btn {
+      flex: 1;
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      border: none;
+      font-size: 0.8rem;
+      font-weight: 800;
+      cursor: pointer;
+      color: var(--text-muted);
+      background: transparent;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .mode-btn.active {
+      background: var(--cyan);
+      color: #04121d;
+      box-shadow: 0 2px 8px rgba(6, 182, 212, 0.35);
+    }
+
+    /* Manual Splitter Grid */
+    .splitter-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    @media (min-width: 600px) {
+      .splitter-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (min-width: 800px) {
+      .splitter-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .splitter-btn {
+      background: #090e17;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+      padding: 10px 8px;
+      text-align: left;
+      cursor: pointer;
+      color: var(--text-main);
+      transition: all 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .splitter-btn:hover {
+      border-color: var(--cyan);
+      background: var(--card-hover);
+    }
+
+    .splitter-btn.selected {
+      border-color: var(--cyan);
+      background: var(--cyan-glow);
+      box-shadow: 0 0 0 1px var(--cyan);
+    }
+
+    .splitter-btn.cascade {
+      border-color: rgba(244, 63, 94, 0.4);
+      background: rgba(244, 63, 94, 0.06);
+    }
+
+    .splitter-btn.cascade.selected {
+      border-color: var(--rose);
+      background: var(--rose-glow);
+      box-shadow: 0 0 0 1px var(--rose);
+    }
+
+    .splitter-btn.disabled {
+      opacity: 0.45;
+      border-style: dashed;
+      cursor: not-allowed;
+    }
+
+    .s-name {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .s-meta {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+    }
+
+    .s-loss {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--cyan);
+    }
+
+    /* Hero Banner */
+    .hero-banner {
+      background: linear-gradient(180deg, #162238 0%, #0d1524 100%);
+      border: 2px solid var(--cyan);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      margin-bottom: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+      transition: border-color 0.25s ease;
+    }
+
+    .hero-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .hero-title-area {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .hero-tag {
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--cyan);
+    }
+
+    .hero-name {
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: #ffffff;
+    }
+
+    .hero-desc {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+
+    /* Ground Block Dedicated Strip */
+    .gb-strip {
+      background: rgba(168, 85, 247, 0.08);
+      border: 1px solid rgba(168, 85, 247, 0.35);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .gb-strip:hover {
+      background: rgba(168, 85, 247, 0.14);
+      border-color: var(--purple);
+    }
+
+    .gb-label-area {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .gb-badge {
+      background: var(--purple);
+      color: #0b0f19;
+      font-size: 0.65rem;
+      font-weight: 900;
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      text-transform: uppercase;
+    }
+
+    .gb-title {
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .gb-readings {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    .gb-val-box {
+      text-align: right;
+    }
+
+    .gb-val-tag {
+      font-size: 0.62rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      display: block;
+    }
+
+    .gb-val-num {
+      font-size: 1.05rem;
+      font-weight: 900;
+      color: #e9d5ff;
+    }
+
+    /* 3-Card Device Telemetry Grid */
+    .telemetry-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    @media (min-width: 600px) {
+      .telemetry-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .telemetry-card {
+      background: #090e17;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .telemetry-card:hover {
+      background: #111a2e;
+      border-color: var(--cyan);
+      transform: translateY(-2px);
+    }
+
+    .t-label {
+      font-size: 0.65rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-sub);
+      margin-bottom: 4px;
+    }
+
+    .t-val {
+      font-size: 1.25rem;
+      font-weight: 900;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      margin-bottom: 2px;
+    }
+
+    .t-sub {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+    }
+
+    .val-ideal { color: var(--emerald); }
+    .val-safe { color: var(--cyan); }
+    .val-warn { color: var(--amber); }
+    .val-fail { color: var(--rose); }
+
+    /* Port Guide Box */
+    .port-box {
+      margin-top: 14px;
+      background: #090e17;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+      padding: 12px;
+    }
+
+    .port-box-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.68rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 6px;
+    }
+
+    .port-guide-text {
+      font-size: 0.74rem;
+      color: var(--text-main);
+      line-height: 1.6;
+    }
+
+    /* Evaluated List */
+    .table-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .topology-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .topology-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      background: #090e17;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .topology-row:hover {
+      border-color: var(--cyan);
+      background: var(--card-hover);
+    }
+
+    .topology-row.active {
+      border-color: var(--cyan);
+      background: rgba(6, 182, 212, 0.08);
+      box-shadow: 0 0 0 1px var(--cyan);
+    }
+
+    .topology-row.cascade-row {
+      border-color: rgba(244, 63, 94, 0.4);
+      background: rgba(244, 63, 94, 0.04);
+    }
+
+    .row-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .row-title {
       font-size: 0.82rem;
-      line-height: 1.35;
+      font-weight: 800;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .row-meta {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+    }
+
+    .row-metrics {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+
+    /* Copy Button */
+    .btn-copy {
+      width: 100%;
+      background: var(--cyan);
+      color: #04121d;
+      border: none;
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      font-size: 0.9rem;
+      font-weight: 900;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-copy:hover {
+      background: #22d3ee;
+      box-shadow: 0 4px 15px rgba(6, 182, 212, 0.4);
+    }
+
+    /* Modal Backdrop & Popup */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 999;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-box {
+      background: #111a2e;
+      border: 1px solid var(--cyan);
+      border-radius: var(--radius-lg);
+      max-width: 560px;
+      width: 100%;
+      padding: 22px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+      animation: modalSlide 0.2s ease-out;
+    }
+
+    @keyframes modalSlide {
+      from { transform: translateY(16px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 14px;
+    }
+
+    .modal-category {
+      font-size: 0.68rem;
+      font-weight: 800;
+      color: var(--cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .modal-title {
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: white;
+      margin-top: 2px;
+    }
+
+    .modal-close {
+      background: #1e293b;
+      border: none;
+      color: white;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-close:hover {
+      background: var(--rose);
+    }
+
+    .modal-body {
+      font-size: 0.8rem;
+      color: #cbd5e1;
+      line-height: 1.65;
+    }
+
+    .modal-body h4 {
+      font-size: 0.82rem;
+      color: var(--cyan);
+      margin-top: 12px;
+      margin-bottom: 4px;
+      font-weight: 800;
+    }
+
+    .modal-body table {
+      width: 100%;
+      border-collapse: collapse;
       margin-top: 8px;
+      margin-bottom: 12px;
+      font-size: 0.72rem;
+    }
+
+    .modal-body th, .modal-body td {
+      border: 1px solid var(--card-border);
+      padding: 6px 8px;
+      text-align: left;
+    }
+
+    .modal-body th {
+      background: #090e17;
+      color: var(--text-muted);
+    }
+
+    .modal-body p {
+      margin-bottom: 8px;
+    }
+
+    .modal-body ul, .modal-body ol {
+      margin-left: 18px;
+      margin-bottom: 10px;
+    }
+
+    .modal-body li {
+      margin-bottom: 4px;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--emerald);
+      color: #04121d;
+      padding: 10px 20px;
+      border-radius: var(--radius-full);
+      font-size: 0.8rem;
+      font-weight: 800;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+      display: none;
+      z-index: 1000;
     }
   </style>
 </head>
 <body>
 
-<div class="container">
-  <!-- Nav Bar -->
-  <div class="nav-top-bar">
-    <a href="index.html" class="btn-back">❮ Field Tech Suite</a>
-  </div>
+  <div class="container">
 
-  <div class="header">
-    <h2>Topology & Demarc Optimizer</h2>
-    <p>Comcast PHT / DOCSIS 3.1 Loss & Port Calculator</p>
-  </div>
-
-  <!-- TOLERANCE STANDARD SUMMARY CARD -->
-  <div class="card" style="padding: 12px 14px;">
-    <div class="tolerance-legend">
-      <div class="legend-row">
-        <span style="color:var(--success); font-weight:800;">● PASS (Wider Band):</span>
-        <span>Rx: <strong>-10.0 to +10.0 dBmV</strong> | Tx: <strong>+36.0 to +50.0 dBmV</strong> | Tilt: <strong>&le; 9.0 dB</strong></span>
-      </div>
-      <div class="legend-row">
-        <span style="color:var(--warning); font-weight:800;">● MARGINAL (Tightened):</span>
-        <span>Rx: [-12 to -10) / (+10 to +12] | Tx: [34 to 36) / (50 to 52] | Tilt: 9.1 to 11.0 dB</span>
-      </div>
-      <div class="legend-row">
-        <span style="color:var(--danger); font-weight:800;">● FAIL:</span>
-        <span>Rx &lt; -12 or &gt; +12 dBmV | Tx &lt; +34 or &gt; +52 dBmV | Tilt &gt; 11.0 dB</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- STEP 1: TAP READINGS -->
-  <div class="card">
-    <div class="card-title">1. Meter Levels at Tap</div>
-    <div class="grid-3">
-      <div class="form-group" style="margin-bottom:0;">
-        <label for="tapHighRx">High Rx (750M)</label>
-        <input type="number" step="0.1" id="tapHighRx" value="14.0" oninput="calculateTopology()">
-      </div>
-      <div class="form-group" style="margin-bottom:0;">
-        <label for="tapLowRx">Low Rx (54M)</label>
-        <input type="number" step="0.1" id="tapLowRx" value="11.5" oninput="calculateTopology()">
-      </div>
-      <div class="form-group" style="margin-bottom:0;">
-        <label for="tapTx">Tap Upstream Tx</label>
-        <input type="number" step="0.1" id="tapTx" value="38.0" oninput="calculateTopology()">
-      </div>
-    </div>
-  </div>
-
-  <!-- STEP 2: DROP SPAN -->
-  <div class="card">
-    <div class="card-title">2. Drop Cable to Ground Block / Demarc</div>
-    <div class="grid-2">
-      <div class="form-group" style="margin-bottom:0;">
-        <label for="cableType">Drop Series</label>
-        <select id="cableType" onchange="calculateTopology()">
-          <option value="RG6" selected>Series 6 (RG6 Tri/Quad)</option>
-          <option value="RG11">Series 11 (RG11 Long Run)</option>
-        </select>
-      </div>
-      <div class="form-group" style="margin-bottom:0;">
-        <label for="dropFootage">Footage (Feet)</label>
-        <input type="number" id="dropFootage" value="125" step="5" oninput="calculateTopology()">
-      </div>
-    </div>
-    <div class="drop-preset-btns">
-      <button type="button" class="drop-btn" onclick="setFootage(75)">75 ft</button>
-      <button type="button" class="drop-btn active" id="btn-125" onclick="setFootage(125)">125 ft</button>
-      <button type="button" class="drop-btn" onclick="setFootage(175)">175 ft</button>
-      <button type="button" class="drop-btn" onclick="setFootage(250)">250 ft</button>
-    </div>
-  </div>
-
-  <!-- STEP 3: DEMARC / SPLITTER CONFIGURATION -->
-  <div class="card">
-    <div class="card-title">3. Demarc Splitter Configuration</div>
-    <div class="form-group">
-      <label for="splitterSelect">Demarc Splitter Selection</label>
-      <select id="splitterSelect" onchange="calculateTopology()">
-        <option value="none">Direct Ground Block (0 dB / No Splitter)</option>
-        <option value="2way" selected>2-Way Balanced (-3.5 dB / -3.5 dB)</option>
-        <option value="3way_unbal_tap">3-Way Unbalanced - TAP PORT (-3.5 dB)</option>
-        <option value="3way_unbal_iso">3-Way Unbalanced - ISO PORTS (-7.0 dB)</option>
-        <option value="3way_bal">3-Way Balanced (-5.5 dB All Ports)</option>
-        <option value="4way">4-Way Balanced (-7.0 dB All Ports)</option>
-        <option value="8way">8-Way Balanced (-11.0 dB All Ports)</option>
-        <option value="comm_drop_amp">CommScope 9-Port eMTA/Data Amp (+0 dB Fwd / +0 dB Ret)</option>
-      </select>
-    </div>
-    <div class="grid-2">
-      <div class="form-group" style="margin-bottom:0;">
-        <label for="internalRun">Est. Outlet Run (Ft)</label>
-        <input type="number" id="internalRun" value="50" step="10" oninput="calculateTopology()">
-      </div>
-      <div class="form-group" style="margin-bottom:0;">
-        <label for="internalCable">Internal Series</label>
-        <select id="internalCable" onchange="calculateTopology()">
-          <option value="RG6" selected>Series 6 (RG6)</option>
-          <option value="RG59">Series 59 (Legacy RG59)</option>
-        </select>
-      </div>
-    </div>
-  </div>
-
-  <!-- STEP 4: CALCULATED RESULTS -->
-  <div class="card">
-    <div class="card-title">
-      <span>Calculated RF Levels</span>
-      <span style="font-size:0.75rem; color:var(--primary); font-weight:700;">Live DOCSIS Evaluation</span>
-    </div>
-
-    <!-- GROUND BLOCK LEVEL -->
-    <div id="demarcBox" class="result-box pass">
-      <div class="result-header">
-        <span class="result-title">Levels at Ground Block (GB)</span>
-        <span id="demarcBadge" class="status-badge badge-pass">PASS</span>
-      </div>
-      <div class="metrics-readout">
-        <div class="metric-cell">
-          <div id="gbHighRx" class="metric-num">--</div>
-          <div class="metric-lbl">High Rx (750M)</div>
+    <!-- Top Header -->
+    <header>
+      <div>
+        <div class="brand-title">
+          <span>📶</span> XFINITY FIELD TECH DEMARC &amp; TOPOLOGY
         </div>
-        <div class="metric-cell">
-          <div id="gbLowRx" class="metric-num">--</div>
-          <div class="metric-lbl">Low Rx (54M)</div>
-        </div>
-        <div class="metric-cell">
-          <div id="gbTx" class="metric-num">--</div>
-          <div class="metric-lbl">Upstream Tx</div>
+        <div class="brand-subtitle">
+          Expected Ground Block Levels &bull; Single-Demarc Topologies &bull; Zero Cascades
         </div>
       </div>
+      <div id="phtBadge" class="pht-header-badge badge-pass" onclick="openModal('pht')">
+        <span>✓ PHT PASSING</span>
+      </div>
+    </header>
+
+    <!-- Tap & Premise Inputs -->
+    <div class="grid-2col">
+
+      <!-- Tap & Drop Input -->
+      <div class="card">
+        <div class="card-title">
+          <span class="dot" style="background: var(--cyan);"></span>
+          Tap &amp; Drop Specification
+        </div>
+
+        <!-- Tap 1 GHz Rx Slider -->
+        <div class="slider-wrap" style="margin-top: 0; margin-bottom: 14px;">
+          <div class="slider-header">
+            <span>Tap 1 GHz Rx (Downstream)</span>
+            <span class="slider-val"><span id="tapDsVal">+15.0</span> dBmV</span>
+          </div>
+          <input type="range" id="tapDs" min="-15.0" max="30.0" step="0.5" value="15.0" oninput="handleTapDs(this.value)">
+          <div class="slider-header" style="font-size: 0.65rem; color: var(--text-sub);">
+            <span>-15.0 dBmV</span>
+            <span>Step: 0.5 dB</span>
+            <span>+30.0 dBmV</span>
+          </div>
+        </div>
+
+        <!-- Tap US Tx Slider -->
+        <div class="slider-wrap" style="margin-top: 0; margin-bottom: 14px;">
+          <div class="slider-header">
+            <span>Tap US Tx (Upstream Return)</span>
+            <span class="slider-val" style="color: var(--amber);"><span id="tapTxVal">38.0</span> dBmV</span>
+          </div>
+          <input type="range" id="tapTx" min="20.0" max="50.0" step="0.5" value="38.0" style="accent-color: var(--amber);" oninput="handleTapTx(this.value)">
+          <div class="slider-header" style="font-size: 0.65rem; color: var(--text-sub);">
+            <span>20.0 dBmV</span>
+            <span>Target: ~38-40</span>
+            <span>50.0 dBmV</span>
+          </div>
+        </div>
+
+        <div class="input-row">
+          <div class="input-group">
+            <label for="dropType">Drop Cable Type</label>
+            <select id="dropType" onchange="calculate()">
+              <option value="rg6">Series 6 (RG6)</option>
+              <option value="rg11">Series 11 (RG11)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="slider-wrap">
+          <div class="slider-header">
+            <span>Drop Length</span>
+            <span class="slider-val"><span id="dropLenVal">100</span> ft</span>
+          </div>
+          <input type="range" id="dropLen" min="20" max="300" step="5" value="100" oninput="handleDropLen(this.value)">
+          <div class="slider-header" style="font-size: 0.65rem; color: var(--text-sub);">
+            <span>20 ft</span>
+            <span id="dropLossDisplay">Drop Loss: -6.0 dB</span>
+            <span>300 ft</span>
+          </div>
+        </div>
+
+        <div id="oesAlert" class="alert-banner alert-oes" style="display: none;">
+          <span>⚠️</span>
+          <div>
+            <strong>OES Standard Violation:</strong> Series 6 (RG6) cannot exceed 150 ft. Must use Series 11 or QR-320 for 151' to 300'.
+          </div>
+        </div>
+      </div>
+
+      <!-- Premise Devices Input -->
+      <div class="card">
+        <div class="card-title">
+          <span class="dot" style="background: var(--amber);"></span>
+          Premise Devices &amp; Inside Run
+        </div>
+
+        <!-- Modem Toggle / Slider -->
+        <div class="slider-wrap" style="margin-top: 0; margin-bottom: 14px;">
+          <div class="slider-header">
+            <span>DOCSIS Gateway (Modem)</span>
+            <span class="slider-val" style="color: var(--cyan);"><span id="modemCountVal">1 Modem Active</span></span>
+          </div>
+          <input type="range" id="modemCount" min="0" max="1" step="1" value="1" oninput="handleModemCount(this.value)">
+          <div class="slider-header" style="font-size: 0.65rem; color: var(--text-sub);">
+            <span>0 (No Modem / TV Only)</span>
+            <span>1 Gateway (DOCSIS)</span>
+          </div>
+        </div>
+
+        <!-- TV Box Slider (0 to 7) -->
+        <div class="slider-wrap" style="margin-top: 0; margin-bottom: 14px;">
+          <div class="slider-header">
+            <span>Connected TV Boxes (STBs)</span>
+            <span class="slider-val" style="color: var(--emerald);"><span id="tvCountVal">2 TVs</span></span>
+          </div>
+          <input type="range" id="tvCountSlider" min="0" max="7" step="1" value="2" style="accent-color: var(--emerald);" oninput="handleTvSlider(this.value)">
+          <div class="slider-header" style="font-size: 0.65rem; color: var(--text-sub);">
+            <span>0 TVs</span>
+            <span>Slide 0 to 7</span>
+            <span>7 TVs</span>
+          </div>
+        </div>
+
+        <!-- Inside Cable Slider -->
+        <div class="slider-wrap" style="margin-top: 0;">
+          <div class="slider-header">
+            <span>Average Inside Cable Run</span>
+            <span class="slider-val" style="color: var(--amber);"><span id="insideLenVal">50</span> ft</span>
+          </div>
+          <input type="range" id="insideLen" min="15" max="150" step="5" value="50" style="accent-color: var(--amber);" oninput="handleInsideLen(this.value)">
+          <div class="slider-header" style="font-size: 0.65rem; color: var(--text-sub);">
+            <span>15 ft</span>
+            <span id="insideLossDisplay">Inside Loss: -3.0 dB</span>
+            <span>150 ft</span>
+          </div>
+        </div>
+
+        <div id="deviceSummaryBox" class="alert-banner" style="background: #090e17; border: 1px solid var(--card-border); color: var(--text-muted); margin-top: 14px;">
+          <span>ℹ️</span>
+          <div id="deviceSummaryText">
+            Total House Outlets: <strong>3</strong> (1 DOCSIS Modem + 2 TV Outlets).
+          </div>
+        </div>
+      </div>
+
     </div>
 
-    <!-- MODEM / CPE OUTLET LEVEL -->
-    <div id="outletBox" class="result-box pass">
-      <div class="result-header">
-        <span class="result-title">Levels at Modem (CPE Port)</span>
-        <span id="outletBadge" class="status-badge badge-pass">PASS</span>
+    <!-- Mode Selector -->
+    <div class="mode-bar">
+      <button id="modeAuto" class="mode-btn active" onclick="setMode('auto')">
+        ⚡ Auto-Recommend (Optimal PHT)
+      </button>
+      <button id="modeManual" class="mode-btn" onclick="setMode('manual')">
+        🛠️ Manual Splitter Selection
+      </button>
+    </div>
+
+    <!-- Manual Splitter Grid (Strictly Passive) -->
+    <div id="manualSplitterSection" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <span style="font-size: 0.72rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">
+          Select Demarc Splitter Hardware (Passive Only)
+        </span>
+        <span id="manualSelectedMeta" style="font-size: 0.72rem; font-weight: 700; color: var(--cyan);">
+          3-Way Hot (-5.0 dB)
+        </span>
       </div>
-      <div class="metrics-readout">
-        <div class="metric-cell">
-          <div id="outHighRx" class="metric-num">--</div>
-          <div class="metric-lbl">High Rx (750M)</div>
-        </div>
-        <div class="metric-cell">
-          <div id="outLowRx" class="metric-num">--</div>
-          <div class="metric-lbl">Low Rx (54M)</div>
-        </div>
-        <div class="metric-cell">
-          <div id="outTx" class="metric-num">--</div>
-          <div class="metric-lbl">Upstream Tx</div>
-        </div>
+      <div id="splitterGrid" class="splitter-grid">
+        <!-- Injected via JS -->
       </div>
-      <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-muted); margin-top:8px; padding-top:6px; border-top:1px solid rgba(255,255,255,0.06);">
-        <span>Full-Band Tilt: <strong id="outTilt" style="color:var(--text);">-- dB</strong></span>
-        <span>Calculated Loss: <strong id="outLoss" style="color:var(--text);">-- dB</strong></span>
+      <div id="portShortfallAlert" class="alert-banner alert-shortfall" style="display: none;">
+        <span>⚠️</span>
+        <div id="portShortfallText">
+          Selected splitter does not have enough ports for total outlets.
+        </div>
       </div>
     </div>
 
-    <div id="recommendationText" class="recommendation-box">
-      Calculating recommended topology...
+    <!-- Hero Results Banner -->
+    <div id="heroBanner" class="hero-banner">
+      <div class="hero-header">
+        <div class="hero-title-area">
+          <span id="heroTag" class="hero-tag">RECOMMENDED SINGLE-DEMARC TOPOLOGY</span>
+          <span id="heroName" class="hero-name">Unbalanced 3-Way (Gateway on Hot Leg)</span>
+        </div>
+        <div id="heroBadge" class="pht-header-badge badge-pass" onclick="openModal('pht')">
+          <span>✓ OPTIMAL PHT PASS</span>
+        </div>
+      </div>
+      <div id="heroDesc" class="hero-desc">
+        Gateway on -5.0 dB Hot Leg protects return transmit power. STBs utilize -8.5 dB weak legs.
+      </div>
+
+      <!-- DEDICATED EXPECTED GROUND BLOCK STRIP -->
+      <div class="gb-strip" onclick="openModal('gb')">
+        <div class="gb-label-area">
+          <span class="gb-badge">Ground Block</span>
+          <div>
+            <div class="gb-title">Expected Ground Block Levels (Pre-Split)</div>
+            <div id="gbMatrixCompare" style="font-size: 0.68rem; color: #d8b4fe;">Target: Ideal +8.0 dBmV Rx | Safe: 0.0 to +16.0</div>
+          </div>
+        </div>
+        <div class="gb-readings">
+          <div class="gb-val-box">
+            <span class="gb-val-tag">Expected GB Rx</span>
+            <span id="valGbRx" class="gb-val-num">+9.0 dBmV</span>
+          </div>
+          <div class="gb-val-box">
+            <span class="gb-val-tag">Expected GB Tx</span>
+            <span id="valGbTx" class="gb-val-num" style="color: #fed7aa;">39.6 dBmV</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3 Device Telemetry Cards (Rx, Tx, STB Rx) -->
+      <div class="telemetry-grid">
+        <div class="telemetry-card" onclick="openModal('rx')">
+          <div class="t-label">Delivered Modem 1 GHz Rx</div>
+          <div id="valModemRx" class="t-val val-safe">+1.5 dBmV</div>
+          <div id="subModemRx" class="t-sub">Target: 0.0 (-8.0 to +8.0)</div>
+        </div>
+        <div class="telemetry-card" onclick="openModal('tx')">
+          <div class="t-label">Required Modem US Tx</div>
+          <div id="valModemTx" class="t-val val-ideal">44.5 dBmV</div>
+          <div id="subModemTx" class="t-sub">Safe: 35.0 to 48.0</div>
+        </div>
+        <div class="telemetry-card" onclick="openModal('stb')">
+          <div class="t-label">Delivered STB 1 GHz Rx</div>
+          <div id="valStbRx" class="t-val val-safe">+1.5 dBmV</div>
+          <div id="subStbRx" class="t-sub">Safe: -8.0 to +8.0</div>
+        </div>
+      </div>
+
+      <!-- Demarc Port Assignment Box -->
+      <div class="port-box">
+        <div class="port-box-header">
+          <span>Demarc Port Wiring Assignment</span>
+          <span id="portCapacityBadge" style="color: var(--cyan);">3-Port Demarc</span>
+        </div>
+        <div id="portGuideText" class="port-guide-text">
+          &bull; <strong>HOT LEG (-5.0 dB):</strong> Connect DOCSIS Gateway.<br>
+          &bull; <strong>WEAK LEGS (-8.5 dB):</strong> Connect TV STB 1 &amp; TV STB 2.
+        </div>
+      </div>
+
+      <!-- Terminator Notice -->
+      <div id="terminatorAlert" class="alert-banner alert-terminator" style="display: none;">
+        <span>⚠️</span>
+        <div id="terminatorText">
+          Unused splitter ports must be capped with 75Ω locking terminators to prevent a 7-point TQI-C deduction.
+        </div>
+      </div>
+    </div>
+
+    <!-- Ranked Topologies Table -->
+    <div class="table-card">
+      <div class="card-title">
+        <span class="dot" style="background: var(--emerald);"></span>
+        All Candidate Topologies Evaluated
+      </div>
+      <div id="topologiesList" class="topology-list">
+        <!-- Rendered via JS -->
+      </div>
+    </div>
+
+    <!-- Copy Job Note Button -->
+    <button class="btn-copy" onclick="copyJobSummary()">
+      📋 Copy Wiring Plan &amp; Ground Block Levels to Job Notes
+    </button>
+
+  </div>
+
+  <!-- Interactive Explanatory Modal -->
+  <div id="modalBackdrop" class="modal-backdrop" onclick="closeModalOnBackdrop(event)">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title-area">
+          <span id="modalCat" class="modal-category">PHT SPECIFICATION</span>
+          <h3 id="modalTitle" class="modal-title">Downstream Power (Rx)</h3>
+        </div>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div id="modalBody" class="modal-body">
+        <!-- Injected via JS -->
+      </div>
     </div>
   </div>
-</div>
 
-<script>
-  // CABLE ATTENUATION CONSTANTS PER 100 FT (Nominal @ 68°F)
-  const ATTENUATION = {
-    RG6:  { low: 1.5, high: 5.6, ret: 0.8 },  // 54MHz: 1.5dB, 750MHz: 5.6dB, Ret (15MHz): 0.8dB
-    RG11: { low: 0.9, high: 3.6, ret: 0.4 },  // 54MHz: 0.9dB, 750MHz: 3.6dB, Ret: 0.4dB
-    RG59: { low: 2.3, high: 8.2, ret: 1.2 }   // 54MHz: 2.3dB, 750MHz: 8.2dB, Ret: 1.2dB
-  };
+  <!-- Toast -->
+  <div id="toast" class="toast">✓ Copied wiring plan to clipboard!</div>
 
-  const SPLITTER_PROFILES = {
-    "none":             { fwd: 0.0,  ret: 0.0 },
-    "2way":             { fwd: 3.7,  ret: 3.7 },
-    "3way_unbal_tap":   { fwd: 3.7,  ret: 3.7 },
-    "3way_unbal_iso":   { fwd: 7.4,  ret: 7.4 },
-    "3way_bal":         { fwd: 5.8,  ret: 5.8 },
-    "4way":             { fwd: 7.4,  ret: 7.4 },
-    "8way":             { fwd: 11.5, ret: 11.5 },
-    "comm_drop_amp":    { fwd: 0.0,  ret: 0.0 } // Unity gain passive/active bypass
-  };
+  <script>
+    // State
+    const state = {
+      mode: 'auto',
+      manualId: '3way_hot',
+      tapDs: 15.0,
+      tapTx: 38.0,
+      dropType: 'rg6',
+      dropLen: 100,
+      modemCount: 1,
+      stbCount: 2,
+      insideLen: 50
+    };
 
-  function setFootage(ft) {
-    document.getElementById('dropFootage').value = ft;
-    document.querySelectorAll('.drop-btn').forEach(btn => btn.classList.remove('active'));
-    if (event && event.target) event.target.classList.add('active');
-    calculateTopology();
-  }
-
-  // WIDENED PASS / SHRUNKEN MARGINAL EVALUATION ENGINE
-  function evaluateRx(rx) {
-    // WIDER PASS: -10.0 to +10.0 dBmV
-    if (rx >= -10.0 && rx <= 10.0) {
-      return { status: "PASS", class: "pass", badgeClass: "badge-pass" };
-    }
-    // SHRUNKEN MARGINAL: [-12.0 to -10.0) or (10.0 to 12.0]
-    if ((rx >= -12.0 && rx < -10.0) || (rx > 10.0 && rx <= 12.0)) {
-      return { status: "MARGINAL", class: "marginal", badgeClass: "badge-marginal" };
-    }
-    // FAIL: < -12.0 or > +12.0 dBmV
-    return { status: "FAIL", class: "fail", badgeClass: "badge-fail" };
-  }
-
-  function evaluateTx(tx) {
-    // WIDER PASS: +36.0 to +50.0 dBmV
-    if (tx >= 36.0 && tx <= 50.0) {
-      return { status: "PASS", class: "pass", badgeClass: "badge-pass" };
-    }
-    // SHRUNKEN MARGINAL: [34.0 to 36.0) or (50.0 to 52.0]
-    if ((tx >= 34.0 && tx < 36.0) || (tx > 50.0 && tx <= 52.0)) {
-      return { status: "MARGINAL", class: "marginal", badgeClass: "badge-marginal" };
-    }
-    // FAIL: < +34.0 or > +52.0 dBmV
-    return { status: "FAIL", class: "fail", badgeClass: "badge-fail" };
-  }
-
-  function evaluateTilt(tilt) {
-    const abs = Math.abs(tilt);
-    // WIDER PASS: <= 9.0 dB
-    if (abs <= 9.0) return "PASS";
-    // SHRUNKEN MARGINAL: 9.1 to 11.0 dB
-    if (abs <= 11.0) return "MARGINAL";
-    return "FAIL";
-  }
-
-  function calculateTopology() {
-    // 1. Get Inputs
-    const tapHighRx = parseFloat(document.getElementById('tapHighRx').value) || 0;
-    const tapLowRx = parseFloat(document.getElementById('tapLowRx').value) || 0;
-    const tapTx = parseFloat(document.getElementById('tapTx').value) || 0;
-
-    const cableType = document.getElementById('cableType').value;
-    const dropFootage = parseFloat(document.getElementById('dropFootage').value) || 0;
-
-    const splitterKey = document.getElementById('splitterSelect').value;
-    const internalRun = parseFloat(document.getElementById('internalRun').value) || 0;
-    const internalCable = document.getElementById('internalCable').value;
-
-    // 2. Drop Loss Calculation
-    const dropRates = ATTENUATION[cableType];
-    const dropHighLoss = (dropFootage / 100) * dropRates.high;
-    const dropLowLoss = (dropFootage / 100) * dropRates.low;
-    const dropRetLoss = (dropFootage / 100) * dropRates.ret;
-
-    // Ground Block Levels
-    const gbHigh = tapHighRx - dropHighLoss;
-    const gbLow = tapLowRx - dropLowLoss;
-    const gbTxVal = tapTx + dropRetLoss;
-
-    // 3. Demarc & Internal Run Loss
-    const splitProfile = SPLITTER_PROFILES[splitterKey];
-    const intRates = ATTENUATION[internalCable];
-    const intHighLoss = (internalRun / 100) * intRates.high;
-    const intLowLoss = (internalRun / 100) * intRates.low;
-    const intRetLoss = (internalRun / 100) * intRates.ret;
-
-    const totalHighLoss = dropHighLoss + splitProfile.fwd + intHighLoss;
-    const totalRetLoss = dropRetLoss + splitProfile.ret + intRetLoss;
-
-    // Outlet / Modem Levels
-    const outHigh = tapHighRx - totalHighLoss;
-    const outLow = tapLowRx - (dropLowLoss + splitProfile.fwd + intLowLoss);
-    const outTxVal = tapTx + totalRetLoss;
-    const outTiltVal = outHigh - outLow;
-
-    // 4. Update UI - Ground Block
-    document.getElementById('gbHighRx').textContent = (gbHigh > 0 ? "+" : "") + gbHigh.toFixed(1);
-    document.getElementById('gbLowRx').textContent = (gbLow > 0 ? "+" : "") + gbLow.toFixed(1);
-    document.getElementById('gbTx').textContent = gbTxVal.toFixed(1);
-
-    const gbRxEval = evaluateRx(gbHigh);
-    const gbTxEval = evaluateTx(gbTxVal);
-    applyResultBox('demarcBox', 'demarcBadge', gbRxEval, gbTxEval);
-
-    // 5. Update UI - Outlet / Modem
-    document.getElementById('outHighRx').textContent = (outHigh > 0 ? "+" : "") + outHigh.toFixed(1);
-    document.getElementById('outLowRx').textContent = (outLow > 0 ? "+" : "") + outLow.toFixed(1);
-    document.getElementById('outTx').textContent = outTxVal.toFixed(1);
-    document.getElementById('outTilt').textContent = Math.abs(outTiltVal).toFixed(1) + " dB";
-    document.getElementById('outLoss').textContent = totalHighLoss.toFixed(1) + " dB";
-
-    const outRxEval = evaluateRx(outHigh);
-    const outTxEval = evaluateTx(outTxVal);
-    const tiltEval = evaluateTilt(outTiltVal);
-    applyResultBox('outletBox', 'outletBadge', outRxEval, outTxEval, tiltEval);
-
-    // 6. Generate Contextual Field Recommendations
-    generateRecommendation(outHigh, outTxVal, outTiltVal, splitterKey, dropFootage);
-  }
-
-  function applyResultBox(boxId, badgeId, rxEval, txEval, tiltEval = "PASS") {
-    const box = document.getElementById(boxId);
-    const badge = document.getElementById(badgeId);
-
-    // Determine overall status (FAIL > MARGINAL > PASS)
-    if (rxEval.status === "FAIL" || txEval.status === "FAIL" || tiltEval === "FAIL") {
-      box.className = "result-box fail";
-      badge.className = "status-badge badge-fail";
-      badge.textContent = "FAIL";
-    } else if (rxEval.status === "MARGINAL" || txEval.status === "MARGINAL" || tiltEval === "MARGINAL") {
-      box.className = "result-box marginal";
-      badge.className = "status-badge badge-marginal";
-      badge.textContent = "MARGINAL";
-    } else {
-      box.className = "result-box pass";
-      badge.className = "status-badge badge-pass";
-      badge.textContent = "PASS";
-    }
-  }
-
-  function generateRecommendation(rx, tx, tilt, currentSplitter, footage) {
-    const recBox = document.getElementById('recommendationText');
-    let recs = [];
-
-    // Upstream Tx Check
-    if (tx > 50.0) {
-      if (currentSplitter.includes("4way") || currentSplitter.includes("8way")) {
-        recs.push("🚨 <strong>High Tx Warning:</strong> Swap to a 3-way unbalanced (put modem on 3.5dB TAP) or dedicate a 2-way first split.");
-      } else if (currentSplitter === "2way" && tx > 52.0) {
-        recs.push("🚨 <strong>Severe Upstream Deficit:</strong> Upstream exceeds maximum plant ceiling. Verify tap levels with meter or submit RTM for plant pad adjustment.");
-      } else {
-        recs.push("⚠️ Upstream is leaning hot. Ensure no unnecessary pads, attenuators, or cascaded internal splitters exist.");
+    // Master Catalog of Strictly Passive Splitters
+    const catalog = {
+      barrel: {
+        id: 'barrel',
+        name: 'Direct Barrel (0 dB Insertion Loss)',
+        short: 'Direct Barrel',
+        ports: 1,
+        lossDs: 0.0,
+        lossUs: 0.0,
+        stbLossDs: null,
+        desc: 'Direct drop home-run through PoE ground block. Zero passive split loss.',
+        guide: '&bull; <strong>Port Connection:</strong> Direct drop home-run to DOCSIS Gateway. Terminate all unused house lines.',
+        isCascade: false,
+        matrix: {
+          rxMin: -5.0,
+          rxIdeal: 3.0,
+          rxMax: 11.0,
+          txIdeal: 37.0,
+          txMax: 45.0
+        }
+      },
+      '2way': {
+        id: '2way',
+        name: 'Single Balanced 2-Way Splitter (-4.5 dB)',
+        short: 'Balanced 2-Way',
+        ports: 2,
+        lossDs: 4.5,
+        lossUs: 4.5,
+        stbLossDs: 4.5,
+        desc: '1 input, 2 balanced ports (-4.5 dB). Perfectly equalized downstream and return.',
+        guide: '&bull; <strong>Port 1 (-4.5 dB):</strong> Dedicated DOCSIS Gateway.<br>&bull; <strong>Port 2 (-4.5 dB):</strong> TV STB.',
+        isCascade: false,
+        matrix: {
+          rxMin: -0.5,
+          rxIdeal: 7.5,
+          rxMax: 15.5,
+          txIdeal: 32.5,
+          txMax: 40.5
+        }
+      },
+      '3way_hot': {
+        id: '3way_hot',
+        name: 'Unbalanced 3-Way (Gateway on Hot Leg)',
+        short: '3-Way Hot Leg',
+        ports: 3,
+        lossDs: 5.0,
+        lossUs: 5.0,
+        stbLossDs: 8.5,
+        desc: 'Gateway on -5.0 dB Hot Leg protects return Tx power. STBs take -8.5 dB weak legs.',
+        guide: '&bull; <strong>HOT LEG (-5.0 dB):</strong> Connect DOCSIS Gateway.<br>&bull; <strong>WEAK LEGS (-8.5 dB):</strong> Connect TV Outlets.',
+        isCascade: false,
+        matrix: {
+          rxMin: 0.0,
+          rxIdeal: 8.0,
+          rxMax: 16.0,
+          txIdeal: 32.0,
+          txMax: 40.0
+        }
+      },
+      '3way_weak': {
+        id: '3way_weak',
+        name: 'Unbalanced 3-Way (Gateway on Weak Leg)',
+        short: '3-Way Weak Leg',
+        ports: 3,
+        lossDs: 8.5,
+        lossUs: 8.5,
+        stbLossDs: 5.0,
+        desc: 'Gateway on -8.5 dB weak leg. Higher upstream transmit required. Non-optimal if hot leg is open.',
+        guide: '&bull; <strong>HOT LEG (-5.0 dB):</strong> High-loss TV run.<br>&bull; <strong>WEAK LEG (-8.5 dB):</strong> Connect DOCSIS Gateway.<br>&bull; <strong>WEAK LEG 2 (-8.5 dB):</strong> Secondary TV.',
+        isCascade: false,
+        matrix: {
+          rxMin: 3.5,
+          rxIdeal: 11.5,
+          rxMax: 19.5,
+          txIdeal: 28.5,
+          txMax: 36.5
+        }
+      },
+      '4way': {
+        id: '4way',
+        name: 'Single Balanced 4-Way Splitter (-7.0 dB)',
+        short: 'Balanced 4-Way',
+        ports: 4,
+        lossDs: 7.0,
+        lossUs: 7.0,
+        stbLossDs: 7.0,
+        desc: 'All 4 outlets receive equal -7.0 dB attenuation. Standard balanced demarc architecture.',
+        guide: '&bull; <strong>Port 1 (-7.0 dB):</strong> DOCSIS Gateway.<br>&bull; <strong>Ports 2-4 (-7.0 dB):</strong> TV Outlets.',
+        isCascade: false,
+        matrix: {
+          rxMin: 2.0,
+          rxIdeal: 10.0,
+          rxMax: 18.0,
+          txIdeal: 30.0,
+          txMax: 38.0
+        }
+      },
+      '8way': {
+        id: '8way',
+        name: 'Single Balanced 8-Way Splitter (-11.0 dB)',
+        short: 'Balanced 8-Way',
+        ports: 8,
+        lossDs: 11.0,
+        lossUs: 11.0,
+        stbLossDs: 11.0,
+        desc: 'Demarc home-run hub. All ports balanced at -11.0 dB attenuation.',
+        guide: '&bull; <strong>Port 1 (-11.0 dB):</strong> DOCSIS Gateway.<br>&bull; <strong>Active Ports (-11.0 dB):</strong> TV Outlets.<br>&bull; <strong>Unused Ports:</strong> 75Ω locking terminators required.',
+        isCascade: false,
+        matrix: {
+          rxMin: 6.0,
+          rxIdeal: 14.0,
+          rxMax: 22.0,
+          txIdeal: 26.0,
+          txMax: 34.0
+        }
+      },
+      cascade: {
+        id: 'cascade',
+        name: 'Cascaded Splitter (⚠️ Anti-Pattern / Avoid)',
+        short: 'Cascaded 2-Way',
+        ports: 6,
+        lossDs: 4.5,
+        lossUs: 4.5,
+        stbLossDs: 11.5,
+        desc: 'Demarc 2-Way feeding secondary splitter. Creates return squeeze and severe MoCA isolation loss.',
+        guide: '⚠️ <strong>Non-Standard:</strong> Re-cable with a single home-run splitter (3-Way, 4-Way, or 8-Way).',
+        isCascade: true,
+        matrix: null
       }
-    } else if (tx < 36.0) {
-      recs.push("ℹ️ <strong>Low Tx:</strong> Upstream is cool. Ensure at least a 2-way splitter or forward/reverse attenuator pad is present if plant noise floors fluctuate.");
+    };
+
+    function handleTapDs(val) {
+      state.tapDs = parseFloat(val);
+      const el = document.getElementById('tapDsVal');
+      if (el) el.textContent = (state.tapDs > 0 ? '+' : '') + state.tapDs.toFixed(1);
+      calculate();
     }
 
-    // Downstream Rx Check
-    if (rx < -10.0) {
-      if (footage > 150 && document.getElementById('cableType').value === 'RG6') {
-        recs.push("📉 <strong>Span Loss:</strong> Drop exceeds 150ft on RG6. Consider replacing with RG11 to recover ~2.5 to 3.5 dB of High Rx.");
-      } else {
-        recs.push("📉 <strong>Low Downstream:</strong> Reduce demarc split loss or move modem line to a lower-attenuation port.");
+    function handleTapTx(val) {
+      state.tapTx = parseFloat(val);
+      const el = document.getElementById('tapTxVal');
+      if (el) el.textContent = state.tapTx.toFixed(1);
+      calculate();
+    }
+
+    function handleModemCount(val) {
+      state.modemCount = parseInt(val, 10);
+      const el = document.getElementById('modemCountVal');
+      if (el) el.textContent = state.modemCount === 1 ? '1 Modem Active' : 'No Modem (TV Only)';
+      autoAdjustManualId();
+      calculate();
+    }
+
+    function handleTvSlider(val) {
+      state.stbCount = parseInt(val, 10);
+      const el = document.getElementById('tvCountVal');
+      if (el) el.textContent = `${state.stbCount} TV${state.stbCount === 1 ? '' : 's'}`;
+      autoAdjustManualId();
+      calculate();
+    }
+
+    function autoAdjustManualId() {
+      const totalOutlets = state.modemCount + state.stbCount;
+      if (state.mode === 'manual') {
+        const cur = catalog[state.manualId];
+        if (cur && cur.ports < totalOutlets) {
+          if (totalOutlets <= 1) state.manualId = 'barrel';
+          else if (totalOutlets === 2) state.manualId = '2way';
+          else if (totalOutlets === 3) state.manualId = state.modemCount === 1 ? '3way_hot' : '4way';
+          else if (totalOutlets === 4) state.manualId = '4way';
+          else state.manualId = '8way';
+        }
       }
-    } else if (rx > 10.0) {
-      recs.push("📈 <strong>Hot Downstream:</strong> Signal is high (+10 dBmV). Add a 2-way or 4-way balanced splitter or forward attenuator to pull levels closer to 0 dBmV.");
     }
 
-    // Tilt Check
-    if (Math.abs(tilt) > 9.0) {
-      recs.push("📐 <strong>High Tilt (&gt;9dB):</strong> Significant delta between low and high carriers. Check for water in drop, crimped jacket, or corrosion on F-connectors.");
+    function handleDropLen(val) {
+      state.dropLen = parseInt(val, 10);
+      const el = document.getElementById('dropLenVal');
+      if (el) el.textContent = state.dropLen;
+      calculate();
     }
 
-    if (recs.length === 0) {
-      recBox.innerHTML = "✅ <strong>Ideal Topology:</strong> Modem port falls comfortably within the widened Comcast pass window (-10 to +10 dBmV Rx, 36 to 50 dBmV Tx). Safe to close out job.";
-      recBox.style.borderLeftColor = "var(--success)";
-    } else {
-      recBox.innerHTML = recs.join("<br>");
-      recBox.style.borderLeftColor = tx > 50 || rx < -10 ? "var(--warning)" : "var(--primary)";
+    function handleInsideLen(val) {
+      state.insideLen = parseInt(val, 10);
+      const el = document.getElementById('insideLenVal');
+      if (el) el.textContent = state.insideLen;
+      calculate();
     }
-  }
 
-  // Initialize on load
-  document.addEventListener('DOMContentLoaded', () => {
-    calculateTopology();
-  });
-</script>
+    function setMode(mode) {
+      state.mode = mode;
+      document.getElementById('modeAuto').className = 'mode-btn ' + (mode === 'auto' ? 'active' : '');
+      document.getElementById('modeManual').className = 'mode-btn ' + (mode === 'manual' ? 'active' : '');
+      document.getElementById('manualSplitterSection').style.display = (mode === 'manual' ? 'block' : 'none');
+      document.getElementById('heroTag').textContent = (mode === 'auto' ? 'RECOMMENDED SINGLE-DEMARC TOPOLOGY' : 'MANUALLY SELECTED TOPOLOGY');
+      calculate();
+    }
 
+    function selectManualSplitter(id) {
+      state.manualId = id;
+      calculate();
+    }
+
+    // Calculation Engine - Updated with tighter tolerances
+    function calculate() {
+      const dropTypeSelect = document.getElementById('dropType');
+      if (dropTypeSelect) {
+        state.dropType = dropTypeSelect.value;
+      }
+      
+      const totalOutlets = state.modemCount + state.stbCount;
+      const modemLabel = state.modemCount === 1 ? '1 DOCSIS Modem' : '0 Modems';
+      const summaryText = document.getElementById('deviceSummaryText');
+      if (summaryText) {
+        summaryText.innerHTML = 
+          `Total House Outlets: <strong>${totalOutlets}</strong> (${modemLabel} + ${state.stbCount} TV Outlet${state.stbCount === 1 ? '' : 's'}).`;
+      }
+
+      // OES Drop Rule: Series 6 max 150 ft
+      const isOesViolation = (state.dropType === 'rg6' && state.dropLen > 150);
+      const oesAlert = document.getElementById('oesAlert');
+      if (oesAlert) oesAlert.style.display = isOesViolation ? 'flex' : 'none';
+
+      // Attenuation Rates
+      const dropDsRate = state.dropType === 'rg6' ? 0.060 : 0.038; // per ft at 1 GHz
+      const dropUsRate = state.dropType === 'rg6' ? 0.016 : 0.010; // per ft at 55 MHz
+      const insideDsRate = 0.060; // 3.0 dB / 50 ft
+      const insideUsRate = 0.015;
+
+      const dropLossDs = Number((state.dropLen * dropDsRate).toFixed(1));
+      const dropLossUs = Number((state.dropLen * dropUsRate).toFixed(1));
+      const insideLossDs = Number((state.insideLen * insideDsRate).toFixed(1));
+      const insideLossUs = Number((state.insideLen * insideUsRate).toFixed(1));
+
+      const dropLossDisp = document.getElementById('dropLossDisplay');
+      if (dropLossDisp) dropLossDisp.textContent = `Drop Loss: -${dropLossDs.toFixed(1)} dB (1G)`;
+      const insideLossDisp = document.getElementById('insideLossDisplay');
+      if (insideLossDisp) insideLossDisp.textContent = `Inside Loss: -${insideLossDs.toFixed(1)} dB (1G)`;
+
+      // EXPECTED GROUND BLOCK NUMBERS (Pre-Splitter, after Drop Cable)
+      const gbRx = Number((state.tapDs - dropLossDs).toFixed(1));
+      const gbTx = Number((state.tapTx + dropLossUs).toFixed(1));
+
+      // Scoring Function - Updated with tighter tolerances
+      function scoreItem(item) {
+        const mRx = state.modemCount === 1 
+          ? Number((state.tapDs - dropLossDs - item.lossDs - insideLossDs).toFixed(1)) 
+          : null;
+        const mTx = state.modemCount === 1 
+          ? Number((state.tapTx + dropLossUs + item.lossUs + insideLossUs).toFixed(1)) 
+          : null;
+        
+        const stbLossToUse = (state.modemCount === 0) ? item.lossDs : (item.stbLossDs !== null ? item.stbLossDs : item.lossDs);
+        const sRx = (state.stbCount > 0)
+          ? Number((state.tapDs - dropLossDs - stbLossToUse - insideLossDs).toFixed(1))
+          : null;
+
+        let penalty = 0;
+        
+        if (state.modemCount === 1 && mRx !== null) {
+          // Tighter Rx ideal target
+          penalty += Math.abs(mRx - 0.0) * 2;
+          
+          // Tighter Tx penalties
+          if (mTx > 48.0) penalty += (mTx - 48.0) * 35; // increased penalty slope
+          if (mTx > 51.0) penalty += 500; // tighter upper bound hard fail
+          if (mTx < 35.0) penalty += 200;
+        } else if (sRx !== null) {
+          penalty += Math.abs(sRx - 0.0) * 2;
+        }
+
+        const portShortfall = Math.max(0, totalOutlets - item.ports);
+        if (portShortfall > 0) {
+          penalty += 2000 + (portShortfall * 300);
+        }
+
+        const excessPorts = Math.max(0, item.ports - totalOutlets);
+        if (excessPorts > 0) {
+          penalty += excessPorts * 5;
+        }
+
+        // Tighter STB Rx bounds
+        if (sRx !== null && (sRx < -8.0 || sRx > 8.0)) penalty += 75; // increased penalty
+        if (item.isCascade) penalty += 400;
+
+        return { ...item, mRx, mTx, sRx, penalty, portShortfall, excessPorts };
+      }
+
+      const candidateKeys = ['barrel', '2way', '3way_hot', '3way_weak', '4way', '8way', 'cascade'];
+      const evaluated = candidateKeys.map(k => scoreItem(catalog[k]));
+      const sortedForAuto = [...evaluated].filter(i => !i.isCascade).sort((a, b) => a.penalty - b.penalty);
+
+      let active;
+      if (state.mode === 'auto') {
+        active = sortedForAuto[0];
+      } else {
+        active = evaluated.find(i => i.id === state.manualId) || evaluated[0];
+      }
+
+      // Render Manual Grid
+      const manualGrid = document.getElementById('splitterGrid');
+      if (manualGrid) {
+        manualGrid.innerHTML = '';
+        candidateKeys.forEach(k => {
+          const item = catalog[k];
+          const isSel = (active.id === k);
+          const hasEnoughPorts = item.ports >= totalOutlets;
+          const btn = document.createElement('div');
+          
+          let cls = 'splitter-btn';
+          if (item.isCascade) cls += ' cascade';
+          if (isSel) cls += ' selected';
+          if (!hasEnoughPorts && !item.isCascade) cls += ' disabled';
+
+          btn.className = cls;
+          btn.onclick = () => selectManualSplitter(k);
+
+          btn.innerHTML = `
+            <div class="s-name">${item.short}</div>
+            <div class="s-meta">${item.ports} Port${item.ports > 1 ? 's' : ''} ${!hasEnoughPorts ? '• <span style="color:var(--rose)">Need ' + totalOutlets + '</span>' : ''}</div>
+            <div class="s-loss">${item.isCascade ? '⚠️ Non-Standard' : '-' + item.lossDs.toFixed(1) + ' dB'}</div>
+          `;
+          manualGrid.appendChild(btn);
+        });
+      }
+
+      const metaEl = document.getElementById('manualSelectedMeta');
+      if (metaEl) {
+        metaEl.textContent = `${active.short} (-${active.lossDs.toFixed(1)} dB DS)`;
+      }
+
+      // Port shortfall warning
+      const shortfallEl = document.getElementById('portShortfallAlert');
+      if (shortfallEl) {
+        if (active.portShortfall > 0) {
+          shortfallEl.style.display = 'flex';
+          const sfText = document.getElementById('portShortfallText');
+          if (sfText) {
+            sfText.innerHTML = `Selected <strong>${active.short}</strong> has only ${active.ports} port(s), but premise requires ${totalOutlets} outlets. Shortfall: <strong>${active.portShortfall} port(s)</strong>.`;
+          }
+        } else {
+          shortfallEl.style.display = 'none';
+        }
+      }
+
+      // Populate Hero Banner
+      const heroName = document.getElementById('heroName');
+      if (heroName) heroName.textContent = active.name;
+      const heroDesc = document.getElementById('heroDesc');
+      if (heroDesc) heroDesc.textContent = active.desc;
+      const portBadge = document.getElementById('portCapacityBadge');
+      if (portBadge) portBadge.textContent = `${active.ports}-PORT DEMARC (${totalOutlets} OUTLETS IN USE)`;
+      const portGuide = document.getElementById('portGuideText');
+      if (portGuide) portGuide.innerHTML = active.guide;
+
+      // Populate Dedicated Ground Block Telemetry
+      const gbRxEl = document.getElementById('valGbRx');
+      if (gbRxEl) gbRxEl.textContent = `${gbRx > 0 ? '+' : ''}${gbRx.toFixed(1)} dBmV`;
+      const gbTxEl = document.getElementById('valGbTx');
+      if (gbTxEl) gbTxEl.textContent = `${gbTx.toFixed(1)} dBmV`;
+
+      const matrixComp = document.getElementById('gbMatrixCompare');
+      if (matrixComp && active.matrix) {
+        matrixComp.textContent = 
+          `Target: Ideal ${active.matrix.rxIdeal > 0 ? '+' : ''}${active.matrix.rxIdeal.toFixed(1)} dBmV Rx | Safe: ${active.matrix.rxMin > 0 ? '+' : ''}${active.matrix.rxMin.toFixed(1)} to +${active.matrix.rxMax.toFixed(1)}`;
+      }
+
+      // Unused Ports Alert
+      const termAlert = document.getElementById('terminatorAlert');
+      if (termAlert) {
+        const unusedCount = Math.max(0, active.ports - totalOutlets);
+        if (unusedCount > 0 && !active.isCascade) {
+          termAlert.style.display = 'flex';
+          const termText = document.getElementById('terminatorText');
+          if (termText) {
+            termText.innerHTML = `<strong>${unusedCount} unused port${unusedCount > 1 ? 's' : ''}</strong> must be capped with approved 75Ω locking terminators to prevent a 7-point TQI-C deduction and protect against RF noise ingress.`;
+          }
+        } else {
+          termAlert.style.display = 'none';
+        }
+      }
+
+      // Populate Delivered Device Telemetry Cards
+      // UPDATED WITH TIGHTER TOLERANCES
+      const rxEl = document.getElementById('valModemRx');
+      const rxSub = document.getElementById('subModemRx');
+      if (rxEl && rxSub) {
+        if (state.modemCount === 1 && active.mRx !== null) {
+          rxEl.textContent = `${active.mRx > 0 ? '+' : ''}${active.mRx.toFixed(1)} dBmV`;
+          if (active.mRx < -10.0 || active.mRx > 10.0) { // tighter hard fail
+            rxEl.className = 't-val val-fail';
+            rxSub.textContent = 'HARD FAIL (< -10 or > +10)';
+          } else if (active.mRx < -8.0 || active.mRx > 8.0) { // tighter marginal
+            rxEl.className = 't-val val-warn';
+            rxSub.textContent = 'MARGINAL (Safe: -8 to +8)';
+          } else {
+            rxEl.className = 't-val val-safe';
+            rxSub.textContent = 'Target: 0.0 (-8.0 to +8.0)';
+          }
+        } else {
+          rxEl.textContent = 'N/A';
+          rxEl.className = 't-val';
+          rxSub.textContent = 'No Modem (TV Only)';
+        }
+      }
+
+      const txEl = document.getElementById('valModemTx');
+      const txSub = document.getElementById('subModemTx');
+      if (txEl && txSub) {
+        if (state.modemCount === 1 && active.mTx !== null) {
+          txEl.textContent = `${active.mTx.toFixed(1)} dBmV`;
+          if (active.mTx < 35.0 || active.mTx > 51.0) { // tighter hard fail
+            txEl.className = 't-val val-fail';
+            txSub.textContent = 'HARD FAIL (< 35 or > 51)';
+          } else if (active.mTx > 48.0) {
+            txEl.className = 't-val val-warn';
+            txSub.textContent = 'MARGINAL (> 48.0 dBmV)';
+          } else {
+            txEl.className = 't-val val-ideal';
+            txSub.textContent = 'Safe: 35.0 to 48.0';
+          }
+        } else {
+          txEl.textContent = 'N/A';
+          txEl.className = 't-val';
+          txSub.textContent = 'No Modem (TV Only)';
+        }
+      }
+
+      const stbEl = document.getElementById('valStbRx');
+      const stbSub = document.getElementById('subStbRx');
+      if (stbEl && stbSub) {
+        if (active.sRx !== null) {
+          stbEl.textContent = `${active.sRx > 0 ? '+' : ''}${active.sRx.toFixed(1)} dBmV`;
+          if (active.sRx < -8.0 || active.sRx > 8.0) {
+            stbEl.className = 't-val val-warn';
+            stbSub.textContent = 'MARGINAL (Safe: -8 to +8)';
+          } else {
+            stbEl.className = 't-val val-safe';
+            stbSub.textContent = 'Safe: -8.0 to +8.0';
+          }
+        } else {
+          stbEl.textContent = 'N/A';
+          stbEl.className = 't-val';
+          stbSub.textContent = '0 TVs connected';
+        }
+      }
+
+      // Overall PHT Status - Updated with tighter tolerances
+      const modemHardFail = state.modemCount === 1 && (active.mRx < -10.0 || active.mRx > 10.0 || active.mTx < 35.0 || active.mTx > 51.0);
+      const stbHardFail = active.sRx !== null && (active.sRx < -12.0 || active.sRx > 12.0); // tighter STB fail
+      const hasHardFail = modemHardFail || stbHardFail || active.portShortfall > 0;
+
+      const modemMarginal = state.modemCount === 1 && (active.mRx < -8.0 || active.mRx > 8.0 || active.mTx > 48.0);
+      const stbMarginal = active.sRx !== null && (active.sRx < -8.0 || active.sRx > 8.0);
+      const hasMarginal = !hasHardFail && (modemMarginal || stbMarginal || active.isCascade);
+
+      const topBadge = document.getElementById('phtBadge');
+      const heroBadge = document.getElementById('heroBadge');
+      const heroBanner = document.getElementById('heroBanner');
+
+      if (hasHardFail) {
+        const text = active.portShortfall > 0 ? '❌ PORT SHORTFALL' : '❌ PHT HARD FAIL';
+        if (topBadge) {
+          topBadge.className = 'pht-header-badge badge-fail';
+          topBadge.innerHTML = `<span>${text}</span>`;
+        }
+        if (heroBadge) {
+          heroBadge.className = 'pht-header-badge badge-fail';
+          heroBadge.innerHTML = `<span>${text}</span>`;
+        }
+        if (heroBanner) heroBanner.style.borderColor = 'var(--rose)';
+      } else if (hasMarginal) {
+        if (topBadge) {
+          topBadge.className = 'pht-header-badge badge-marginal';
+          topBadge.innerHTML = `<span>⚠️ PHT MARGINAL</span>`;
+        }
+        if (heroBadge) {
+          heroBadge.className = 'pht-header-badge badge-marginal';
+          heroBadge.innerHTML = `<span>⚠️ PHT MARGINAL</span>`;
+        }
+        if (heroBanner) heroBanner.style.borderColor = 'var(--amber)';
+      } else {
+        if (topBadge) {
+          topBadge.className = 'pht-header-badge badge-pass';
+          topBadge.innerHTML = `<span>✓ OPTIMAL PHT PASS</span>`;
+        }
+        if (heroBadge) {
+          heroBadge.className = 'pht-header-badge badge-pass';
+          heroBadge.innerHTML = `<span>✓ OPTIMAL PHT PASS</span>`;
+        }
+        if (heroBanner) heroBanner.style.borderColor = 'var(--cyan)';
+      }
+
+      // Populate Evaluated List
+      const topList = document.getElementById('topologiesList');
+      if (topList) {
+        topList.innerHTML = '';
+
+        evaluated.forEach(item => {
+          const isActive = (item.id === active.id);
+          const hasPorts = (item.ports >= totalOutlets);
+          const row = document.createElement('div');
+          
+          let rowCls = 'topology-row';
+          if (item.isCascade) rowCls += ' cascade-row';
+          if (isActive) rowCls += ' active';
+
+          row.className = rowCls;
+          row.onclick = () => {
+            if (state.mode === 'auto') setMode('manual');
+            selectManualSplitter(item.id);
+          };
+
+          const isOverallPass = (state.modemCount === 0 || (item.mTx <= 48.0 && item.mRx >= -8.0 && item.mRx <= 8.0)) &&
+                                (item.sRx === null || (item.sRx >= -8.0 && item.sRx <= 8.0)) && !item.isCascade;
+
+          const passBadge = (!hasPorts && !item.isCascade)
+            ? `<span style="font-size:0.65rem; color:var(--rose); font-weight:800;">[SHORTFALL]</span>`
+            : isOverallPass
+              ? `<span style="font-size:0.65rem; color:var(--emerald); font-weight:800;">[PASS]</span>`
+              : `<span style="font-size:0.65rem; color:var(--amber); font-weight:800;">[MARGINAL]</span>`;
+
+          const displayRx = state.modemCount === 1 ? item.mRx : item.sRx;
+          const displayTx = state.modemCount === 1 ? item.mTx : null;
+
+          row.innerHTML = `
+            <div class="row-info">
+              <div class="row-title">
+                ${passBadge}
+                <span style="${item.isCascade ? 'text-decoration: line-through; color: var(--rose);' : ''}">${item.name}</span>
+              </div>
+              <div class="row-meta">${item.desc}</div>
+            </div>
+            <div class="row-metrics">
+              <span style="color:${displayRx !== null && displayRx >= -8 && displayRx <= 8 ? 'var(--cyan)' : 'var(--amber)'}">
+                ${displayRx !== null ? ((displayRx > 0 ? '+' : '') + displayRx.toFixed(1) + ' Rx') : 'N/A'}
+              </span>
+              ${displayTx !== null ? `
+                <span style="color:var(--text-sub)">|</span>
+                <span style="color:${displayTx <= 48 ? 'var(--emerald)' : 'var(--rose)'}">
+                  ${displayTx.toFixed(1)} Tx
+                </span>
+              ` : ''}
+            </div>
+          `;
+          topList.appendChild(row);
+        });
+      }
+    }
+
+    // Modal Content Generator
+    function openModal(topic) {
+      const cat = document.getElementById('modalCat');
+      const title = document.getElementById('modalTitle');
+      const body = document.getElementById('modalBody');
+
+      if (topic === 'gb') {
+        cat.textContent = 'CHEAT SHEET &bull; GROUND BLOCK MATRIX';
+        title.textContent = 'Expected Ground Block Reference';
+        body.innerHTML = `
+          <p>The <strong>Ground Block</strong> is measured at the demarcation point directly after the drop cable, <em>before</em> the demarc splitter. It verifies that incoming signal levels can properly feed the home wiring.</p>
+          <h4>Standard Ground Block Safe Windows (Calculated at 50 ft RG6 run):</h4>
+          <table>
+            <thead>
+              <tr>
+                <th>Configuration</th>
+                <th>Safe Rx Min</th>
+                <th>Ideal Rx</th>
+                <th>Safe Rx Max</th>
+                <th>Ideal Tx</th>
+                <th>Max Tx</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>1 Device (Barrel 0 dB)</strong></td>
+                <td>-5.0 dBmV</td>
+                <td style="color:var(--emerald); font-weight:bold;">+3.0 dBmV</td>
+                <td>+11.0 dBmV</td>
+                <td>37.0 dBmV</td>
+                <td>45.0 dBmV</td>
+              </tr>
+              <tr>
+                <td><strong>2 Devices (2-Way -4.5 dB)</strong></td>
+                <td>-0.5 dBmV</td>
+                <td style="color:var(--emerald); font-weight:bold;">+7.5 dBmV</td>
+                <td>+15.5 dBmV</td>
+                <td>32.5 dBmV</td>
+                <td>40.5 dBmV</td>
+              </tr>
+              <tr>
+                <td><strong>3 Devices (3-Way Hot -5.0 dB)</strong></td>
+                <td>0.0 dBmV</td>
+                <td style="color:var(--emerald); font-weight:bold;">+8.0 dBmV</td>
+                <td>+16.0 dBmV</td>
+                <td>32.0 dBmV</td>
+                <td>40.0 dBmV</td>
+              </tr>
+              <tr>
+                <td><strong>3 Devices (3-Way Weak -8.5 dB)</strong></td>
+                <td>+3.5 dBmV</td>
+                <td style="color:var(--emerald); font-weight:bold;">+11.5 dBmV</td>
+                <td>+19.5 dBmV</td>
+                <td>28.5 dBmV</td>
+                <td>36.5 dBmV</td>
+              </tr>
+              <tr>
+                <td><strong>4 Devices (4-Way -7.0 dB)</strong></td>
+                <td>+2.0 dBmV</td>
+                <td style="color:var(--emerald); font-weight:bold;">+10.0 dBmV</td>
+                <td>+18.0 dBmV</td>
+                <td>30.0 dBmV</td>
+                <td>38.0 dBmV</td>
+              </tr>
+            </tbody>
+          </table>
+          <p><strong>Field Tip:</strong> If your Ground Block Rx is lower than the Safe Min, your modem Rx will fall below -8.0 dBmV once it passes through the splitter and inside cable run.</p>
+        `;
+      } else if (topic === 'rx') {
+        cat.textContent = 'PHT SPECIFICATION &bull; DOWNSTREAM RF';
+        title.textContent = 'Delivered Modem Downstream Power (Rx)';
+        body.innerHTML = `
+          <p><strong>Downstream Power (Rx)</strong> measures the signal strength delivered to the modem's internal tuner across the 1.0 GHz spectrum.</p>
+          <h4>Standard Thresholds:</h4>
+          <ul>
+            <li><strong>Ideal:</strong> 0.0 dBmV</li>
+            <li><strong>Safe PHT Window:</strong> -8.0 to +8.0 dBmV</li>
+            <li><strong>Marginal Warning:</strong> -8.1 to -9.9 dBmV OR +8.1 to +9.9 dBmV</li>
+            <li><strong>Hard Fail:</strong> &lt; -10.0 dBmV OR &gt; +10.0 dBmV</li>
+          </ul>
+          <h4>Technical Root Causes of Failure:</h4>
+          <p><strong>Failing Low (&lt; -8.0 dBmV):</strong> Signal approaches the thermal noise floor of the coaxial cable. SNR drops below 33.0 dB, triggering Correctable and Uncorrectable Codeword (FEC) errors, resulting in packet loss and modem dropouts.</p>
+          <p><strong>Failing High (&gt; +8.0 dBmV):</strong> Excessive RF power saturates the Low-Noise Amplifier (LNA) in the front-end tuner. This induces amplifier clipping and non-linear intermodulation products that distort adjacent OFDM carriers.</p>
+        `;
+      } else if (topic === 'tx') {
+        cat.textContent = 'PHT SPECIFICATION &bull; UPSTREAM RF';
+        title.textContent = 'Required Modem Upstream Transmit (Tx)';
+        body.innerHTML = `
+          <p><strong>Upstream Transmit Power (Tx)</strong> is the power level the DOCSIS modem uses to communicate back to the CMTS (headend/node) across 5–85 MHz.</p>
+          <h4>Standard Thresholds:</h4>
+          <ul>
+            <li><strong>Ideal:</strong> 40.0 dBmV</li>
+            <li><strong>Safe PHT Window:</strong> 35.0 to 48.0 dBmV</li>
+            <li><strong>Marginal Warning:</strong> 48.1 to 50.9 dBmV</li>
+            <li><strong>Hard Fail:</strong> &lt; 35.0 dBmV OR &gt; 51.0 dBmV</li>
+          </ul>
+          <h4>Technical Root Causes of Failure:</h4>
+          <p><strong>High Transmit (&gt; 48.0 dBmV):</strong> Excessive return loss (from splitters or long drops) forces the modem to blast at maximum power. Past 53.0 dBmV, the modem hits physical power compression, causing DOCSIS T3/T4 ranging timeouts and loss of upstream channel bonding.</p>
+          <p><strong>Low Transmit (&lt; 35.0 dBmV):</strong> The modem transmits too quietly, allowing premise electrical noise and ingress on the return path to corrupt upstream packets at the node.</p>
+        `;
+      } else if (topic === 'pht') {
+        cat.textContent = 'COMPLIANCE AUDIT &bull; TQI-C IMPACT';
+        title.textContent = 'PHT Failure &amp; Craftsmanship Scoring';
+        body.innerHTML = `
+          <p>Under the Comcast <strong>TQI-C (Trust Quality Interactions - Craftsmanship)</strong> standard, customer service and CPE must pass Premise Health Testing (PHT).</p>
+          <h4>Scoring Mechanics:</h4>
+          <ul>
+            <li><strong>Starting Baseline:</strong> 100 Points</li>
+            <li><strong>Passing Threshold:</strong> &gt; 87 Points (88+ is a PASS)</li>
+            <li><strong>Failing Grade:</strong> &le; 86 Points (Instant Audit Failure)</li>
+          </ul>
+          <h4>The Penalty Cascade:</h4>
+          <p>Failing PHT carries an immediate <strong>8-point deduction</strong> ("Service/CPE not working properly"). This lowers the score to 92.</p>
+          <p>A single minor infraction on top of this—such as an un-terminated splitter port (-7 pts) or a missing enclosure latch (-7 pts)—drops the score to <strong>85</strong>, resulting in an automatic audit failure requiring formal follow-up in the TRUST platform.</p>
+        `;
+      }
+
+      document.getElementById('modalBackdrop').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('modalBackdrop').classList.remove('open');
+    }
+
+    function closeModalOnBackdrop(e) {
+      if (e.target === document.getElementById('modalBackdrop')) {
+        closeModal();
+      }
+    }
+
+    function copyJobSummary() {
+      const dropType = state.dropType.toUpperCase();
+      const dropLen = state.dropLen;
+      const rec = document.getElementById('heroName').textContent;
+      const gbRx = document.getElementById('valGbRx').textContent;
+      const gbTx = document.getElementById('valGbTx').textContent;
+      const rx = document.getElementById('valModemRx').textContent;
+      const tx = document.getElementById('valModemTx').textContent;
+      const stb = document.getElementById('valStbRx').textContent;
+      const status = document.getElementById('heroBadge').textContent.replace(/[^a-zA-Z ]/g, '').trim();
+
+      const note = `[XFINITY RF TOPOLOGY AUDIT] Drop: ${dropLen}ft ${dropType} | Ground Block: ${gbRx} / ${gbTx} | Topology: ${rec} | Gateway: ${rx} / ${tx} | STB: ${stb} | Status: ${status}`;
+      
+      const el = document.createElement('textarea');
+      el.value = note;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+
+      const toast = document.getElementById('toast');
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, 3000);
+    }
+
+    // Explicit Dual Event Binding for Fluid Touch & Mouse Sliders
+    function attachSliderListeners() {
+      const sliderBindings = [
+        { id: 'tapDs', fn: handleTapDs },
+        { id: 'tapTx', fn: handleTapTx },
+        { id: 'dropLen', fn: handleDropLen },
+        { id: 'modemCount', fn: handleModemCount },
+        { id: 'tvCountSlider', fn: handleTvSlider },
+        { id: 'insideLen', fn: handleInsideLen }
+      ];
+
+      sliderBindings.forEach(binding => {
+        const el = document.getElementById(binding.id);
+        if (el) {
+          ['input', 'change'].forEach(evtType => {
+            el.addEventListener(evtType, (e) => {
+              binding.fn(e.target.value);
+            }, { passive: true });
+          });
+        }
+      });
+
+      const dropSelect = document.getElementById('dropType');
+      if (dropSelect) {
+        ['change', 'input'].forEach(evtType => {
+          dropSelect.addEventListener(evtType, () => {
+            calculate();
+          });
+        });
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      attachSliderListeners();
+      calculate();
+    });
+
+    window.onload = function() {
+      calculate();
+    };
+  </script>
 </body>
 </html>
