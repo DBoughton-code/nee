@@ -32,19 +32,15 @@
       background-color: var(--bg);
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      overflow-x: hidden; /* Prevents horizontal scroll */
     }
 
-    /* Wrap the main UI in a solid layer so the PDF renders behind it unseen */
-    .app-wrapper {
-      position: relative;
-      z-index: 10;
-      background-color: var(--bg);
-      min-height: 100vh;
+    /* Main UI Wrapper */
+    #main-ui {
       display: flex;
       justify-content: center;
       padding: 16px;
       padding-bottom: 60px;
+      min-height: 100vh;
     }
 
     .container {
@@ -55,188 +51,49 @@
       gap: 14px;
     }
 
-    .nav-bar {
-      display: flex;
-      align-items: center;
-    }
+    .nav-bar { display: flex; align-items: center; }
 
     .btn-back {
-      background: #18233a;
-      color: var(--text);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius);
-      padding: 6px 12px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
+      background: #18233a; color: var(--text); border: 1px solid var(--card-border);
+      border-radius: var(--radius); padding: 6px 12px; font-size: 0.8rem;
+      font-weight: 700; text-decoration: none; display: inline-flex;
+      align-items: center; gap: 6px;
     }
+    .btn-back:hover { background: #243452; border-color: var(--cyan); color: var(--cyan); }
 
-    .btn-back:hover {
-      background: #243452;
-      border-color: var(--cyan);
-      color: var(--cyan);
-    }
+    header { text-align: center; padding: 4px 0 10px 0; border-bottom: 1px solid var(--card-border); }
+    h1 { font-size: 1.2rem; font-weight: 900; color: var(--amber); display: flex; align-items: center; justify-content: center; gap: 6px; }
+    p.sub { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
 
-    header {
-      text-align: center;
-      padding: 4px 0 10px 0;
-      border-bottom: 1px solid var(--card-border);
-    }
+    .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+    .form-group { display: flex; flex-direction: column; gap: 4px; }
+    label { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
+    input, select, textarea { width: 100%; background: #090e17; border: 1px solid var(--card-border); color: var(--text); padding: 8px 10px; border-radius: 6px; font-size: 0.85rem; outline: none; }
+    input:focus, select:focus, textarea:focus { border-color: var(--cyan); }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
-    h1 {
-      font-size: 1.2rem;
-      font-weight: 900;
-      color: var(--amber);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-
-    p.sub {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      margin-top: 2px;
-    }
-
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius);
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    label {
-      font-size: 0.72rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--text-muted);
-    }
-
-    input, select, textarea {
-      width: 100%;
-      background: #090e17;
-      border: 1px solid var(--card-border);
-      color: var(--text);
-      padding: 8px 10px;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      outline: none;
-    }
-
-    input:focus, select:focus, textarea:focus {
-      border-color: var(--cyan);
-    }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-
-    /* Legal Scroll Box */
-    .legal-box {
-      background: #090e17;
-      border: 1px solid var(--card-border);
-      border-radius: 6px;
-      padding: 10px;
-      font-size: 0.73rem;
-      color: #cbd5e1;
-      line-height: 1.5;
-      max-height: 140px;
-      overflow-y: auto;
-    }
-
-    .legal-box p {
-      margin-bottom: 8px;
-    }
+    /* Legal Box */
+    .legal-box { background: #090e17; border: 1px solid var(--card-border); border-radius: 6px; padding: 10px; font-size: 0.73rem; color: #cbd5e1; line-height: 1.5; max-height: 140px; overflow-y: auto; }
+    .legal-box p { margin-bottom: 8px; }
 
     /* Signature Canvas */
-    .sig-wrapper {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
+    .sig-wrapper { display: flex; flex-direction: column; gap: 6px; }
+    .canvas-container { background: #ffffff; border-radius: 6px; border: 2px dashed var(--cyan); touch-action: none; }
+    canvas { width: 100%; height: 160px; display: block; cursor: crosshair; }
+    .sig-actions { display: flex; justify-content: space-between; align-items: center; }
+    .btn-clear { background: transparent; border: 1px solid var(--card-border); color: var(--rose); font-size: 0.72rem; font-weight: 700; padding: 4px 8px; border-radius: 4px; cursor: pointer; }
+    
+    .btn-submit { width: 100%; background: var(--emerald); color: #04121d; border: none; border-radius: var(--radius); padding: 12px; font-size: 0.9rem; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 6px; }
+    .btn-submit:hover { background: #34d399; }
 
-    .canvas-container {
-      background: #ffffff;
-      border-radius: 6px;
-      border: 2px dashed var(--cyan);
-      touch-action: none;
-    }
-
-    canvas {
-      width: 100%;
-      height: 160px;
-      display: block;
-      cursor: crosshair;
-    }
-
-    .sig-actions {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .btn-clear {
-      background: transparent;
-      border: 1px solid var(--card-border);
-      color: var(--rose);
-      font-size: 0.72rem;
-      font-weight: 700;
-      padding: 4px 8px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    .btn-submit {
-      width: 100%;
-      background: var(--emerald);
-      color: #04121d;
-      border: none;
-      border-radius: var(--radius);
-      padding: 12px;
-      font-size: 0.9rem;
-      font-weight: 900;
-      letter-spacing: 0.02em;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      transition: all 0.15s ease;
-      margin-top: 6px;
-    }
-
-    .btn-submit:hover {
-      background: #34d399;
-      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
-    }
-
-    /* HIDDEN PRINTABLE TEMPLATE (Placed Behind UI layer) */
+    /* HIDDEN PRINTABLE TEMPLATE */
     #pdf-template {
-      display: none; /* Toggled by JS during generation */
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 1; /* Below the app-wrapper's z-index of 10 */
-      width: 800px; /* Fixed width prevents mobile squish */
+      display: none; /* Stays hidden until generation */
+      width: 800px; /* Forces a full-size desktop layout so it never clips */
       background: #ffffff;
       color: #000000;
       padding: 40px;
+      margin: 0 auto;
       font-family: Arial, sans-serif;
       font-size: 11pt;
       line-height: 1.4;
@@ -245,8 +102,8 @@
 </head>
 <body>
 
-<!-- User Interface Wrapper -->
-<div class="app-wrapper">
+<!-- MAIN USER INTERFACE -->
+<div id="main-ui">
   <div class="container">
 
     <div class="nav-bar">
@@ -329,7 +186,7 @@
   </div>
 </div>
 
-<!-- HIDDEN PDF DOCUMENT LAYOUT -->
+<!-- PDF DOCUMENT LAYOUT (Toggled visible during generation) -->
 <div id="pdf-template">
   <div style="border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 16px; display: flex; justify-content: space-between;">
     <div>
@@ -344,42 +201,42 @@
 
   <table style="width: 100%; margin-bottom: 16px; border-collapse: collapse; font-size: 10pt;">
     <tr>
-      <td style="padding: 4px; border: 1px solid #ccc; width: 25%;"><strong>Customer Name:</strong></td>
-      <td style="padding: 4px; border: 1px solid #ccc;" id="pdf-custname"></td>
-      <td style="padding: 4px; border: 1px solid #ccc; width: 20%;"><strong>Tech ID:</strong></td>
-      <td style="padding: 4px; border: 1px solid #ccc;" id="pdf-techid"></td>
+      <td style="padding: 6px; border: 1px solid #ccc; width: 20%;"><strong>Customer Name:</strong></td>
+      <td style="padding: 6px; border: 1px solid #ccc;" id="pdf-custname"></td>
+      <td style="padding: 6px; border: 1px solid #ccc; width: 15%;"><strong>Tech ID:</strong></td>
+      <td style="padding: 6px; border: 1px solid #ccc;" id="pdf-techid"></td>
     </tr>
     <tr>
-      <td style="padding: 4px; border: 1px solid #ccc;"><strong>Service Address:</strong></td>
-      <td colspan="3" style="padding: 4px; border: 1px solid #ccc;" id="pdf-address"></td>
+      <td style="padding: 6px; border: 1px solid #ccc;"><strong>Service Address:</strong></td>
+      <td colspan="3" style="padding: 6px; border: 1px solid #ccc;" id="pdf-address"></td>
     </tr>
     <tr>
-      <td style="padding: 4px; border: 1px solid #ccc;"><strong>Drill Scope:</strong></td>
-      <td colspan="3" style="padding: 4px; border: 1px solid #ccc;" id="pdf-scope"></td>
+      <td style="padding: 6px; border: 1px solid #ccc;"><strong>Drill Scope:</strong></td>
+      <td colspan="3" style="padding: 6px; border: 1px solid #ccc;" id="pdf-scope"></td>
     </tr>
     <tr>
-      <td style="padding: 4px; border: 1px solid #ccc;"><strong>Location Notes:</strong></td>
-      <td colspan="3" style="padding: 4px; border: 1px solid #ccc;" id="pdf-notes"></td>
+      <td style="padding: 6px; border: 1px solid #ccc;"><strong>Location Notes:</strong></td>
+      <td colspan="3" style="padding: 6px; border: 1px solid #ccc;" id="pdf-notes"></td>
     </tr>
   </table>
 
-  <div style="font-size: 9.5pt; color: #333; line-height: 1.4; margin-bottom: 20px; border: 1px solid #ddd; padding: 10px;">
-    <strong>TERMS &amp; RELEASE OF LIABILITY:</strong><br>
+  <div style="font-size: 9.5pt; color: #333; line-height: 1.5; margin-bottom: 30px; border: 1px solid #ddd; padding: 14px;">
+    <strong>TERMS &amp; RELEASE OF LIABILITY:</strong><br><br>
     The customer represents that they are the legal owner of the premises or an authorized tenant with written permission from the landlord to approve exterior/interior wall, floor, or ceiling penetrations. The technician will practice standard craftsmanship, including pre-inspecting the cavity and sealing all exterior holes with approved silicone/weatherproof bushings. The technician and contractor are released from liability regarding unmapped or concealed structural, electrical, or plumbing lines positioned within wall voids not identifiable through standard pre-drill exterior/interior visual inspection.
   </div>
 
   <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 40px;">
     <div style="width: 60%;">
-      <div style="border-bottom: 1px solid #000; height: 70px;">
-        <img id="pdf-sig-img" style="max-height: 65px;" alt="Signature">
+      <div style="border-bottom: 1px solid #000; height: 75px;">
+        <img id="pdf-sig-img" style="max-height: 70px;" alt="Signature">
       </div>
-      <div style="font-size: 9pt; margin-top: 4px;"><strong>Customer Signature</strong></div>
+      <div style="font-size: 10pt; margin-top: 6px;"><strong>Customer Signature</strong></div>
     </div>
-    <div style="width: 35%; text-align: right;">
-      <div style="border-bottom: 1px solid #000; height: 70px; display: flex; align-items: flex-end; justify-content: flex-end; padding-bottom: 4px;">
+    <div style="width: 30%; text-align: right;">
+      <div style="border-bottom: 1px solid #000; height: 75px; display: flex; align-items: flex-end; justify-content: flex-end; padding-bottom: 6px;">
         <span id="pdf-signed-date" style="font-size: 10pt;"></span>
       </div>
-      <div style="font-size: 9pt; margin-top: 4px;"><strong>Date Signed</strong></div>
+      <div style="font-size: 10pt; margin-top: 6px;"><strong>Date Signed</strong></div>
     </div>
   </div>
 </div>
@@ -406,7 +263,6 @@
   window.addEventListener('resize', resizeCanvas);
   document.addEventListener('DOMContentLoaded', () => {
     resizeCanvas();
-    loadProfileDefaults();
   });
 
   function getPos(e) {
@@ -447,13 +303,8 @@
     hasSigned = false;
   }
 
-  function loadProfileDefaults() {
-    const savedTechNum = localStorage.getItem('qc_tech_num');
-    if (savedTechNum) document.getElementById('techId').value = savedTechNum;
-  }
-
   // ----------------------------------------------------
-  // PDF GENERATION & EXPORT
+  // BULLETPROOF PDF GENERATION (UI TOGGLE)
   // ----------------------------------------------------
   function generateAndSavePDF() {
     const custName = document.getElementById('custName').value.trim();
@@ -488,9 +339,12 @@
     document.getElementById('pdf-signed-date').textContent = dateFormatted;
     document.getElementById('pdf-sig-img').src = canvas.toDataURL('image/png');
 
+    const mainUI = document.getElementById('main-ui');
     const pdfElement = document.getElementById('pdf-template');
     
-    // Briefly display the template (hidden behind the UI) so html2canvas can read it
+    // TOGGLE: Hide UI, Show Template (This guarantees a perfect snapshot)
+    mainUI.style.display = 'none';
+    document.body.style.backgroundColor = '#ffffff';
     pdfElement.style.display = 'block';
 
     const filename = `Drill_Waiver_WO_${wo}_${custName.replace(/\s+/g, '_')}.pdf`;
@@ -499,13 +353,15 @@
       margin:       0.4,
       filename:     filename,
       image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2, useCORS: true, windowWidth: 800 }, 
+      html2canvas:  { scale: 2, useCORS: true }, 
       jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
 
     html2pdf().set(opt).from(pdfElement).save().then(() => {
-      // Hide the template again
+      // TOGGLE: Hide Template, Show UI
       pdfElement.style.display = 'none';
+      document.body.style.backgroundColor = 'var(--bg)';
+      mainUI.style.display = 'flex';
 
       // Open email draft with metadata prepopulated
       if (techEmail) {
