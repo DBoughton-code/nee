@@ -89,11 +89,13 @@
     /* HIDDEN PRINTABLE TEMPLATE */
     #pdf-template {
       display: none; /* Stays hidden until generation */
+      position: absolute; /* Anchors firmly to top left to prevent scroll bugs */
+      top: 0;
+      left: 0;
       width: 800px; /* Forces a full-size desktop layout so it never clips */
       background: #ffffff;
       color: #000000;
       padding: 40px;
-      margin: 0 auto;
       font-family: Arial, sans-serif;
       font-size: 11pt;
       line-height: 1.4;
@@ -332,6 +334,9 @@
       return;
     }
 
+    // Force browser to scroll to absolute top to prevent html2canvas blank space bug
+    window.scrollTo(0, 0);
+
     const now = new Date();
     const dateFormatted = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
@@ -360,7 +365,7 @@
       margin:       0.4,
       filename:     filename,
       image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2, useCORS: true }, 
+      html2canvas:  { scale: 2, useCORS: true, scrollY: 0 }, 
       jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
 
