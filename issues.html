@@ -17,7 +17,6 @@
       --amber: #f59e0b;
       --emerald: #10b981;
       --rose: #f43f5e;
-      --purple: #a855f7;
       --radius: 12px;
     }
 
@@ -164,10 +163,9 @@
       flex-shrink: 0;
     }
 
-    .icon-amber { background: rgba(245, 158, 11, 0.15); color: var(--amber); border: 1px solid rgba(245, 158, 11, 0.3); }
     .icon-rose { background: rgba(244, 63, 94, 0.15); color: var(--rose); border: 1px solid rgba(244, 63, 94, 0.3); }
+    .icon-amber { background: rgba(245, 158, 11, 0.15); color: var(--amber); border: 1px solid rgba(245, 158, 11, 0.3); }
     .icon-emerald { background: rgba(16, 185, 129, 0.15); color: var(--emerald); border: 1px solid rgba(16, 185, 129, 0.3); }
-    .icon-purple { background: rgba(168, 85, 247, 0.15); color: var(--purple); border: 1px solid rgba(168, 85, 247, 0.3); }
 
     .menu-info {
       flex: 1;
@@ -208,7 +206,7 @@
     <header>
       <div class="logo-badge">Prince Telecom Ops</div>
       <h1>Field Claims &amp; Disputes Hub</h1>
-      <p class="sub">Central management portal for damage claims, contractor reviews, and waivers.</p>
+      <p class="sub">Central management portal for damage claims, contractor reviews, and dispute resolutions.</p>
     </header>
 
     <!-- QUICK CLAIM JUMP -->
@@ -222,12 +220,12 @@
 
     <!-- MAIN TOOLS -->
     <div class="menu-grid">
-      <!-- 1. Initiate Escalation -->
-      <a href="prince_dispute_dossier.html" class="menu-card">
+      <!-- 1. Primary Intake & Escalation -->
+      <a href="https://dboughton-code.github.io/nee/ecm.html" class="menu-card">
         <div class="icon-box icon-rose">🛡️</div>
         <div class="menu-info">
-          <h2>New Damage Escalation</h2>
-          <p>Log property damage, issue formal 48-hour contractor notices, make liability rulings, and close claims.</p>
+          <h2>New Damage Intake &amp; Escalation (ECM)</h2>
+          <p>Primary intake file. Log damage, set the 48-hour contractor review clock, issue Prince rulings, and manage chargebacks.</p>
         </div>
         <div class="menu-arrow">❯</div>
       </a>
@@ -248,16 +246,6 @@
         <div class="menu-info">
           <h2>Claims &amp; Chargeback Reports</h2>
           <p>View historical claim metrics, total exposure amounts, contractor volume, and export spreadsheet reports.</p>
-        </div>
-        <div class="menu-arrow">❯</div>
-      </a>
-
-      <!-- 4. Drilling & Attachment Waiver -->
-      <a href="amber_drill_waiver.html" class="menu-card">
-        <div class="icon-box icon-purple">📝</div>
-        <div class="menu-info">
-          <h2>Drilling Consent &amp; Waiver</h2>
-          <p>On-device customer authorization waiver with dual touch signatures, GPS auto-fill, and work area photos.</p>
         </div>
         <div class="menu-arrow">❯</div>
       </a>
