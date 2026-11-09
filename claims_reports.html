@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prince Telecom - Claims Analytics & Reporting</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body { background: #0b0f19; color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 20px; }
+    .card { background: #131c2e; border: 1px solid #1e293b; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+    .filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+    select, input, button { background: #090e17; border: 1px solid #1e293b; color: #fff; padding: 8px 12px; border-radius: 6px; }
+    button { background: #06b6d4; color: #000; font-weight: bold; cursor: pointer; border: none; }
+    button.btn-csv { background: #10b981; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 10px; }
+    th, td { border: 1px solid #1e293b; padding: 8px; text-align: left; }
+    th { background: #1e293b; color: #06b6d4; }
+    a { color: #06b6d4; text-decoration: none; font-weight: bold; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <h2>📊 Claims & Chargeback Reporting Dashboard</h2>
+
+  <div class="card">
+    <div class="filters">
+      <select id="filterContractor"><option value="">All Contractors</option></select>
+      <select id="filterStatus">
+        <option value="">All Statuses</option>
+        <option value="PENDING REVIEW">Pending Review</option>
+        <option value="APPROVED">Approved</option>
+        <option value="CLOSED">Closed</option>
+      </select>
+      <button onclick="renderTable()">Apply Filters</button>
+      <button class="btn-csv" onclick="exportTableToCSV()">📥 Export to CSV / Excel</button>
+    </div>
+
+    <div style="display:flex; gap:20px; margin-bottom:12px; font-weight:bold;">
+      <div>Total Claims: <span id="statCount" style="color:#06b6d4;">0</span></div>
+      <div>Total Assessed: <span id="statAmount" style="color:#f43f5e;">$0.00</span></div>
+    </div>
+
+    <table id="claimsTable">
+      <thead>
+        <tr>
+          <th>Claim #</th>
+          <th>WO #</th>
+          <th>Contractor</th>
+          <th>Customer</th>
+          <th>Status</th>
+          <th>Chargeback</th>
+          <th>Created Date</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://vopprpqdnepzsjnhnstd.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_ryRaA8Kg3gSyAZ3rDfKZng_wrT03lCJ";
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let rawClaims = [];
+
+    window.addEventListener('DOMContentLoaded', loadReportData);
+
+    async function loadReportData() {
+      const { data, error } = await supabaseClient.from('claims').select('*').order('created_at', { ascending: false });
+      if (error || !data) {
+        console.warn("Unable to load claims:", error);
+        return;
+      }
+      rawClaims = data;
+
+      const select = document.getElementById('filterContractor');
+      const uniqueSubs = [...new Set(data.map(c => c.contractor_name).filter(Boolean))];
+      select.innerHTML = '<option value="">All Contractors</option>' + uniqueSubs.map(s => `<option value="${s}">${s}</option>`).join('');
+
+      renderTable();
+    }
+
+    function renderTable() {
+      const subVal = document.getElementById('filterContractor').value;
+      const statusVal = document.getElementById('filterStatus').value;
+
+      const filtered = rawClaims.filter(c => {
+        const matchesSub = !subVal || c.contractor_name === subVal;
+        const matchesStatus = !statusVal || (c.status && c.status.includes(statusVal));
+        return matchesSub && matchesStatus;
+      });
+
+      document.getElementById('statCount').textContent = filtered.length;
+
+      const totalSum = filtered.reduce((acc, row) => {
+        const num = parseFloat((row.chargeback_amount || '0').replace(/[^0-9.-]+/g, '')) || 0;
+        return acc + num;
+      }, 0);
+      document.getElementById('statAmount').textContent = `$${totalSum.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = filtered.map(c => `
+        <tr>
+          <td><a href="dispute_portal.html?claim=${c.id}">${c.id}</a></td>
+          <td>${c.work_order || '-'}</td>
+          <td>${c.contractor_name || '-'}</td>
+          <td>${c.customer_name || '-'}</td>
+          <td>${c.status || 'PENDING'}</td>
+          <td>${c.chargeback_amount || '$0.00'}</td>
+          <td>${new Date(c.created_at).toLocaleDateString()}</td>
+        </tr>
+      `).join('');
+    }
+
+    function exportTableToCSV() {
+      let csv = "Claim ID,Work Order,Contractor,Customer,Address,Category,Status,Chargeback Amount,Created Date\n";
+      rawClaims.forEach(c => {
+        csv += `"${c.id}","${c.work_order || ''}","${c.contractor_name || ''}","${c.customer_name || ''}","${c.address || ''}","${c.category || ''}","${c.status || ''}","${c.chargeback_amount || ''}","${c.created_at}"\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `Prince_Claims_Report_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+    }
+  </script>
+</body>
+</html>
