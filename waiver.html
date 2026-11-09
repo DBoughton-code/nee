@@ -32,11 +32,19 @@
       background-color: var(--bg);
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      padding: 16px;
-      padding-bottom: 60px;
+      overflow-x: hidden; /* Prevents horizontal scroll */
+    }
+
+    /* Wrap the main UI in a solid layer so the PDF renders behind it unseen */
+    .app-wrapper {
+      position: relative;
+      z-index: 10;
+      background-color: var(--bg);
+      min-height: 100vh;
       display: flex;
       justify-content: center;
-      overflow-x: hidden; /* Prevents scrolling to the hidden template */
+      padding: 16px;
+      padding-bottom: 60px;
     }
 
     .container {
@@ -218,107 +226,110 @@
       box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
     }
 
-    /* HIDDEN PRINTABLE TEMPLATE */
+    /* HIDDEN PRINTABLE TEMPLATE (Placed Behind UI layer) */
     #pdf-template {
-      /* Pushed off-screen instead of display: none */
+      display: none; /* Toggled by JS during generation */
       position: absolute;
-      left: -9999px;
       top: 0;
-      width: 800px; /* Fixed document width */
+      left: 0;
+      z-index: 1; /* Below the app-wrapper's z-index of 10 */
+      width: 800px; /* Fixed width prevents mobile squish */
       background: #ffffff;
       color: #000000;
       padding: 40px;
       font-family: Arial, sans-serif;
       font-size: 11pt;
       line-height: 1.4;
-      z-index: -1;
     }
   </style>
 </head>
 <body>
 
-<div class="container">
+<!-- User Interface Wrapper -->
+<div class="app-wrapper">
+  <div class="container">
 
-  <div class="nav-bar">
-    <a href="index.html" class="btn-back">❮ Main Menu</a>
+    <div class="nav-bar">
+      <a href="index.html" class="btn-back">❮ Main Menu</a>
+    </div>
+
+    <header>
+      <h1>📝 Drilling &amp; Penetration Consent</h1>
+      <p class="sub">Customer Authorization &amp; Instant PDF Generation</p>
+    </header>
+
+    <div class="card">
+      <div class="grid-2">
+        <div class="form-group">
+          <label for="custName">Customer Full Name *</label>
+          <input type="text" id="custName" placeholder="Jane Doe">
+        </div>
+        <div class="form-group">
+          <label for="workOrder">Work Order / Account # *</label>
+          <input type="text" id="workOrder" placeholder="e.g. 849510001234">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="serviceAddress">Service Address *</label>
+        <input type="text" id="serviceAddress" placeholder="123 Main St, Apt 4B">
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label for="techId">Technician ID *</label>
+          <input type="text" id="techId" placeholder="e.g. T-10492">
+        </div>
+        <div class="form-group">
+          <label for="techEmail">Tech Email (Copy to) *</label>
+          <input type="email" id="techEmail" placeholder="tech@princetelecom.com">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="drillScope">Scope &amp; Location of Drilling *</label>
+        <select id="drillScope">
+          <option value="Exterior Wall Penetration (Siding/Brick into Premise)">Exterior Wall Penetration (Siding/Brick into Premise)</option>
+          <option value="Floor / Crawlspace Penetration">Floor / Crawlspace Penetration</option>
+          <option value="Interior Drywall Drill (Between Rooms)">Interior Drywall Drill (Between Rooms)</option>
+          <option value="Basement Rim Joist Entry">Basement Rim Joist Entry</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="drillNotes">Specific Entry Details / Room Location</label>
+        <input type="text" id="drillNotes" placeholder="e.g. Living room north exterior wall, 6 inches above baseboard">
+      </div>
+
+      <!-- Legal Terms -->
+      <label>Terms of Authorization &amp; Waiver</label>
+      <div class="legal-box">
+        <p><strong>1. Authorization to Penetrate Surface:</strong> By signing below, the customer/property owner authorizes the technician to drill the agreed-upon surface hole(s) solely for the routing of telecommunication coaxial/fiber cabling required for service delivery.</p>
+        <p><strong>2. Pre-Drill Inspection &amp; Hidden Utilities:</strong> The customer acknowledges that the technician has visually inspected the interior and exterior surfaces. However, neither the contractor nor service provider shall be held liable for damage to concealed or unmapped plumbing, electrical wiring, HVAC ductwork, or insulation located within concealed cavities unless caused by gross negligence.</p>
+        <p><strong>3. Weatherproofing Seal:</strong> The technician agrees to install an exterior wall bushing and seal the penetration with approved silicone/duct-seal compound.</p>
+        <p><strong>4. Tenant Representation:</strong> If the signatory is a tenant, they confirm they have obtained explicit consent from the landlord/property owner.</p>
+      </div>
+
+      <!-- Signature Pad -->
+      <div class="sig-wrapper">
+        <div class="sig-actions">
+          <label>Customer Signature (Sign Below) *</label>
+          <button type="button" class="btn-clear" onclick="clearCanvas()">Clear Signature</button>
+        </div>
+        <div class="canvas-container">
+          <canvas id="sigCanvas"></canvas>
+        </div>
+      </div>
+
+      <button type="button" class="btn-submit" onclick="generateAndSavePDF()">
+        📄 Sign &amp; Export Signed PDF
+      </button>
+    </div>
+
   </div>
-
-  <header>
-    <h1>📝 Drilling &amp; Penetration Consent</h1>
-    <p class="sub">Customer Authorization &amp; Instant PDF Generation</p>
-  </header>
-
-  <div class="card">
-    <div class="grid-2">
-      <div class="form-group">
-        <label for="custName">Customer Full Name *</label>
-        <input type="text" id="custName" placeholder="Jane Doe">
-      </div>
-      <div class="form-group">
-        <label for="workOrder">Work Order / Account # *</label>
-        <input type="text" id="workOrder" placeholder="e.g. 849510001234">
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label for="serviceAddress">Service Address *</label>
-      <input type="text" id="serviceAddress" placeholder="123 Main St, Apt 4B">
-    </div>
-
-    <div class="grid-2">
-      <div class="form-group">
-        <label for="techId">Technician ID *</label>
-        <input type="text" id="techId" placeholder="e.g. T-10492">
-      </div>
-      <div class="form-group">
-        <label for="techEmail">Tech Email (Copy to) *</label>
-        <input type="email" id="techEmail" placeholder="tech@princetelecom.com">
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label for="drillScope">Scope &amp; Location of Drilling *</label>
-      <select id="drillScope">
-        <option value="Exterior Wall Penetration (Siding/Brick into Premise)">Exterior Wall Penetration (Siding/Brick into Premise)</option>
-        <option value="Floor / Crawlspace Penetration">Floor / Crawlspace Penetration</option>
-        <option value="Interior Drywall Drill (Between Rooms)">Interior Drywall Drill (Between Rooms)</option>
-        <option value="Basement Rim Joist Entry">Basement Rim Joist Entry</option>
-      </select>
-    </div>
-
-    <div class="form-group">
-      <label for="drillNotes">Specific Entry Details / Room Location</label>
-      <input type="text" id="drillNotes" placeholder="e.g. Living room north exterior wall, 6 inches above baseboard">
-    </div>
-
-    <!-- Legal Terms -->
-    <label>Terms of Authorization &amp; Waiver</label>
-    <div class="legal-box">
-      <p><strong>1. Authorization to Penetrate Surface:</strong> By signing below, the customer/property owner authorizes the technician to drill the agreed-upon surface hole(s) solely for the routing of telecommunication coaxial/fiber cabling required for service delivery.</p>
-      <p><strong>2. Pre-Drill Inspection &amp; Hidden Utilities:</strong> The customer acknowledges that the technician has visually inspected the interior and exterior surfaces. However, neither the contractor nor service provider shall be held liable for damage to concealed or unmapped plumbing, electrical wiring, HVAC ductwork, or insulation located within concealed cavities unless caused by gross negligence.</p>
-      <p><strong>3. Weatherproofing Seal:</strong> The technician agrees to install an exterior wall bushing and seal the penetration with approved silicone/duct-seal compound.</p>
-      <p><strong>4. Tenant Representation:</strong> If the signatory is a tenant, they confirm they have obtained explicit consent from the landlord/property owner.</p>
-    </div>
-
-    <!-- Signature Pad -->
-    <div class="sig-wrapper">
-      <div class="sig-actions">
-        <label>Customer Signature (Sign Below) *</label>
-        <button type="button" class="btn-clear" onclick="clearCanvas()">Clear Signature</button>
-      </div>
-      <div class="canvas-container">
-        <canvas id="sigCanvas"></canvas>
-      </div>
-    </div>
-
-    <button type="button" class="btn-submit" onclick="generateAndSavePDF()">
-      📄 Sign &amp; Export Signed PDF
-    </button>
-  </div>
-
 </div>
 
-<!-- HIDDEN PDF DOCUMENT LAYOUT (NOW RENDERED OFF-SCREEN) -->
+<!-- HIDDEN PDF DOCUMENT LAYOUT -->
 <div id="pdf-template">
   <div style="border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 16px; display: flex; justify-content: space-between;">
     <div>
@@ -478,18 +489,24 @@
     document.getElementById('pdf-sig-img').src = canvas.toDataURL('image/png');
 
     const pdfElement = document.getElementById('pdf-template');
+    
+    // Briefly display the template (hidden behind the UI) so html2canvas can read it
+    pdfElement.style.display = 'block';
+
     const filename = `Drill_Waiver_WO_${wo}_${custName.replace(/\s+/g, '_')}.pdf`;
 
     const opt = {
       margin:       0.4,
       filename:     filename,
       image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2, useCORS: true, windowWidth: 800 }, // Forces a desktop width capture
+      html2canvas:  { scale: 2, useCORS: true, windowWidth: 800 }, 
       jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
 
-    // No need to un-hide the element; it's already rendered off-screen!
     html2pdf().set(opt).from(pdfElement).save().then(() => {
+      // Hide the template again
+      pdfElement.style.display = 'none';
+
       // Open email draft with metadata prepopulated
       if (techEmail) {
         const mailSubject = encodeURIComponent(`Drilling Waiver Copy - WO# ${wo} - ${custName}`);
