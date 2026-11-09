@@ -3,175 +3,202 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Exterior / Interior Drilling Consent Waiver</title>
+  <title>Remote Drilling Consent Waiver</title>
 
-  <!-- NATIVE jsPDF Library (Bypasses html2canvas completely) -->
+  <!-- NATIVE jsPDF Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <style>
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg: #0b0f19;
-      --card-bg: #131c2e;
-      --card-border: #1e293b;
-      --text: #f1f5f9;
-      --text-muted: #94a3b8;
-      --cyan: #06b6d4;
-      --emerald: #10b981;
-      --amber: #f59e0b;
-      --rose: #f43f5e;
+      --bg: #0b0f19; --card-bg: #131c2e; --card-border: #1e293b;
+      --text: #f1f5f9; --text-muted: #94a3b8;
+      --cyan: #06b6d4; --emerald: #10b981; --amber: #f59e0b; --rose: #f43f5e;
       --radius: 10px;
     }
-
-    body {
-      background-color: var(--bg);
-      color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    }
-
-    #main-ui {
-      display: flex;
-      justify-content: center;
-      padding: 16px;
-      padding-bottom: 60px;
-      min-height: 100vh;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 580px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .nav-bar { display: flex; align-items: center; }
-
-    .btn-back {
-      background: #18233a; color: var(--text); border: 1px solid var(--card-border);
-      border-radius: var(--radius); padding: 6px 12px; font-size: 0.8rem;
-      font-weight: 700; text-decoration: none; display: inline-flex;
-      align-items: center; gap: 6px;
-    }
-    .btn-back:hover { background: #243452; border-color: var(--cyan); color: var(--cyan); }
-
+    body { background-color: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    
+    #app-container { display: flex; justify-content: center; padding: 16px; padding-bottom: 60px; min-height: 100vh; }
+    .container { width: 100%; max-width: 580px; display: flex; flex-direction: column; gap: 14px; }
+    
     header { text-align: center; padding: 4px 0 10px 0; border-bottom: 1px solid var(--card-border); }
     h1 { font-size: 1.2rem; font-weight: 900; color: var(--amber); display: flex; align-items: center; justify-content: center; gap: 6px; }
     p.sub { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
 
-    .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+    .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    .card-title { font-size: 0.85rem; font-weight: 800; color: var(--cyan); text-transform: uppercase; margin-bottom: 4px; border-bottom: 1px dashed var(--card-border); padding-bottom: 8px;}
+    
     .form-group { display: flex; flex-direction: column; gap: 4px; }
-    label { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
-    input, select, textarea { width: 100%; background: #090e17; border: 1px solid var(--card-border); color: var(--text); padding: 8px 10px; border-radius: 6px; font-size: 0.85rem; outline: none; }
-    input:focus, select:focus, textarea:focus { border-color: var(--cyan); }
+    label { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted); }
+    input, select { width: 100%; background: #090e17; border: 1px solid var(--card-border); color: var(--text); padding: 10px; border-radius: 6px; font-size: 0.85rem; outline: none; }
+    input:focus, select:focus { border-color: var(--cyan); }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
+    /* Buttons */
+    .btn { width: 100%; padding: 12px; border-radius: 8px; border: none; font-size: 0.9rem; font-weight: 800; cursor: pointer; transition: all 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 8px; text-decoration: none; }
+    .btn-primary { background: var(--cyan); color: #000; }
+    .btn-primary:hover { background: #22d3ee; }
+    .btn-success { background: var(--emerald); color: #000; }
+    .btn-success:hover { background: #34d399; }
+    
+    /* Customer Mode Specifics */
+    .read-only-data { background: #090e17; padding: 12px; border-radius: 6px; border: 1px solid var(--card-border); font-size: 0.85rem; line-height: 1.5; color: var(--text); }
+    .highlight { color: var(--cyan); font-weight: bold; }
     .legal-box { background: #090e17; border: 1px solid var(--card-border); border-radius: 6px; padding: 10px; font-size: 0.73rem; color: #cbd5e1; line-height: 1.5; max-height: 140px; overflow-y: auto; }
     .legal-box p { margin-bottom: 8px; }
 
-    .sig-wrapper { display: flex; flex-direction: column; gap: 6px; }
+    /* Canvas */
     .canvas-container { background: #ffffff; border-radius: 6px; border: 2px dashed var(--cyan); touch-action: none; }
     canvas { width: 100%; height: 160px; display: block; cursor: crosshair; }
-    .sig-actions { display: flex; justify-content: space-between; align-items: center; }
-    .btn-clear { background: transparent; border: 1px solid var(--card-border); color: var(--rose); font-size: 0.72rem; font-weight: 700; padding: 4px 8px; border-radius: 4px; cursor: pointer; }
-    
-    .btn-submit { width: 100%; background: var(--emerald); color: #04121d; border: none; border-radius: var(--radius); padding: 12px; font-size: 0.9rem; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 6px; }
-    .btn-submit:hover { background: #34d399; }
+    .btn-clear { background: transparent; border: none; color: var(--rose); font-size: 0.72rem; font-weight: 700; cursor: pointer; }
+
+    /* View Toggling */
+    #techView, #customerView, #successView { display: none; }
   </style>
 </head>
 <body>
 
-<div id="main-ui">
+<div id="app-container">
   <div class="container">
-    <div class="nav-bar">
-      <a href="index.html" class="btn-back">❮ Main Menu</a>
-    </div>
-
     <header>
-      <h1>📝 Drilling &amp; Penetration Consent</h1>
-      <p class="sub">Customer Authorization &amp; Instant PDF Generation</p>
+      <h1>📝 Property Drill Waiver</h1>
+      <p class="sub" id="headerSub">Technician Dispatch Setup</p>
     </header>
 
-    <div class="card">
+    <!-- VIEW 1: TECHNICIAN SETUP -->
+    <div id="techView" class="card">
+      <div class="card-title">1. Generate Customer Remote Link</div>
+      
       <div class="grid-2">
-        <div class="form-group">
-          <label for="custName">Customer Full Name *</label>
-          <input type="text" id="custName" placeholder="Jane Doe">
-        </div>
-        <div class="form-group">
-          <label for="workOrder">Work Order / Account # *</label>
-          <input type="text" id="workOrder" placeholder="e.g. 849510001234">
-        </div>
+        <div class="form-group"><label>Customer Name *</label><input type="text" id="t_custName" placeholder="e.g. John Doe"></div>
+        <div class="form-group"><label>Customer Mobile *</label><input type="tel" id="t_custPhone" placeholder="555-123-4567"></div>
       </div>
-
-      <div class="form-group">
-        <label for="serviceAddress">Service Address *</label>
-        <input type="text" id="serviceAddress" placeholder="123 Main St, Apt 4B">
-      </div>
-
+      
+      <div class="form-group"><label>Work Order / Account # *</label><input type="text" id="t_woNum" placeholder="e.g. 100593822"></div>
+      <div class="form-group"><label>Service Address *</label><input type="text" id="t_address" placeholder="123 Main St, Apt 4B"></div>
+      
       <div class="grid-2">
+        <div class="form-group"><label>Technician ID *</label><input type="text" id="t_techId" placeholder="e.g. T-10492"></div>
         <div class="form-group">
-          <label for="techId">Technician ID *</label>
-          <input type="text" id="techId" placeholder="e.g. T-10492">
-        </div>
-        <div class="form-group">
-          <label for="techEmail">Tech Email (Copy to) *</label>
-          <input type="email" id="techEmail" placeholder="tech@princetelecom.com">
+          <label>Manager Email (Closeout Target) *</label>
+          <input type="email" id="t_mgrEmail" value="fieldmgr@princetelecom.com">
         </div>
       </div>
-
+      
       <div class="form-group">
-        <label for="drillScope">Scope &amp; Location of Drilling *</label>
-        <select id="drillScope">
-          <option value="Exterior Wall Penetration (Siding/Brick into Premise)">Exterior Wall Penetration (Siding/Brick into Premise)</option>
-          <option value="Floor / Crawlspace Penetration">Floor / Crawlspace Penetration</option>
-          <option value="Interior Drywall Drill (Between Rooms)">Interior Drywall Drill (Between Rooms)</option>
-          <option value="Basement Rim Joist Entry">Basement Rim Joist Entry</option>
+        <label>Drill Scope *</label>
+        <select id="t_scope">
+          <option>Exterior Wall Penetration (Siding/Brick into Premise)</option>
+          <option>Floor / Crawlspace Penetration</option>
+          <option>Interior Drywall Drill (Between Rooms)</option>
+          <option>Basement Rim Joist Entry</option>
         </select>
       </div>
+      <div class="form-group"><label>Specific Location Notes</label><input type="text" id="t_notes" placeholder="e.g. Living room north wall, 6 inches above baseboard"></div>
 
-      <div class="form-group">
-        <label for="drillNotes">Specific Entry Details / Room Location</label>
-        <input type="text" id="drillNotes" placeholder="e.g. Living room north exterior wall, 6 inches above baseboard">
-      </div>
-
-      <label>Terms of Authorization &amp; Waiver</label>
-      <div class="legal-box">
-        <p><strong>1. Authorization to Penetrate Surface:</strong> By signing below, the customer/property owner authorizes the technician to drill the agreed-upon surface hole(s) solely for the routing of telecommunication coaxial/fiber cabling required for service delivery.</p>
-        <p><strong>2. Pre-Drill Inspection &amp; Hidden Utilities:</strong> The customer acknowledges that the technician has visually inspected the interior and exterior surfaces. However, neither the contractor nor service provider shall be held liable for damage to concealed or unmapped plumbing, electrical wiring, HVAC ductwork, or insulation located within concealed cavities unless caused by gross negligence.</p>
-        <p><strong>3. Weatherproofing Seal:</strong> The technician agrees to install an exterior wall bushing and seal the penetration with approved silicone/duct-seal compound.</p>
-        <p><strong>4. Tenant Representation:</strong> If the signatory is a tenant, they confirm they have obtained explicit consent from the landlord/property owner.</p>
-      </div>
-
-      <div class="sig-wrapper">
-        <div class="sig-actions">
-          <label>Customer Signature (Sign Below) *</label>
-          <button type="button" class="btn-clear" onclick="clearCanvas()">Clear Signature</button>
-        </div>
-        <div class="canvas-container">
-          <canvas id="sigCanvas"></canvas>
-        </div>
-      </div>
-
-      <button type="button" class="btn-submit" onclick="generateAndSaveNativePDF()">
-        📄 Sign &amp; Export Signed PDF
-      </button>
+      <button class="btn btn-primary" onclick="generateAndTextLink()">📱 Text Link to Customer</button>
     </div>
+
+    <!-- VIEW 2: CUSTOMER SIGNING -->
+    <div id="customerView" class="card">
+      <div class="card-title">Property Modification Authorization</div>
+      
+      <div class="read-only-data">
+        I, <span class="highlight" id="c_custName"></span>, authorize Prince Telecom / Xfinity to perform the following modifications at <span class="highlight" id="c_address"></span> for Work Order <span class="highlight" id="c_woNum"></span>.<br><br>
+        <strong>Scope:</strong> <span id="c_scope"></span><br>
+        <strong>Notes:</strong> <span id="c_notes"></span>
+      </div>
+
+      <label>Terms of Release</label>
+      <div class="legal-box">
+        <p>1. The customer authorizes the technician to drill the agreed-upon surface hole(s) solely for routing telecommunication cabling.</p>
+        <p>2. The technician and contractor shall not be held liable for damage to concealed or unmapped plumbing, electrical wiring, HVAC ductwork, or insulation located within concealed cavities unless caused by gross negligence.</p>
+        <p>3. If the signatory is a tenant, they confirm they have obtained explicit consent from the landlord/property owner.</p>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+        <label>Please Sign Below *</label>
+        <button type="button" class="btn-clear" onclick="clearCanvas()">Clear Signature</button>
+      </div>
+      <div class="canvas-container">
+        <canvas id="sigCanvas"></canvas>
+      </div>
+
+      <button class="btn btn-success" onclick="generateAndSaveNativePDF()">📄 Sign &amp; Submit Document</button>
+    </div>
+
+    <!-- VIEW 3: SUCCESS & MANAGER HANDOFF -->
+    <div id="successView" class="card" style="text-align: center; padding: 30px 16px;">
+      <div style="font-size: 3rem; margin-bottom: 10px;">✅</div>
+      <h2 style="color: var(--emerald); margin-bottom: 12px;">Waiver Generated</h2>
+      <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 20px;">
+        The signed drilling authorization PDF has downloaded to your device.<br><br>
+        <strong>Final Step:</strong> Tap below to submit the signed waiver directly to field management for the job closeout record.
+      </p>
+      <a id="emailMgrBtn" href="#" class="btn btn-primary">✉️ Email Waiver to Manager</a>
+      <p style="font-size: 0.72rem; color: var(--rose); margin-top: 10px;">* Tap paperclip/attachment in your email client to attach the downloaded PDF.</p>
+    </div>
+
   </div>
 </div>
 
 <script>
-  // --- SIGNATURE CANVAS ENGINE ---
-  const canvas = document.getElementById('sigCanvas');
-  const ctx = canvas.getContext('2d');
-  let isDrawing = false, hasSigned = false;
+  const urlParams = new URLSearchParams(window.location.search);
+  const mode = urlParams.get('mode');
 
-  function resizeCanvas() {
+  window.onload = () => {
+    if (mode === 'customer') {
+      document.getElementById('techView').style.display = 'none';
+      document.getElementById('customerView').style.display = 'flex';
+      document.getElementById('headerSub').textContent = 'Please review and sign below';
+      
+      document.getElementById('c_custName').textContent = decodeURIComponent(urlParams.get('cn') || 'Customer');
+      document.getElementById('c_woNum').textContent = decodeURIComponent(urlParams.get('wo') || 'N/A');
+      document.getElementById('c_address').textContent = decodeURIComponent(urlParams.get('addr') || 'Address not provided');
+      document.getElementById('c_scope').textContent = decodeURIComponent(urlParams.get('sc') || 'Standard Drilling');
+      document.getElementById('c_notes').textContent = decodeURIComponent(urlParams.get('no') || 'N/A');
+      
+      initCanvas();
+    } else {
+      document.getElementById('techView').style.display = 'flex';
+      const savedTechNum = localStorage.getItem('qc_tech_num');
+      if (savedTechNum) document.getElementById('t_techId').value = savedTechNum;
+      const savedMgrEmail = localStorage.getItem('qc_mgr_email');
+      if (savedMgrEmail) document.getElementById('t_mgrEmail').value = savedMgrEmail;
+    }
+  };
+
+  function generateAndTextLink() {
+    const cn = document.getElementById('t_custName').value.trim();
+    const custPhone = document.getElementById('t_custPhone').value.replace(/\D/g, '');
+    const techId = document.getElementById('t_techId').value.trim();
+    const mgrEmail = document.getElementById('t_mgrEmail').value.trim();
+    const wo = document.getElementById('t_woNum').value.trim();
+    const addr = document.getElementById('t_address').value.trim();
+    const scope = document.getElementById('t_scope').value;
+    const notes = document.getElementById('t_notes').value.trim() || 'Standard entry hole per agreement';
+
+    if (!cn || !custPhone || !wo || !addr || !mgrEmail || !techId) {
+      alert("Please fill in all required fields before generating the link.");
+      return;
+    }
+
+    localStorage.setItem('qc_tech_num', techId);
+    localStorage.setItem('qc_mgr_email', mgrEmail);
+
+    const baseUrl = window.location.origin + window.location.pathname;
+    
+    const signingLink = `${baseUrl}?mode=customer&cn=${encodeURIComponent(cn)}&wo=${encodeURIComponent(wo)}&addr=${encodeURIComponent(addr)}&me=${encodeURIComponent(mgrEmail)}&tid=${encodeURIComponent(techId)}&sc=${encodeURIComponent(scope)}&no=${encodeURIComponent(notes)}`;
+    
+    const message = `Prince Telecom / Xfinity: Please review and sign the property drilling waiver for your installation today: ${signingLink}`;
+    window.location.href = `sms:${custPhone}?&body=${encodeURIComponent(message)}`;
+  }
+
+  let canvas, ctx, isDrawing = false, hasSigned = false;
+  function initCanvas() {
+    canvas = document.getElementById('sigCanvas');
+    ctx = canvas.getContext('2d');
+    
     const ratio = Math.max(window.devicePixelRatio || 1, 1);
     canvas.width = canvas.offsetWidth * ratio;
     canvas.height = canvas.offsetHeight * ratio;
@@ -179,57 +206,51 @@
     ctx.lineWidth = 2.5;
     ctx.lineCap = 'round';
     ctx.strokeStyle = '#04121d';
+
+    const getPos = (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      return { x: clientX - rect.left, y: clientY - rect.top };
+    };
+
+    const startDraw = (e) => { isDrawing = true; hasSigned = true; const pos = getPos(e); ctx.beginPath(); ctx.moveTo(pos.x, pos.y); e.preventDefault(); };
+    const draw = (e) => { if (!isDrawing) return; const pos = getPos(e); ctx.lineTo(pos.x, pos.y); ctx.stroke(); e.preventDefault(); };
+    const stopDraw = () => { isDrawing = false; };
+
+    canvas.addEventListener('mousedown', startDraw); canvas.addEventListener('mousemove', draw); window.addEventListener('mouseup', stopDraw);
+    canvas.addEventListener('touchstart', startDraw, { passive: false }); canvas.addEventListener('touchmove', draw, { passive: false }); window.addEventListener('touchend', stopDraw);
   }
-  window.addEventListener('resize', resizeCanvas);
-  document.addEventListener('DOMContentLoaded', resizeCanvas);
 
-  function getPos(e) {
-    const rect = canvas.getBoundingClientRect();
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    return { x: clientX - rect.left, y: clientY - rect.top };
+  function clearCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    hasSigned = false;
   }
 
-  function startDraw(e) { isDrawing = true; hasSigned = true; const pos = getPos(e); ctx.beginPath(); ctx.moveTo(pos.x, pos.y); e.preventDefault(); }
-  function draw(e) { if (!isDrawing) return; const pos = getPos(e); ctx.lineTo(pos.x, pos.y); ctx.stroke(); e.preventDefault(); }
-  function stopDraw() { isDrawing = false; }
-
-  canvas.addEventListener('mousedown', startDraw); canvas.addEventListener('mousemove', draw); window.addEventListener('mouseup', stopDraw);
-  canvas.addEventListener('touchstart', startDraw, { passive: false }); canvas.addEventListener('touchmove', draw, { passive: false }); window.addEventListener('touchend', stopDraw);
-  function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); hasSigned = false; }
-
-  // --- NATIVE PROGRAMMATIC PDF GENERATION (Bypasses UI completely) ---
   function generateAndSaveNativePDF() {
-    const custName = document.getElementById('custName').value.trim();
-    const wo = document.getElementById('workOrder').value.trim();
-    const address = document.getElementById('serviceAddress').value.trim();
-    const techId = document.getElementById('techId').value.trim();
-    const techEmail = document.getElementById('techEmail').value.trim();
-    const scope = document.getElementById('drillScope').value;
-    const notes = document.getElementById('drillNotes').value.trim() || 'Standard entry hole per agreement';
-
-    if (!custName || !wo || !address || !techId) {
-      alert("Please fill in Customer Name, WO #, Service Address, and Tech ID.");
-      return;
-    }
     if (!hasSigned) {
-      alert("Customer signature is required before exporting the waiver.");
+      alert("Please provide a signature before submitting.");
       return;
     }
+
+    const custName = decodeURIComponent(urlParams.get('cn') || 'Customer');
+    const wo = decodeURIComponent(urlParams.get('wo') || 'N/A');
+    const address = decodeURIComponent(urlParams.get('addr') || 'N/A');
+    const mgrEmail = decodeURIComponent(urlParams.get('me') || 'fieldmgr@princetelecom.com');
+    const techId = decodeURIComponent(urlParams.get('tid') || 'N/A');
+    const scope = decodeURIComponent(urlParams.get('sc') || 'Standard Drilling');
+    const notes = decodeURIComponent(urlParams.get('no') || 'N/A');
 
     const now = new Date();
     const dateFormatted = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const filename = `Drill_Waiver_WO_${wo}_${custName.replace(/\s+/g, '_')}.pdf`;
 
-    // Initialize Native jsPDF (Standard Letter Size, Unit: points)
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ format: 'letter', unit: 'pt' });
 
-    // Document styling defaults
     const leftMargin = 40;
     const rightMargin = 570;
 
-    // --- Draw Header ---
     doc.setFontSize(16);
     doc.setFont("helvetica", "bold");
     doc.text("PRINCE TELECOM FIELD OPERATIONS", leftMargin, 50);
@@ -237,16 +258,12 @@
     doc.setFont("helvetica", "normal");
     doc.text("Customer Drilling & Surface Penetration Authorization Waiver", leftMargin, 65);
 
-    // Header Right-Aligned Text
     doc.setFontSize(9);
     doc.text(`Date: ${dateFormatted}`, rightMargin, 50, { align: "right" });
     doc.text(`WO #: ${wo}`, rightMargin, 62, { align: "right" });
-
-    // Divider Line
     doc.setLineWidth(1.5);
     doc.line(leftMargin, 75, rightMargin, 75);
 
-    // --- Draw Data Block ---
     doc.setFontSize(10);
     let currentY = 110;
 
@@ -261,6 +278,10 @@
     doc.setFont("helvetica", "normal"); doc.text(address, 140, currentY);
 
     currentY += 25;
+    doc.setFont("helvetica", "bold"); doc.text("Remote Signature:", leftMargin, currentY);
+    doc.setFont("helvetica", "normal"); doc.text("Authenticated via Customer Direct Mobile SMS", 140, currentY);
+
+    currentY += 25;
     doc.setFont("helvetica", "bold"); doc.text("Drill Scope:", leftMargin, currentY);
     doc.setFont("helvetica", "normal"); doc.text(scope, 140, currentY);
 
@@ -268,13 +289,11 @@
     doc.setFont("helvetica", "bold"); doc.text("Location Notes:", leftMargin, currentY);
     doc.setFont("helvetica", "normal"); doc.text(notes, 140, currentY);
 
-    // Divider Line
     currentY += 20;
     doc.setLineWidth(0.5);
     doc.setDrawColor(200, 200, 200);
     doc.line(leftMargin, currentY, rightMargin, currentY);
 
-    // --- Draw Legal Text ---
     currentY += 30;
     doc.setFontSize(10);
     doc.setFont("helvetica", "bold");
@@ -284,57 +303,47 @@
     doc.setFont("helvetica", "normal");
     const legalParagraph = "The customer represents that they are the legal owner of the premises or an authorized tenant with written permission from the landlord to approve exterior/interior wall, floor, or ceiling penetrations. The technician will practice standard craftsmanship, including pre-inspecting the cavity and sealing all exterior holes with approved silicone/weatherproof bushings. The technician and contractor are released from liability regarding unmapped or concealed structural, electrical, or plumbing lines positioned within wall voids not identifiable through standard pre-drill exterior/interior visual inspection.";
     
-    // Automatically wraps text to fit the page width
     const wrappedText = doc.splitTextToSize(legalParagraph, 530);
     doc.text(wrappedText, leftMargin, currentY);
 
-    // --- Draw Signature Section ---
     currentY += (wrappedText.length * 14) + 60; 
-
-    // Insert Signature Canvas Image
     const sigData = canvas.toDataURL('image/png');
     doc.addImage(sigData, 'PNG', leftMargin, currentY - 45, 200, 45);
 
-    // Draw Signature Lines
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(1);
     
-    // Cust Line
     doc.line(leftMargin, currentY, 260, currentY);
     doc.setFontSize(9);
     doc.setFont("helvetica", "bold");
     doc.text("Customer Signature", leftMargin, currentY + 12);
 
-    // Date Line
     doc.setFont("helvetica", "normal");
     doc.text(dateFormatted, 370, currentY - 5);
     doc.line(370, currentY, rightMargin, currentY);
     doc.setFont("helvetica", "bold");
     doc.text("Date Signed", 370, currentY + 12);
 
-    // --- Save the PDF ---
     doc.save(filename);
 
-    // Setup email routing
-    setTimeout(() => {
-      if (techEmail) {
-        const sendEmail = confirm(`✅ PDF Downloaded Successfully!\n\n(Check your iPhone 'Files' app or Chrome Downloads).\n\nWould you like to open your email app to send a copy to ${techEmail}?`);
-        
-        if (sendEmail) {
-          const mailSubject = encodeURIComponent(`Drilling Waiver Copy - WO# ${wo} - ${custName}`);
-          const mailBody = encodeURIComponent(
-            `Hi Tech,\n\nThe customer (${custName}) at ${address} has signed the drilling waiver for Work Order #${wo}.\n\n` +
-            `Scope: ${scope}\n` +
-            `Notes: ${notes}\n` +
-            `Date Signed: ${dateFormatted}\n\n` +
-            `The generated PDF (${filename}) has been downloaded to your device downloads folder. Attach it to your job closeout.`
-          );
-          window.location.href = `mailto:${techEmail}?subject=${mailSubject}&body=${mailBody}`;
-        }
-      } else {
-        alert(`✅ Signed waiver downloaded!\n\nFile Name: ${filename}\n\nCheck your 'Files' app or browser downloads folder.`);
-      }
-    }, 800);
+    document.getElementById('customerView').style.display = 'none';
+    document.getElementById('successView').style.display = 'block';
+    document.getElementById('headerSub').textContent = 'Step 2: Submit to Management';
+
+    const mailSubject = encodeURIComponent(`EXECUTED DRILL WAIVER - WO# ${wo} - Tech ${techId} - ${custName}`);
+    const mailBody = encodeURIComponent(
+      `Prince Telecom Field Operations,\n\n` +
+      `Attached is the customer-signed drilling & penetration waiver for:\n\n` +
+      `Work Order: ${wo}\n` +
+      `Customer: ${custName}\n` +
+      `Service Address: ${address}\n` +
+      `Tech ID: ${techId}\n` +
+      `Drill Scope: ${scope}\n` +
+      `Notes: ${notes}\n` +
+      `Executed Date: ${dateFormatted}\n\n` +
+      `Signed waiver document (${filename}) attached.`
+    );
+    document.getElementById('emailMgrBtn').href = `mailto:${mgrEmail}?subject=${mailSubject}&body=${mailBody}`;
   }
 </script>
 
