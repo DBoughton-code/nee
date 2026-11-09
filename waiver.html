@@ -103,7 +103,7 @@
 
     <header>
       <h1>📝 Drilling &amp; Penetration Consent</h1>
-      <p class="sub">Technician &amp; Customer Authorization Form</p>
+      <p class="sub">Contractor Field Authorization &amp; Waiver</p>
     </header>
 
     <div class="card">
@@ -138,8 +138,8 @@
       </div>
 
       <div class="form-group">
-        <label for="techEmail">Tech / Manager Email (PDF Copy) *</label>
-        <input type="email" id="techEmail" placeholder="fieldmgr@princetelecom.com">
+        <label for="techEmail">Field Manager / Job Email (PDF Copy) *</label>
+        <input type="email" id="techEmail" placeholder="dispatch@telecomoperations.com">
       </div>
 
       <div class="form-group">
@@ -159,9 +159,9 @@
 
       <label>Terms of Authorization &amp; Waiver</label>
       <div class="legal-box">
-        <p><strong>1. Authorization to Penetrate Surface:</strong> By signing below, the customer/property owner authorizes the technician to drill the agreed-upon surface hole(s) solely for the routing of telecommunication coaxial/fiber cabling required for service delivery.</p>
-        <p><strong>2. Pre-Drill Inspection &amp; Hidden Utilities:</strong> The customer acknowledges that the technician has visually inspected the interior and exterior surfaces. However, neither the contractor nor service provider shall be held liable for damage to concealed or unmapped plumbing, electrical wiring, HVAC ductwork, or insulation located within concealed cavities unless caused by gross negligence.</p>
-        <p><strong>3. Weatherproofing Seal:</strong> The technician agrees to install an exterior wall bushing and seal the penetration with approved silicone/duct-seal compound.</p>
+        <p><strong>1. Authorization to Penetrate Surface:</strong> By signing below, the customer/property owner authorizes the independent installation contractor to drill the agreed-upon surface hole(s) solely for the routing of telecommunication coaxial/fiber cabling required for service delivery.</p>
+        <p><strong>2. Pre-Drill Inspection &amp; Hidden Utilities:</strong> The customer acknowledges that the contractor has visually inspected the interior and exterior surfaces. Neither the independent contractor nor the service provider shall be held liable for damage to concealed or unmapped plumbing, electrical wiring, HVAC ductwork, or insulation located within concealed cavities unless caused by gross negligence.</p>
+        <p><strong>3. Weatherproofing Seal:</strong> The contractor agrees to install an exterior wall bushing and seal the penetration with approved silicone/duct-seal compound.</p>
         <p><strong>4. Tenant Representation:</strong> If the signatory is a tenant, they confirm they have obtained explicit consent from the landlord/property owner.</p>
       </div>
 
@@ -322,7 +322,6 @@
       return;
     }
 
-    // Save profile defaults
     localStorage.setItem('qc_tech_num', techId);
     if (techPhone) localStorage.setItem('qc_tech_phone', techPhone);
     if (techEmail) localStorage.setItem('qc_mgr_email', techEmail);
@@ -344,10 +343,10 @@
     // --- Header ---
     doc.setFontSize(15);
     doc.setFont("helvetica", "bold");
-    doc.text("PRINCE TELECOM FIELD OPERATIONS", leftMargin, 48);
+    doc.text("FIELD TELECOMMUNICATIONS OPERATIONS", leftMargin, 48);
     doc.setFontSize(9);
     doc.setFont("helvetica", "normal");
-    doc.text("Customer Drilling & Surface Penetration Authorization Waiver", leftMargin, 61);
+    doc.text("Independent Contractor Surface Penetration & Drilling Authorization Waiver", leftMargin, 61);
 
     doc.setFontSize(8.5);
     doc.text(`Date: ${dateFormatted}`, rightMargin, 48, { align: "right" });
@@ -363,8 +362,8 @@
     doc.setFont("helvetica", "bold"); doc.text("Customer Name:", leftMargin, currentY);
     doc.setFont("helvetica", "normal"); doc.text(custName, 135, currentY);
 
-    doc.setFont("helvetica", "bold"); doc.text("Tech ID:", 380, currentY);
-    doc.setFont("helvetica", "normal"); doc.text(techId + (techPhone ? ` (${techPhone})` : ''), 435, currentY);
+    doc.setFont("helvetica", "bold"); doc.text("Contractor ID:", 380, currentY);
+    doc.setFont("helvetica", "normal"); doc.text(techId + (techPhone ? ` (${techPhone})` : ''), 445, currentY);
 
     currentY += 18;
     doc.setFont("helvetica", "bold"); doc.text("Service Address:", leftMargin, currentY);
@@ -395,7 +394,7 @@
     currentY += 14;
     doc.setFontSize(8.5);
     doc.setFont("helvetica", "normal");
-    const legalParagraph = "The customer represents that they are the legal owner of the premises or an authorized tenant with written permission from the landlord to approve exterior/interior wall, floor, or ceiling penetrations. The technician will practice standard craftsmanship, including pre-inspecting the cavity and sealing all exterior holes with approved silicone/weatherproof bushings. The technician and contractor are released from liability regarding unmapped or concealed structural, electrical, or plumbing lines positioned within wall voids not identifiable through standard pre-drill exterior/interior visual inspection.";
+    const legalParagraph = "The customer represents that they are the legal owner of the premises or an authorized tenant with written permission from the landlord to approve exterior/interior wall, floor, or ceiling penetrations. The contractor will practice standard craftsmanship, including pre-inspecting the cavity and sealing all exterior holes with approved silicone/weatherproof bushings. The independent contractor and prime provider are released from liability regarding unmapped or concealed structural, electrical, or plumbing lines positioned within wall voids not identifiable through standard pre-drill exterior/interior visual inspection.";
     
     const wrappedText = doc.splitTextToSize(legalParagraph, 530);
     doc.text(wrappedText, leftMargin, currentY);
@@ -423,7 +422,7 @@
     doc.line(360, currentY, rightMargin, currentY);
     doc.setFontSize(8.5);
     doc.setFont("helvetica", "bold");
-    doc.text("Technician Signature", 360, currentY + 11);
+    doc.text("Contractor Technician Signature", 360, currentY + 11);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8);
     doc.text(`ID: ${techId} | ${dateFormatted}`, 360, currentY + 22);
@@ -441,11 +440,11 @@
         if (sendEmail) {
           const mailSubject = encodeURIComponent(`EXECUTED DRILL WAIVER - WO# ${wo} - ${custName}`);
           const mailBody = encodeURIComponent(
-            `Prince Telecom Field Operations,\n\n` +
+            `Field Operations & Dispatch,\n\n` +
             `Attached is the signed drilling & penetration waiver for Work Order #${wo}.\n\n` +
             `Customer: ${custName}\n` +
             `Service Address: ${address}\n` +
-            `Tech ID: ${techId}\n` +
+            `Contractor Tech ID: ${techId}\n` +
             `Scope: ${scope}\n` +
             `Notes: ${notes}\n` +
             `Date Signed: ${dateFormatted}\n\n` +
