@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prince Telecom - Contractor Damage Claim Determination</title>
+
+  <!-- NATIVE jsPDF Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0b0f19;
+      --card-bg: #131c2e;
+      --card-border: #1e293b;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --amber: #f59e0b;
+      --cyan: #06b6d4;
+      --emerald: #10b981;
+      --rose: #f43f5e;
+      --radius: 10px;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    #main-ui {
+      display: flex;
+      justify-content: center;
+      padding: 16px;
+      padding-bottom: 60px;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 620px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .nav-bar { display: flex; align-items: center; }
+
+    .btn-back {
+      background: #18233a; color: var(--text); border: 1px solid var(--card-border);
+      border-radius: var(--radius); padding: 6px 12px; font-size: 0.8rem;
+      font-weight: 700; text-decoration: none; display: inline-flex;
+      align-items: center; gap: 6px;
+    }
+    .btn-back:hover { background: #243452; border-color: var(--cyan); color: var(--cyan); }
+
+    header { text-align: center; padding: 4px 0 10px 0; border-bottom: 1px solid var(--card-border); }
+    h1 { font-size: 1.25rem; font-weight: 900; color: var(--cyan); display: flex; align-items: center; justify-content: center; gap: 6px; }
+    p.sub { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+
+    .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+    .card-title { font-size: 0.8rem; font-weight: 800; color: var(--cyan); text-transform: uppercase; border-bottom: 1px dashed var(--card-border); padding-bottom: 6px; }
+    
+    .form-group { display: flex; flex-direction: column; gap: 4px; }
+    label { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
+    input, select, textarea { width: 100%; background: #090e17; border: 1px solid var(--card-border); color: var(--text); padding: 8px 10px; border-radius: 6px; font-size: 0.85rem; outline: none; }
+    input:focus, select:focus, textarea:focus { border-color: var(--cyan); }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+    .input-with-btn { display: flex; gap: 6px; }
+    .btn-geo {
+      background: #18233a; border: 1px solid var(--card-border); color: var(--cyan);
+      border-radius: 6px; padding: 0 12px; font-size: 0.8rem; font-weight: 700;
+      cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px;
+    }
+    .btn-geo:hover { background: #243452; }
+
+    /* Segmented Status Toggle */
+    .status-container { display: flex; flex-direction: column; gap: 6px; }
+    .status-btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .status-btn {
+      background: #090e17; border: 1px solid var(--card-border); color: var(--text-muted);
+      padding: 10px 4px; border-radius: 6px; font-size: 0.78rem; font-weight: 800;
+      cursor: pointer; text-align: center; transition: all 0.2s;
+    }
+    .status-btn:hover { border-color: #475569; color: var(--text); }
+    
+    .status-btn.active[data-status="PENDING REVIEW"] {
+      background: rgba(245, 158, 11, 0.15); border-color: var(--amber); color: var(--amber);
+    }
+    .status-btn.active[data-status="APPROVED"] {
+      background: rgba(16, 185, 129, 0.15); border-color: var(--emerald); color: var(--emerald);
+    }
+    .status-btn.active[data-status="DENIAL"] {
+      background: rgba(244, 63, 94, 0.15); border-color: var(--rose); color: var(--rose);
+    }
+
+    /* Photo Upload / Capture Box */
+    .photo-section { display: flex; flex-direction: column; gap: 8px; }
+    .photo-btn-group { display: flex; gap: 8px; }
+    .btn-photo {
+      flex: 1; background: #18233a; border: 1px dashed var(--cyan); color: var(--text);
+      padding: 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 700;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .btn-photo:hover { background: #243452; border-style: solid; }
+    .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; margin-top: 4px; }
+    .photo-thumb-wrap { position: relative; width: 100%; padding-top: 100%; border-radius: 6px; overflow: hidden; border: 1px solid var(--card-border); background: #090e17; }
+    .photo-thumb-wrap img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+    .btn-del-photo { position: absolute; top: 2px; right: 2px; background: rgba(244, 63, 94, 0.9); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+    .btn-submit {
+      width: 100%; background: var(--cyan); color: #04121d; border: none; border-radius: var(--radius);
+      padding: 13px; font-size: 0.95rem; font-weight: 900; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 4px;
+    }
+    .btn-submit:hover { background: #22d3ee; }
+  </style>
+</head>
+<body>
+
+<div id="main-ui">
+  <div class="container">
+    <div class="nav-bar">
+      <a href="index.html" class="btn-back">❮ Main Menu</a>
+    </div>
+
+    <header>
+      <h1>🛡️ Prince Telecom Field Operations</h1>
+      <p class="sub">Contractor Damage Claim &amp; Incident Determination Notice</p>
+    </header>
+
+    <div class="card">
+      <div class="card-title">1. Investigation Finding &amp; Claim Status</div>
+      <div class="status-container">
+        <label>Claim Disposition *</label>
+        <div class="status-btn-group">
+          <button type="button" class="status-btn active" data-status="PENDING REVIEW" onclick="setStatus('PENDING REVIEW')">⏳ PENDING REVIEW</button>
+          <button type="button" class="status-btn" data-status="APPROVED" onclick="setStatus('APPROVED')">✅ APPROVED</button>
+          <button type="button" class="status-btn" data-status="DENIAL" onclick="setStatus('DENIAL')">❌ DENIAL</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="statusReason">Determination Summary / Decision Rationale *</label>
+        <input type="text" id="statusReason" placeholder="e.g. Approved - Contractor liable for drywall puncture OR Denied - Pre-existing foundation crack">
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">2. Contractor &amp; Incident Information</div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label for="subcontractorName">Contractor Company Name *</label>
+          <input type="text" id="subcontractorName" placeholder="e.g. Apex Cable Installs LLC">
+        </div>
+        <div class="form-group">
+          <label for="techId">Technician ID / Name *</label>
+          <input type="text" id="techId" placeholder="e.g. T-10492 / John Smith">
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label for="workOrder">Work Order / Account # *</label>
+          <input type="text" id="workOrder" placeholder="e.g. 849510001234">
+        </div>
+        <div class="form-group">
+          <label for="claimRefNum">Prince Claim Reference # *</label>
+          <input type="text" id="claimRefNum" placeholder="e.g. CLM-2026-0841">
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label for="custName">Customer Name *</label>
+          <input type="text" id="custName" placeholder="Customer Full Name">
+        </div>
+        <div class="form-group">
+          <label for="telephone">Customer Telephone</label>
+          <input type="tel" id="telephone" placeholder="555-123-4567">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="streetAddress">Premise Address *</label>
+        <div class="input-with-btn">
+          <input type="text" id="streetAddress" placeholder="e.g. 1015 Worthington Ridge">
+          <button type="button" class="btn-geo" id="btnPullAddress" onclick="pullTechCurrentAddress()">📍 GPS Auto-Fill</button>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label for="cityStateZip">City / State / Zip *</label>
+          <input type="text" id="cityStateZip" placeholder="Berlin, CT 06037">
+        </div>
+        <div class="form-group">
+          <label for="incidentDate">Incident Date *</label>
+          <input type="date" id="incidentDate">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">3. Damage Assessment &amp; Findings</div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label for="damageCategory">Damage Category *</label>
+          <select id="damageCategory">
+            <option value="Interior Drywall / Paint / Trim">Interior Drywall / Paint / Trim</option>
+            <option value="Exterior Siding / Stucco / Brick / Fascia">Exterior Siding / Stucco / Brick / Fascia</option>
+            <option value="Flooring / Carpet / Tile / Hardwood">Flooring / Carpet / Tile / Hardwood</option>
+            <option value="Plumbing / Water Pipe Penetration">Plumbing / Water Pipe Penetration</option>
+            <option value="Electrical / Power Line / Low-Voltage">Electrical / Power Line / Low-Voltage</option>
+            <option value="Lawn / Sprinkler Head / Landscaping">Lawn / Sprinkler Head / Landscaping</option>
+            <option value="Customer Personal Property / Electronics">Customer Personal Property / Electronics</option>
+            <option value="Roof / Shingles / Attic Structure">Roof / Shingles / Attic Structure</option>
+            <option value="Other Property Damage">Other Property Damage</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="assessedAmount">Assessed Liability / Chargeback ($)</label>
+          <input type="text" id="assessedAmount" placeholder="e.g. $350.00 or Under Review">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="investigationFindings">Prince Telecom Investigation Findings *</label>
+        <textarea id="investigationFindings" rows="4" placeholder="Detail the inspection findings, root cause analysis, whether damage occurred within technician work scope, tool marks observed, pre-existing condition notes, and liability conclusion..."></textarea>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label for="adjusterName">Investigator / Supervisor Name *</label>
+          <input type="text" id="adjusterName" placeholder="e.g. M. Jenkins - Field Operations">
+        </div>
+        <div class="form-group">
+          <label for="contractorEmail">Contractor Email (PDF Recipient) *</label>
+          <input type="email" id="contractorEmail" placeholder="dispatch@contractor.com">
+        </div>
+      </div>
+
+      <!-- Evidence Photos -->
+      <div class="photo-section">
+        <label>Damage Evidence &amp; Findings Photos (Optional - Max 4)</label>
+        <div class="photo-btn-group">
+          <label class="btn-photo">
+            📷 Take Photo
+            <input type="file" accept="image/*" capture="environment" id="cameraInput" style="display: none;" onchange="handlePhotoSelect(this)">
+          </label>
+          <label class="btn-photo">
+            🖼️ Choose from Gallery
+            <input type="file" accept="image/*" multiple id="uploadInput" style="display: none;" onchange="handlePhotoSelect(this)">
+          </label>
+        </div>
+        <div class="photo-grid" id="photoGallery"></div>
+      </div>
+
+      <button type="button" class="btn-submit" id="btnSubmit" onclick="generateAndSaveNativePDF()">
+        📄 Generate Prince Determination PDF
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentStatus = "PENDING REVIEW";
+  let attachedPhotos = [];
+
+  function setStatus(status) {
+    currentStatus = status;
+    document.querySelectorAll('.status-btn').forEach(btn => {
+      if (btn.getAttribute('data-status') === status) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    loadProfileDefaults();
+    const now = new Date();
+    document.getElementById('incidentDate').value = now.toISOString().slice(0, 10);
+    if (!document.getElementById('claimRefNum').value) {
+      document.getElementById('claimRefNum').value = 'PT-CLM-' + Math.floor(100000 + Math.random() * 900000);
+    }
+  });
+
+  function loadProfileDefaults() {
+    const savedSupervisor = localStorage.getItem('pt_claims_investigator');
+    if (savedSupervisor) document.getElementById('adjusterName').value = savedSupervisor;
+  }
+
+  function handlePhotoSelect(input) {
+    const files = input.files;
+    if (!files || files.length === 0) return;
+
+    for (let i = 0; i < files.length; i++) {
+      if (attachedPhotos.length >= 4) {
+        alert("Maximum 4 evidence photos allowed per report.");
+        break;
+      }
+      resizeAndStoreImage(files[i]);
+    }
+    input.value = "";
+  }
+
+  function resizeAndStoreImage(file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = new Image();
+      img.onload = function() {
+        const maxDim = 800;
+        let w = img.width;
+        let h = img.height;
+        if (w > h) {
+          if (w > maxDim) { h = Math.round((h * maxDim) / w); w = maxDim; }
+        } else {
+          if (h > maxDim) { w = Math.round((w * maxDim) / h); h = maxDim; }
+        }
+
+        const offCanvas = document.createElement('canvas');
+        offCanvas.width = w;
+        offCanvas.height = h;
+        const offCtx = offCanvas.getContext('2d');
+        offCtx.drawImage(img, 0, 0, w, h);
+
+        const dataUrl = offCanvas.toDataURL('image/jpeg', 0.8);
+        attachedPhotos.push(dataUrl);
+        renderPhotoGallery();
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function renderPhotoGallery() {
+    const gallery = document.getElementById('photoGallery');
+    gallery.innerHTML = '';
+    attachedPhotos.forEach((dataUrl, index) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'photo-thumb-wrap';
+
+      const img = document.createElement('img');
+      img.src = dataUrl;
+
+      const delBtn = document.createElement('button');
+      delBtn.className = 'btn-del-photo';
+      delBtn.innerHTML = '✕';
+      delBtn.onclick = () => removePhoto(index);
+
+      wrap.appendChild(img);
+      wrap.appendChild(delBtn);
+      gallery.appendChild(wrap);
+    });
+  }
+
+  function removePhoto(index) {
+    attachedPhotos.splice(index, 1);
+    renderPhotoGallery();
+  }
+
+  async function reverseGeocode(lat, lng) {
+    try {
+      const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`, {
+        headers: { 'Accept': 'application/json' }
+      });
+      if (!response.ok) return null;
+      return await response.json();
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function pullTechCurrentAddress() {
+    const btn = document.getElementById('btnPullAddress');
+    const streetInput = document.getElementById('streetAddress');
+    const cszInput = document.getElementById('cityStateZip');
+    if (!("geolocation" in navigator)) return;
+
+    btn.textContent = "⏳ Locating...";
+    btn.disabled = true;
+
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const data = await reverseGeocode(pos.coords.latitude, pos.coords.longitude);
+        if (data && data.address) {
+          const addr = data.address;
+          const road = addr.road || addr.pedestrian || addr.suburb || '';
+          const houseNumber = addr.house_number || '';
+          streetInput.value = `${houseNumber} ${road}`.trim() || data.display_name.split(',')[0];
+          
+          const city = addr.city || addr.town || addr.village || addr.county || '';
+          const state = addr.state || '';
+          const postcode = addr.postcode || '';
+          cszInput.value = `${city}, ${state} ${postcode}`.trim().replace(/^,\s*/, '');
+        } else if (data && data.display_name) {
+          streetInput.value = data.display_name;
+        } else {
+          streetInput.value = `${pos.coords.latitude.toFixed(6)}, ${pos.coords.longitude.toFixed(6)}`;
+        }
+        btn.textContent = "✓ Found";
+        setTimeout(() => { btn.textContent = "📍 GPS Auto-Fill"; btn.disabled = false; }, 2000);
+      },
+      () => {
+        alert("Unable to fetch location. Please enter address manually.");
+        btn.textContent = "📍 GPS Auto-Fill";
+        btn.disabled = false;
+      },
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+    );
+  }
+
+  function generateAndSaveNativePDF() {
+    const statusReason = document.getElementById('statusReason').value.trim() || 'Determination finalized per field inspection';
+    const subName = document.getElementById('subcontractorName').value.trim();
+    const techId = document.getElementById('techId').value.trim();
+    const workOrder = document.getElementById('workOrder').value.trim();
+    const claimRefNum = document.getElementById('claimRefNum').value.trim();
+    const custName = document.getElementById('custName').value.trim();
+    const telephone = document.getElementById('telephone').value.trim() || 'N/A';
+    const streetAddress = document.getElementById('streetAddress').value.trim();
+    const cityStateZip = document.getElementById('cityStateZip').value.trim();
+    const incidentDate = document.getElementById('incidentDate').value;
+    const damageCategory = document.getElementById('damageCategory').value;
+    const assessedAmount = document.getElementById('assessedAmount').value.trim() || '$0.00';
+    const investigationFindings = document.getElementById('investigationFindings').value.trim();
+    const adjusterName = document.getElementById('adjusterName').value.trim();
+    const contractorEmail = document.getElementById('contractorEmail').value.trim();
+
+    if (!subName || !techId || !workOrder || !claimRefNum || !custName || !streetAddress || !cityStateZip || !investigationFindings || !adjusterName) {
+      alert("Please fill in all required fields (Contractor Name, Tech ID, WO #, Claim #, Customer, Address, Findings, and Investigator Name).");
+      return;
+    }
+
+    localStorage.setItem('pt_claims_investigator', adjusterName);
+
+    const btn = document.getElementById('btnSubmit');
+    btn.textContent = "⚙️ Generating Determination PDF...";
+    btn.disabled = true;
+
+    const now = new Date();
+    const dateFormatted = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const cleanClaim = claimRefNum.replace(/\s+/g, '_');
+    const filename = `Prince_Damage_Determination_${cleanClaim}_${currentStatus.replace(/\s+/g, '_')}.pdf`;
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ format: 'letter', unit: 'pt' });
+
+    const left = 45;
+    const right = 567;
+    const contentWidth = right - left;
+
+    // Header
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(15, 23, 42);
+    doc.text("PRINCE TELECOM FIELD OPERATIONS", left, 46);
+
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(2, 132, 199);
+    doc.text("CONTRACTOR DAMAGE CLAIM DETERMINATION NOTICE", left, 61);
+
+    doc.setFontSize(8.5);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(80, 80, 80);
+    doc.text(`Notice Date: ${dateFormatted}`, right, 46, { align: "right" });
+    doc.text(`Claim Ref #: ${claimRefNum}`, right, 59, { align: "right" });
+
+    doc.setDrawColor(15, 23, 42);
+    doc.setLineWidth(1.4);
+    doc.line(left, 68, right, 68);
+
+    // High-Contrast Status Banner
+    let bannerY = 78;
+    let bannerColor = [245, 158, 11];
+    let textColor = [255, 255, 255];
+
+    if (currentStatus === "APPROVED") {
+      bannerColor = [16, 185, 129];
+    } else if (currentStatus === "DENIAL") {
+      bannerColor = [225, 29, 72];
+    }
+
+    doc.setFillColor(bannerColor[0], bannerColor[1], bannerColor[2]);
+    doc.roundedRect(left, bannerY, contentWidth, 34, 4, 4, "F");
+
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(textColor[0], textColor[1], textColor[2]);
+    doc.text(`OFFICIAL FINDING: ${currentStatus}`, left + 14, bannerY + 22);
+
+    doc.setFontSize(8.5);
+    doc.setFont("helvetica", "normal");
+    const safeReason = doc.splitTextToSize(`Rationale: ${statusReason}`, 260);
+    doc.text(safeReason[0], right - 14, bannerY + 21, { align: "right" });
+
+    // Primary Information Grid
+    let y = 132;
+    doc.setFontSize(9);
+    doc.setTextColor(0, 0, 0);
+
+    doc.setFont("helvetica", "bold"); doc.text("Contractor Company:", left, y);
+    doc.setFont("helvetica", "normal"); doc.text(subName, left + 120, y);
+    doc.setFont("helvetica", "bold"); doc.text("Work Order #:", 370, y);
+    doc.setFont("helvetica", "normal"); doc.text(workOrder, 450, y);
+
+    y += 18;
+    doc.setFont("helvetica", "bold"); doc.text("Contractor Tech ID:", left, y);
+    doc.setFont("helvetica", "normal"); doc.text(techId, left + 120, y);
+    doc.setFont("helvetica", "bold"); doc.text("Incident Date:", 370, y);
+    doc.setFont("helvetica", "normal"); doc.text(incidentDate, 450, y);
+
+    y += 18;
+    doc.setFont("helvetica", "bold"); doc.text("Customer / Premise:", left, y);
+    doc.setFont("helvetica", "normal"); doc.text(`${custName} (Tel: ${telephone})`, left + 120, y);
+    doc.setFont("helvetica", "bold"); doc.text("Damage Category:", 370, y);
+    doc.setFont("helvetica", "normal"); doc.text(damageCategory, 465, y);
+
+    y += 18;
+    doc.setFont("helvetica", "bold"); doc.text("Service Address:", left, y);
+    doc.setFont("helvetica", "normal");
+    const wrappedAddr = doc.splitTextToSize(`${streetAddress}, ${cityStateZip}`, contentWidth - 125);
+    doc.text(wrappedAddr, left + 120, y);
+    y += (wrappedAddr.length - 1) * 11;
+
+    y += 18;
+    doc.setFont("helvetica", "bold"); doc.text("Investigating Supervisor:", left, y);
+    doc.setFont("helvetica", "normal"); doc.text(adjusterName, left + 130, y);
+    doc.setFont("helvetica", "bold"); doc.text("Assessed Chargeback:", 370, y);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(currentStatus === "APPROVED" ? 180 : 0, 0, 0);
+    doc.text(assessedAmount, 480, y);
+    doc.setTextColor(0, 0, 0);
+
+    y += 15;
+    doc.setLineWidth(0.5);
+    doc.setDrawColor(210, 210, 210);
+    doc.line(left, y, right, y);
+
+    // Investigation Findings Narrative
+    y += 22;
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "bold");
+    doc.text("PRINCE TELECOM INVESTIGATION FINDINGS & ROOT CAUSE:", left, y);
+
+    y += 15;
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(30, 30, 30);
+    const wrappedDesc = doc.splitTextToSize(investigationFindings, contentWidth);
+    doc.text(wrappedDesc, left, y);
+    y += (wrappedDesc.length * 13) + 20;
+
+    // Official Contractor Chargeback & Rebuttal Notice
+    doc.setFillColor(248, 250, 252);
+    doc.rect(left, y, contentWidth, 85, "F");
+    doc.setDrawColor(203, 213, 225);
+    doc.rect(left, y, contentWidth, 85, "S");
+
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(15, 23, 42);
+    doc.text("CONTRACTOR NOTICE OF LIABILITY & DISPUTE RIGHTS", left + 10, y + 14);
+
+    doc.setFontSize(7.5);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(71, 85, 105);
+    const policyNotice = "This determination notice represents Prince Telecom's formal investigative finding regarding reported property damage linked to contractor work orders. If approved, the assessed liability amount will be processed against contractor settlement remittances or invoiced per master subcontract agreement terms. If you dispute this finding, an official written appeal with supporting photographic proof, pre-existing condition logs, or third-party professional estimates must be submitted to Prince Telecom Field Operations within ten (10) business days of notice receipt.";
+    const wrappedPolicy = doc.splitTextToSize(policyNotice, contentWidth - 20);
+    doc.text(wrappedPolicy, left + 10, y + 26);
+
+    // Inspector Signature Line
+    y += 105;
+    doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(1);
+    doc.line(left, y, 250, y);
+    doc.setFontSize(8.5);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(0, 0, 0);
+    doc.text("Authorized Operations Supervisor", left, y + 11);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.text(`${adjusterName} - Prince Telecom`, left, y + 21);
+
+    doc.line(360, y, 460, y);
+    doc.setFontSize(8.5);
+    doc.setFont("helvetica", "bold");
+    doc.text("Determination Date", 360, y + 11);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.text(now.toLocaleDateString(), 360, y + 21);
+
+    // Optional Photographic Evidence Page 2
+    if (attachedPhotos.length > 0) {
+      doc.addPage();
+
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(15, 23, 42);
+      doc.text("PRINCE TELECOM - DAMAGE EVIDENCE & FINDINGS ATTACHMENT", left, 50);
+
+      doc.setFontSize(8.5);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(80, 80, 80);
+      doc.text(`Contractor: ${subName} | Claim #: ${claimRefNum} | Status: ${currentStatus}`, left, 65);
+      doc.text(`Generated: ${dateFormatted}`, right, 65, { align: "right" });
+
+      doc.setDrawColor(15, 23, 42);
+      doc.setLineWidth(1.2);
+      doc.line(left, 72, right, 72);
+
+      const photoW = 245;
+      const photoH = 185;
+      const col1 = left;
+      const col2 = left + photoW + 30;
+
+      const positions = [
+        { x: col1, y: 92, label: "Evidence Photo 1: Overview of Property Area" },
+        { x: col2, y: 92, label: "Evidence Photo 2: Inspection Point / Damage Detail" },
+        { x: col1, y: 315, label: "Evidence Photo 3: Surrounding Premise / Tool Marks" },
+        { x: col2, y: 315, label: "Evidence Photo 4: Post-Inspection / Supporting Evidence" }
+      ];
+
+      for (let p = 0; p < attachedPhotos.length && p < 4; p++) {
+        const pos = positions[p];
+        doc.setFontSize(8);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(50, 50, 50);
+        doc.text(pos.label, pos.x, pos.y);
+
+        doc.setDrawColor(200, 200, 200);
+        doc.setLineWidth(0.5);
+        doc.rect(pos.x, pos.y + 6, photoW, photoH, "S");
+        doc.addImage(attachedPhotos[p], 'JPEG', pos.x + 1, pos.y + 7, photoW - 2, photoH - 2);
+      }
+    }
+
+    doc.save(filename);
+
+    btn.textContent = "📄 Generate Prince Determination PDF";
+    btn.disabled = false;
+
+    setTimeout(() => {
+      if (contractorEmail) {
+        const photoNotice = attachedPhotos.length > 0 ? ` (${attachedPhotos.length} photo(s) attached on Page 2)` : '';
+        const sendEmail = confirm(`✅ Determination PDF Downloaded!${photoNotice}\n\n(File: ${filename})\n\nOpen email app to forward formal determination to ${contractorEmail}?`);
+        if (sendEmail) {
+          const mailSubject = encodeURIComponent(`[${currentStatus}] DAMAGE CLAIM DETERMINATION - Claim# ${claimRefNum} - ${subName}`);
+          const mailBody = encodeURIComponent(
+            `Prince Telecom Field Operations & Quality Assurance,\n\n` +
+            `Attention: ${subName},\n\n` +
+            `Please find attached the official damage claim determination regarding Work Order #${workOrder}.\n\n` +
+            `Claim Reference: ${claimRefNum}\n` +
+            `Disposition: ${currentStatus}\n` +
+            `Rationale: ${statusReason}\n` +
+            `Assessed Amount: ${assessedAmount}\n` +
+            `Service Premise: ${streetAddress}, ${cityStateZip}\n` +
+            `Technician: ${techId}\n` +
+            `Investigator: ${adjusterName}\n\n` +
+            `Please review the attached PDF notice (${filename}) for findings, photographic evidence, and appeal procedure.`
+          );
+          window.location.href = `mailto:${contractorEmail}?subject=${mailSubject}&body=${mailBody}`;
+        }
+      } else {
+        alert(`✅ Prince Determination PDF downloaded as ${filename}`);
+      }
+    }, 800);
+  }
+</script>
+
+</body>
+</html>
