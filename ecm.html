@@ -72,17 +72,30 @@
     .status-btn.active[data-val="PENDING REVIEW"] { background: rgba(245, 158, 11, 0.15); border-color: var(--amber); color: var(--amber); }
     .status-btn.active[data-val="APPROVED"] { background: rgba(16, 185, 129, 0.15); border-color: var(--emerald); color: var(--emerald); }
     .status-btn.active[data-val="DENIAL"] { background: rgba(244, 63, 94, 0.15); border-color: var(--rose); color: var(--rose); }
+
+    /* Photo Management UI */
     .photo-section { display: flex; flex-direction: column; gap: 8px; }
     .photo-btn-group { display: flex; gap: 8px; }
     .btn-photo {
       flex: 1; background: #18233a; border: 1px dashed var(--cyan); color: var(--text);
-      padding: 8px; border-radius: 6px; font-size: 0.78rem; font-weight: 700;
+      padding: 10px; border-radius: 6px; font-size: 0.78rem; font-weight: 700;
       cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
     }
-    .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)); gap: 8px; margin-top: 4px; }
-    .photo-thumb-wrap { position: relative; width: 100%; padding-top: 100%; border-radius: 6px; overflow: hidden; border: 1px solid var(--card-border); background: #090e17; }
-    .photo-thumb-wrap img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
-    .btn-del-photo { position: absolute; top: 2px; right: 2px; background: rgba(244, 63, 94, 0.9); color: white; border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .btn-photo:hover { background: #243452; }
+    
+    .photo-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; min-height: 20px; }
+    .photo-thumb-wrap {
+      position: relative; width: 84px; height: 84px; border-radius: 8px; overflow: hidden;
+      border: 2px solid var(--cyan); background: #000; flex-shrink: 0; cursor: pointer;
+    }
+    .photo-thumb-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .btn-del-photo {
+      position: absolute; top: 2px; right: 2px; background: rgba(244, 63, 94, 0.95);
+      color: white; border: none; border-radius: 50%; width: 22px; height: 22px;
+      font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      z-index: 5;
+    }
+
     .btn { width: 100%; border: none; border-radius: var(--radius); padding: 12px; font-size: 0.9rem; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s; text-decoration: none; }
     .btn-amber { background: var(--amber); color: #000; }
     .btn-amber:hover { background: #fbbf24; }
@@ -90,6 +103,15 @@
     .btn-rose:hover { background: #fb7185; }
     .btn-emerald { background: var(--emerald); color: #000; }
     .btn-emerald:hover { background: #34d399; }
+
+    /* Lightbox Modal */
+    #lightbox {
+      display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0, 0, 0, 0.88); z-index: 9999; justify-content: center; align-items: center;
+      padding: 16px;
+    }
+    #lightbox img { max-width: 95%; max-height: 85%; border-radius: 8px; border: 2px solid var(--cyan); object-fit: contain; }
+    #lightbox-close { position: absolute; top: 18px; right: 22px; color: #fff; font-size: 2rem; font-weight: 900; cursor: pointer; }
   </style>
 </head>
 <body>
@@ -126,7 +148,10 @@
       <div class="grid-2">
         <div class="form-group">
           <label for="claimRefNum">Claim Reference # *</label>
-          <input type="text" id="claimRefNum">
+          <div class="input-with-btn">
+            <input type="text" id="claimRefNum" placeholder="Generating Claim #...">
+            <button type="button" class="btn-geo" onclick="generateNewClaimNumber()" title="Generate New Claim #">🔄 New #</button>
+          </div>
         </div>
         <div class="form-group">
           <label for="workOrder">Work Order / Account # *</label>
@@ -206,10 +231,16 @@
 
       <div class="photo-section">
         <label>Initial Incident Evidence Photos (Max 4)</label>
+        
+        <!-- Hidden Inputs for Files -->
+        <input type="file" id="fileCameraInitial" accept="image/*" capture="environment" style="display: none;" onchange="handleFilePicker(this, 'initial')">
+        <input type="file" id="fileGalleryInitial" accept="image/*" multiple style="display: none;" onchange="handleFilePicker(this, 'initial')">
+
         <div class="photo-btn-group">
-          <label class="btn-photo">📷 Take Photo <input type="file" accept="image/*" capture="environment" style="display: none;" onchange="handlePhotoSelect(this, 'initial')"></label>
-          <label class="btn-photo">🖼️ Gallery <input type="file" accept="image/*" multiple style="display: none;" onchange="handlePhotoSelect(this, 'initial')"></label>
+          <button type="button" class="btn-photo" onclick="document.getElementById('fileCameraInitial').click()">📷 Take Photo</button>
+          <button type="button" class="btn-photo" onclick="document.getElementById('fileGalleryInitial').click()">🖼️ Choose Gallery</button>
         </div>
+        <div id="statusPhotoInitial" style="font-size: 0.72rem; color: var(--cyan); font-weight: bold;"></div>
         <div class="photo-grid" id="galleryInitial"></div>
       </div>
     </div>
@@ -270,10 +301,15 @@
 
       <div class="photo-section">
         <label>Contractor Rebuttal / Repair Photos (Max 4)</label>
+        
+        <input type="file" id="fileCameraRebuttal" accept="image/*" capture="environment" style="display: none;" onchange="handleFilePicker(this, 'rebuttal')">
+        <input type="file" id="fileGalleryRebuttal" accept="image/*" multiple style="display: none;" onchange="handleFilePicker(this, 'rebuttal')">
+
         <div class="photo-btn-group">
-          <label class="btn-photo">📷 Take Photo <input type="file" accept="image/*" capture="environment" style="display: none;" onchange="handlePhotoSelect(this, 'rebuttal')"></label>
-          <label class="btn-photo">🖼️ Gallery <input type="file" accept="image/*" multiple style="display: none;" onchange="handlePhotoSelect(this, 'rebuttal')"></label>
+          <button type="button" class="btn-photo" onclick="document.getElementById('fileCameraRebuttal').click()">📷 Take Photo</button>
+          <button type="button" class="btn-photo" onclick="document.getElementById('fileGalleryRebuttal').click()">🖼️ Choose Gallery</button>
         </div>
+        <div id="statusPhotoRebuttal" style="font-size: 0.72rem; color: var(--purple); font-weight: bold;"></div>
         <div class="photo-grid" id="galleryRebuttal"></div>
       </div>
     </div>
@@ -312,6 +348,12 @@
   </div>
 </div>
 
+<!-- LIGHTBOX MODAL FOR PREVIEWS -->
+<div id="lightbox" onclick="closeLightbox()">
+  <span id="lightbox-close">&times;</span>
+  <img id="lightbox-img" src="" alt="Enlarged Proof" onclick="event.stopPropagation()">
+</div>
+
 <script>
   let currentStage = 1;
   let princeRuling = "PENDING REVIEW";
@@ -323,15 +365,35 @@
   const SUPABASE_ANON_KEY = "sb_publishable_ryRaA8Kg3gSyAZ3rDfKZng_wrT03lCJ";
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  window.addEventListener('DOMContentLoaded', () => {
+  function generateNewClaimNumber() {
+    const num = Math.floor(100000 + Math.random() * 900000);
+    const input = document.getElementById('claimRefNum');
+    if (input) input.value = 'PT-CLM-' + num;
+    return 'PT-CLM-' + num;
+  }
+
+  function initPage() {
     const now = new Date();
-    document.getElementById('incidentDate').value = now.toISOString().slice(0, 10);
-    if (!document.getElementById('claimRefNum').value) {
-      document.getElementById('claimRefNum').value = 'PT-CLM-' + Math.floor(100000 + Math.random() * 900000);
+    const dateInput = document.getElementById('incidentDate');
+    if (dateInput && !dateInput.value) {
+      dateInput.value = now.toISOString().slice(0, 10);
     }
+    const claimInput = document.getElementById('claimRefNum');
+    if (claimInput && !claimInput.value) {
+      generateNewClaimNumber();
+    }
+    const supervisorInput = document.getElementById('supervisorName');
     const savedSupervisor = localStorage.getItem('pt_claims_investigator');
-    if (savedSupervisor) document.getElementById('supervisorName').value = savedSupervisor;
-  });
+    if (supervisorInput && savedSupervisor) {
+      supervisorInput.value = savedSupervisor;
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initPage);
+  } else {
+    initPage();
+  }
 
   function switchStage(stage) {
     currentStage = stage;
@@ -378,61 +440,112 @@
     if (currentStage === 2) switchStage(2);
   }
 
-  function handlePhotoSelect(input, bucket) {
+  // --- ROBUST ASYNC PHOTO ENGINE ---
+  async function handleFilePicker(input, bucket) {
     const files = input.files;
     if (!files || files.length === 0) return;
-    const targetArr = bucket === 'initial' ? initialPhotos : rebuttalPhotos;
+    const targetArr = (bucket === 'initial') ? initialPhotos : rebuttalPhotos;
+    const statusEl = document.getElementById(bucket === 'initial' ? 'statusPhotoInitial' : 'statusPhotoRebuttal');
+
+    if (statusEl) statusEl.textContent = `⏳ Processing ${files.length} photo(s)...`;
 
     for (let i = 0; i < files.length; i++) {
       if (targetArr.length >= 4) {
-        alert("Maximum 4 photos allowed per section.");
+        alert("Maximum 4 photos allowed for this section.");
         break;
       }
-      resizeAndStorePhoto(files[i], bucket);
+      try {
+        const dataUrl = await fileToCompressedDataUrl(files[i]);
+        if (dataUrl) {
+          targetArr.push(dataUrl);
+          renderGallery(bucket);
+        }
+      } catch (err) {
+        console.error("Photo Error:", err);
+        alert("Could not load image: " + files[i].name);
+      }
     }
     input.value = "";
+    if (statusEl) statusEl.textContent = "";
   }
 
-  function resizeAndStorePhoto(file, bucket) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const img = new Image();
-      img.onload = function() {
-        const maxDim = 800;
-        let w = img.width, h = img.height;
-        if (w > h) { if (w > maxDim) { h = Math.round((h * maxDim) / w); w = maxDim; } }
-        else { if (h > maxDim) { w = Math.round((w * maxDim) / h); h = maxDim; } }
-        const canvas = document.createElement('canvas');
-        canvas.width = w; canvas.height = h;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, w, h);
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-        if (bucket === 'initial') { initialPhotos.push(dataUrl); renderGallery('initial'); }
-        else { rebuttalPhotos.push(dataUrl); renderGallery('rebuttal'); }
+  function fileToCompressedDataUrl(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error("File read failure"));
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onerror = () => reject(new Error("Image decode failure"));
+        img.onload = () => {
+          try {
+            const maxDim = 800;
+            let w = img.width, h = img.height;
+            if (w > h) {
+              if (w > maxDim) { h = Math.round((h * maxDim) / w); w = maxDim; }
+            } else {
+              if (h > maxDim) { w = Math.round((w * maxDim) / h); h = maxDim; }
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.max(1, w);
+            canvas.height = Math.max(1, h);
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.70);
+            resolve(dataUrl);
+          } catch (canvasErr) {
+            reject(canvasErr);
+          }
+        };
+        img.src = e.target.result;
       };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
+      reader.readAsDataURL(file);
+    });
   }
 
   function renderGallery(bucket) {
-    const arr = bucket === 'initial' ? initialPhotos : rebuttalPhotos;
+    const arr = (bucket === 'initial') ? initialPhotos : rebuttalPhotos;
     const gal = document.getElementById(bucket === 'initial' ? 'galleryInitial' : 'galleryRebuttal');
     gal.innerHTML = '';
+
     arr.forEach((url, idx) => {
       const wrap = document.createElement('div');
       wrap.className = 'photo-thumb-wrap';
+      wrap.title = "Click to enlarge";
+      wrap.onclick = () => openLightbox(url);
+
       const img = document.createElement('img');
       img.src = url;
+
       const del = document.createElement('button');
       del.className = 'btn-del-photo';
       del.innerHTML = '✕';
-      del.onclick = () => { arr.splice(idx, 1); renderGallery(bucket); };
-      wrap.appendChild(img); wrap.appendChild(del);
+      del.title = "Delete photo";
+      del.onclick = (e) => {
+        e.stopPropagation();
+        arr.splice(idx, 1);
+        renderGallery(bucket);
+      };
+
+      wrap.appendChild(img);
+      wrap.appendChild(del);
       gal.appendChild(wrap);
     });
   }
 
+  function openLightbox(src) {
+    const lb = document.getElementById('lightbox');
+    const lbImg = document.getElementById('lightbox-img');
+    lbImg.src = src;
+    lb.style.display = 'flex';
+  }
+
+  function closeLightbox() {
+    document.getElementById('lightbox').style.display = 'none';
+  }
+
+  // --- REVERSE GEOCODING ---
   function pullTechCurrentAddress() {
     const btn = document.getElementById('btnPullAddress');
     const streetInput = document.getElementById('streetAddress');
@@ -442,7 +555,15 @@
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         try {
-          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`); const data = await res.json(); if (data && data.address) { const addr = data.address; const road = addr.road \vert{}\vert{} addr.pedestrian \vert{}\vert{} addr.suburb \vert{}\vert{} ''; const num = addr.house_number \vert{}\vert{} ''; streetInput.value = `${num} ${road}`.trim() \vert{}\vert{} data.display_name.split(',')[0]; const city = addr.city \vert{}\vert{} addr.town \vert{}\vert{} addr.village \vert{}\vert{} addr.county \vert{}\vert{} ''; cszInput.value = `${city}, ${addr.state \vert{}\vert{} ''}${addr.postcode || ''}`.trim().replace(/^,\\s*/, '');
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`);
+          const data = await res.json();
+          if (data && data.address) {
+            const addr = data.address;
+            const road = addr.road || addr.pedestrian || addr.suburb || '';
+            const num = addr.house_number || '';
+            streetInput.value = `${num} ${road}`.trim() || data.display_name.split(',')[0];
+            const city = addr.city || addr.town || addr.village || addr.county || '';
+            cszInput.value = `${city}, ${addr.state || ''} ${addr.postcode || ''}`.trim().replace(/^,\s*/, '');
           }
         } catch(e) {}
         btn.textContent = "✓ Done";
@@ -453,6 +574,7 @@
     );
   }
 
+  // --- SUBMISSION & SUPABASE PERSISTENCE ---
   async function executeCurrentStageAction() {
     const claimRef = document.getElementById('claimRefNum').value.trim();
     const wo = document.getElementById('workOrder').value.trim();
@@ -483,7 +605,7 @@
         contractor_name: subName,
         tech_id: techId,
         customer_name: custName,
-        address: `${address},${csz}`,
+        address: `${address}, ${csz}`,
         category: category,
         current_stage: currentStage,
         status: (currentStage === 4) ? document.getElementById('closeoutDisposition').value : (currentStage >= 2 ? princeRuling : 'PENDING REVIEW'),
@@ -498,7 +620,7 @@
           claim_id: claimRef,
           author_role: 'PRINCE_SUPERVISOR',
           author_name: supervisor,
-          message: `[STAGE 1 INITIAL 48-HR NOTICE DISPATCHED]\\nCategory: ${category}\\nFindings:${desc}`,
+          message: `[STAGE 1 INITIAL 48-HR NOTICE DISPATCHED]\nCategory: ${category}\nFindings: ${desc}`,
           stage_at_submission: 1,
           photos: initialPhotos
         }]);
@@ -508,7 +630,7 @@
           claim_id: claimRef,
           author_role: 'PRINCE_SUPERVISOR',
           author_name: supervisor,
-          message: `[STAGE 2 PRINCE DETERMINATION: ${princeRuling}]\\nChargeback: ${chargeback}\\nLiability Rationale:${findings}`,
+          message: `[STAGE 2 PRINCE DETERMINATION: ${princeRuling}]\nChargeback: ${chargeback}\nLiability Rationale: ${findings}`,
           stage_at_submission: 2,
           photos: []
         }]);
@@ -519,7 +641,29 @@
           claim_id: claimRef,
           author_role: 'PRINCE_SUPERVISOR',
           author_name: supervisor,
-          message: `[STAGE 4 CLAIM CLOSED: ${finalDisp}]\\nNotes: ${closeNotes}`, stage_at_submission: 4, photos: [] }]); } } catch (err) { console.warn("Supabase Sync Notice:", err); } finally { btn.innerHTML = origText; }  if (currentStage === 4) { generateMasterCloseoutPDF(); } else { generateProgressiveStagePDF(); }  // DISPLAY ON-SCREEN PORTAL LINK & DIRECT GMAIL BOX showOnScreenPortalBanner(claimRef, subEmail, wo, subName, address, csz); }  function showOnScreenPortalBanner(claimRef, subEmail, wo, subName, address, csz) { const portalLink = window.location.origin + window.location.pathname.replace('ecm.html', 'dispute_portal.html') + `?claim=${claimRef}`;
+          message: `[STAGE 4 CLAIM CLOSED: ${finalDisp}]\nNotes: ${closeNotes}`,
+          stage_at_submission: 4,
+          photos: []
+        }]);
+      }
+    } catch (err) {
+      console.warn("Supabase Sync Notice:", err);
+    } finally {
+      btn.innerHTML = origText;
+    }
+
+    if (currentStage === 4) {
+      generateMasterCloseoutPDF();
+    } else {
+      generateProgressiveStagePDF();
+    }
+
+    // DISPLAY ON-SCREEN PORTAL LINK & DIRECT GMAIL BOX
+    showOnScreenPortalBanner(claimRef, subEmail, wo, subName, address, csz);
+  }
+
+  function showOnScreenPortalBanner(claimRef, subEmail, wo, subName, address, csz) {
+    const portalLink = window.location.origin + window.location.pathname.replace('ecm.html', 'dispute_portal.html') + `?claim=${claimRef}`;
     
     let existingBanner = document.getElementById('portalSuccessBanner');
     if (!existingBanner) {
@@ -532,10 +676,10 @@
       container.insertBefore(existingBanner, document.getElementById('btnAction'));
     }
 
-    const emailSubject = `[48-HR NOTICE - STAGE ${currentStage}] CLAIM #${claimRef} - WO# ${wo} -${subName}`;
-    const emailBody = `Prince Telecom Operations,\\n\\nAttention: ${subName},\\n\\nPlease review the formal damage documentation for Work Order #${wo} (Claim Ref #${claimRef}).\\nPremise: ${address},${csz}\\nStage: Stage ${currentStage}\\n\\nLive Contractor Portal Link:\\n${portalLink}\\n\\nPlease submit inspection notes, repair proof, or rebuttal at the link above.`;
+    const emailSubject = `[48-HR NOTICE - STAGE ${currentStage}] CLAIM #${claimRef} - WO# ${wo} - ${subName}`;
+    const emailBody = `Prince Telecom Operations,\n\nAttention: ${subName},\n\nPlease review the formal damage documentation for Work Order #${wo} (Claim Ref #${claimRef}).\nPremise: ${address}, ${csz}\nStage: Stage ${currentStage}\n\nLive Contractor Portal Link:\n${portalLink}\n\nPlease submit inspection notes, repair proof, or rebuttal at the link above.`;
 
-    // Direct Gmail Web Compose URL (opens Gmail in a new browser tab)
+    // Direct Gmail Web Compose URL
     const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(subEmail)}&su=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
 
     existingBanner.innerHTML = `
@@ -564,9 +708,10 @@
     copyText.select();
     copyText.setSelectionRange(0, 99999);
     navigator.clipboard.writeText(copyText.value);
-    alert("✅ Contractor Portal Link copied to clipboard:\\n" + copyText.value);
+    alert("✅ Contractor Portal Link copied to clipboard:\n" + copyText.value);
   }
 
+  // --- PROGRESSIVE STAGE PDF EXPORT ---
   function generateProgressiveStagePDF() {
     const claimRef = document.getElementById('claimRefNum').value.trim();
     const wo = document.getElementById('workOrder').value.trim();
@@ -635,14 +780,14 @@
 
     y += 18;
     doc.setFont("helvetica", "bold"); doc.text("Customer / Premise:", left, y);
-    doc.setFont("helvetica", "normal"); doc.text(`${custName} (Tel:${phone})`, left + 120, y);
+    doc.setFont("helvetica", "normal"); doc.text(`${custName} (Tel: ${phone})`, left + 120, y);
     doc.setFont("helvetica", "bold"); doc.text("Category:", 370, y);
     doc.setFont("helvetica", "normal"); doc.text(category, 430, y);
 
     y += 18;
     doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.text("Premise Address:", left, y);
     doc.setFont("helvetica", "normal");
-    const wrappedAddr = doc.splitTextToSize(`${address},${csz}`, width - 120);
+    const wrappedAddr = doc.splitTextToSize(`${address}, ${csz}`, width - 120);
     doc.text(wrappedAddr, left + 120, y);
     y += (wrappedAddr.length * 12);
 
@@ -661,4 +806,230 @@
       const chargeback = document.getElementById('chargebackAmount').value.trim() || '$0.00';
       const findings = document.getElementById('princeFindings').value.trim();
       doc.setFontSize(9.5); doc.setFont("helvetica", "bold"); doc.setTextColor(0, 0, 0);
-      doc.text(`PRINCE TELECOM INVESTIGATION RULING & DEMAND (${charge
+      doc.text(`PRINCE TELECOM INVESTIGATION RULING & DEMAND (${chargeback}):`, left, y);
+      y += 14;
+      doc.setFontSize(8.5); doc.setFont("helvetica", "normal"); doc.setTextColor(40, 40, 40);
+      const wrappedFindings = doc.splitTextToSize(findings || "Determination issued based on initial review.", width);
+      doc.text(wrappedFindings, left, y);
+      y += (wrappedFindings.length * 12) + 14;
+    }
+
+    if (currentStage >= 3) {
+      const stance = document.getElementById('contractorPosition').value;
+      const rep = document.getElementById('contractorRepName').value.trim();
+      const notes = document.getElementById('contractorNotes').value.trim();
+      doc.setFontSize(9.5); doc.setFont("helvetica", "bold"); doc.setTextColor(0, 0, 0);
+      doc.text(`CONTRACTOR REBUTTAL STATEMENT (${stance} - Rep: ${rep}):`, left, y);
+      y += 14;
+      doc.setFontSize(8.5); doc.setFont("helvetica", "normal"); doc.setTextColor(40, 40, 40);
+      const wrappedNotes = doc.splitTextToSize(notes || "Rebuttal documentation submitted.", width);
+      doc.text(wrappedNotes, left, y);
+      y += (wrappedNotes.length * 12) + 14;
+    }
+
+    doc.setFillColor(248, 250, 252); doc.rect(left, y, width, 55, "F");
+    doc.setDrawColor(203, 213, 225); doc.rect(left, y, width, 55, "S");
+    doc.setFontSize(7.8); doc.setFont("helvetica", "bold"); doc.setTextColor(15, 23, 42);
+    doc.text("MANDATORY 48-HOUR DISPUTE COMPLIANCE PROTOCOL", left + 10, y + 14);
+    doc.setFontSize(7.2); doc.setFont("helvetica", "normal"); doc.setTextColor(71, 85, 105);
+    const noticeText = "Subcontractors must inspect and respond to damage escalations within 48 hours of dispatch. Failure to provide a corrective repair or written dispute within the prescribed 48-hour window will result in default forfeiture of dispute rights and automatic deduction of assessed charges from weekly contractor remittances.";
+    doc.text(doc.splitTextToSize(noticeText, width - 20), left + 10, y + 26);
+
+    const photosToRender = currentStage >= 3 && rebuttalPhotos.length > 0 ? rebuttalPhotos : initialPhotos;
+    if (photosToRender.length > 0) {
+      doc.addPage();
+      doc.setFontSize(13); doc.setFont("helvetica", "bold"); doc.setTextColor(15, 23, 42);
+      doc.text("PRINCE TELECOM - EVIDENCE & PHOTO APPENDIX", left, 50);
+      doc.setFontSize(8.5); doc.setFont("helvetica", "normal"); doc.setTextColor(80, 80, 80);
+      doc.text(`Claim #: ${claimRef} | Work Order: ${wo} | Sub: ${subName}`, left, 64);
+      doc.setDrawColor(15, 23, 42); doc.setLineWidth(1.2); doc.line(left, 70, right, 70);
+
+      const photoW = 245, photoH = 185;
+      const col1 = left, col2 = left + photoW + 30;
+      const posList = [{ x: col1, y: 90 }, { x: col2, y: 90 }, { x: col1, y: 310 }, { x: col2, y: 310 }];
+
+      for (let p = 0; p < photosToRender.length && p < 4; p++) {
+        try {
+          doc.setFontSize(8); doc.setFont("helvetica", "bold"); doc.setTextColor(60, 60, 60);
+          doc.text(`Evidence Item #${p + 1}`, posList[p].x, posList[p].y);
+          doc.setDrawColor(200, 200, 200); doc.setLineWidth(0.5);
+          doc.rect(posList[p].x, posList[p].y + 5, photoW, photoH, "S");
+          doc.addImage(photosToRender[p], 'JPEG', posList[p].x + 1, posList[p].y + 6, photoW - 2, photoH - 2);
+        } catch(imgErr) {
+          console.warn("Could not render photo to PDF page:", imgErr);
+        }
+      }
+    }
+
+    const filename = `Prince_Claim_${claimRef}_Stage_${currentStage}.pdf`;
+    doc.save(filename);
+  }
+
+  // --- MASTER CLOSEOUT PDF EXPORT ---
+  function generateMasterCloseoutPDF() {
+    const claimRef = document.getElementById('claimRefNum').value.trim();
+    const wo = document.getElementById('workOrder').value.trim();
+    const subName = document.getElementById('subcontractorName').value.trim();
+    const techId = document.getElementById('techId').value.trim();
+    const custName = document.getElementById('custName').value.trim();
+    const address = document.getElementById('streetAddress').value.trim();
+    const csz = document.getElementById('cityStateZip').value.trim();
+    const incidentDate = document.getElementById('incidentDate').value;
+    const initialDesc = document.getElementById('incidentDesc').value.trim();
+    const chargeback = document.getElementById('chargebackAmount').value.trim() || '$0.00';
+    const supervisor = document.getElementById('supervisorName').value.trim() || 'Prince Operations';
+    const princeFindings = document.getElementById('princeFindings').value.trim() || 'Determination finalized per investigation.';
+    const stance = document.getElementById('contractorPosition').value;
+    const rep = document.getElementById('contractorRepName').value.trim() || 'Subcontractor Dispatch';
+    const rebuttalNotes = document.getElementById('contractorNotes').value.trim() || 'Rebuttal logged.';
+    const finalDisp = document.getElementById('closeoutDisposition').value;
+    const settledAmount = document.getElementById('finalSettledAmount').value.trim() || chargeback;
+    const closeoutNotes = document.getElementById('closeoutNotes').value.trim() || 'Resolved and closed.';
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ format: 'letter', unit: 'pt' });
+    const left = 45, right = 567, width = right - left;
+    const dateFormatted = new Date().toLocaleString();
+
+    doc.setFontSize(16); doc.setFont("helvetica", "bold"); doc.setTextColor(15, 23, 42);
+    doc.text("PRINCE TELECOM FIELD OPERATIONS", left, 46);
+    doc.setFontSize(9.5); doc.setTextColor(16, 185, 129);
+    doc.text("CLOSED DAMAGE CLAIM MASTER RECORD & AUDIT DOSSIER", left, 61);
+    doc.setFontSize(8.5); doc.setFont("helvetica", "normal"); doc.setTextColor(80, 80, 80);
+    doc.text(`Closed Date: ${dateFormatted}`, right, 46, { align: "right" });
+    doc.text(`Claim Ref #: ${claimRef}`, right, 59, { align: "right" });
+
+    doc.setDrawColor(15, 23, 42); doc.setLineWidth(1.4); doc.line(left, 68, right, 68);
+
+    doc.setFillColor(16, 185, 129);
+    doc.roundedRect(left, 78, width, 36, 4, 4, "F");
+    doc.setFontSize(11); doc.setFont("helvetica", "bold"); doc.setTextColor(255, 255, 255);
+    doc.text(`FINAL DISPOSITION: ${finalDisp}`, left + 14, 95);
+    doc.setFontSize(8.5); doc.setFont("helvetica", "normal");
+    doc.text(`Settlement / Remittance Amount: ${settledAmount} | Signoff: ${supervisor}`, left + 14, 107);
+
+    let y = 132;
+    doc.setFontSize(9); doc.setTextColor(0, 0, 0);
+    doc.setFont("helvetica", "bold"); doc.text("Contractor:", left, y);
+    doc.setFont("helvetica", "normal"); doc.text(subName, left + 75, y);
+    doc.setFont("helvetica", "bold"); doc.text("Work Order #:", 370, y);
+    doc.setFont("helvetica", "normal"); doc.text(wo, 450, y);
+
+    y += 16;
+    doc.setFont("helvetica", "bold"); doc.text("Tech ID / Name:", left, y);
+    doc.setFont("helvetica", "normal"); doc.text(techId, left + 85, y);
+    doc.setFont("helvetica", "bold"); doc.text("Incident Date:", 370, y);
+    doc.setFont("helvetica", "normal"); doc.text(incidentDate, 450, y);
+
+    y += 16;
+    doc.setFont("helvetica", "bold"); doc.text("Premise / Cust:", left, y);
+    doc.setFont("helvetica", "normal"); doc.text(`${custName} - ${address}, ${csz}`, left + 85, y);
+
+    y += 14;
+    doc.setLineWidth(0.5); doc.setDrawColor(210, 210, 210); doc.line(left, y, right, y);
+
+    y += 18;
+    doc.setFontSize(9.5); doc.setFont("helvetica", "bold"); doc.setTextColor(15, 23, 42);
+    doc.text("48-HOUR DISPUTE ESCALATION LIFECYCLE AUDIT:", left, y);
+
+    y += 14;
+    doc.setFillColor(248, 250, 252); doc.rect(left, y, width, 55, "F");
+    doc.setDrawColor(203, 213, 225); doc.rect(left, y, width, 55, "S");
+    doc.setFontSize(8); doc.setFont("helvetica", "normal"); doc.setTextColor(51, 65, 85);
+    doc.text(`• STEP 1 (48h Window): Dispatched to ${subName} for mandatory 48-hour inspection & corrective action.`, left + 10, y + 14);
+    doc.text(`• STEP 2 (Prince Review): Prince issued formal ruling: ${princeRuling} (Initial Demand: ${chargeback}).`, left + 10, y + 26);
+    doc.text(`• STEP 3 (Rebuttal): Contractor representative (${rep}) filed stance: ${stance}.`, left + 10, y + 38);
+    doc.text(`• STEP 4 (Resolution): Case adjudicated by ${supervisor}. Final closed resolution: ${finalDisp}.`, left + 10, y + 50);
+
+    y += 68;
+    doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.setTextColor(0, 0, 0);
+    doc.text("1. INITIAL DAMAGE CLAIM & CUSTOMER STATEMENT:", left, y);
+    y += 12;
+    doc.setFontSize(8); doc.setFont("helvetica", "normal"); doc.setTextColor(50, 50, 50);
+    const wrapP1 = doc.splitTextToSize(initialDesc, width);
+    doc.text(wrapP1, left, y);
+    y += (wrapP1.length * 11) + 10;
+
+    doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.setTextColor(0, 0, 0);
+    doc.text("2. PRINCE INVESTIGATION FINDINGS & ROOT CAUSE:", left, y);
+    y += 12;
+    doc.setFontSize(8); doc.setFont("helvetica", "normal"); doc.setTextColor(50, 50, 50);
+    const wrapP2 = doc.splitTextToSize(princeFindings, width);
+    doc.text(wrapP2, left, y);
+    y += (wrapP2.length * 11) + 10;
+
+    doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.setTextColor(0, 0, 0);
+    doc.text("3. CONTRACTOR REBUTTAL & PROOF OF ACTION:", left, y);
+    y += 12;
+    doc.setFontSize(8); doc.setFont("helvetica", "normal"); doc.setTextColor(50, 50, 50);
+    const wrapP3 = doc.splitTextToSize(rebuttalNotes, width);
+    doc.text(wrapP3, left, y);
+    y += (wrapP3.length * 11) + 10;
+
+    y += 10;
+    doc.setDrawColor(0, 0, 0); doc.setLineWidth(1); doc.line(left, y, 240, y);
+    doc.setFontSize(8); doc.setFont("helvetica", "bold"); doc.setTextColor(0, 0, 0);
+    doc.text("Prince Authorized Supervisor", left, y + 10);
+    doc.setFont("helvetica", "normal"); doc.text(supervisor, left, y + 19);
+
+    doc.line(360, y, 460, y);
+    doc.setFont("helvetica", "bold"); doc.text("Final Closeout Date", 360, y + 10);
+    doc.setFont("helvetica", "normal"); doc.text(new Date().toLocaleDateString(), 360, y + 19);
+
+    if (initialPhotos.length > 0) {
+      doc.addPage();
+      doc.setFontSize(13); doc.setFont("helvetica", "bold"); doc.setTextColor(15, 23, 42);
+      doc.text("APPENDIX A: INITIAL INCIDENT & DAMAGE PHOTOS", left, 50);
+      doc.setFontSize(8.5); doc.setFont("helvetica", "normal"); doc.setTextColor(80, 80, 80);
+      doc.text(`Claim #: ${claimRef} | Work Order: ${wo} | Captured by Prince Ops`, left, 64);
+      doc.setDrawColor(15, 23, 42); doc.setLineWidth(1.2); doc.line(left, 70, right, 70);
+
+      const photoW = 245, photoH = 185;
+      const col1 = left, col2 = left + photoW + 30;
+      const posList = [{ x: col1, y: 90 }, { x: col2, y: 90 }, { x: col1, y: 310 }, { x: col2, y: 310 }];
+
+      for (let p = 0; p < initialPhotos.length && p < 4; p++) {
+        try {
+          doc.setFontSize(8); doc.setFont("helvetica", "bold"); doc.setTextColor(60, 60, 60);
+          doc.text(`Initial Evidence Photo #${p + 1}`, posList[p].x, posList[p].y);
+          doc.setDrawColor(200, 200, 200); doc.setLineWidth(0.5);
+          doc.rect(posList[p].x, posList[p].y + 5, photoW, photoH, "S");
+          doc.addImage(initialPhotos[p], 'JPEG', posList[p].x + 1, posList[p].y + 6, photoW - 2, photoH - 2);
+        } catch(imgErr) {
+          console.warn("Could not add initial photo to PDF:", imgErr);
+        }
+      }
+    }
+
+    if (rebuttalPhotos.length > 0) {
+      doc.addPage();
+      doc.setFontSize(13); doc.setFont("helvetica", "bold"); doc.setTextColor(15, 23, 42);
+      doc.text("APPENDIX B: CONTRACTOR REBUTTAL & REPAIR PHOTOS", left, 50);
+      doc.setFontSize(8.5); doc.setFont("helvetica", "normal"); doc.setTextColor(80, 80, 80);
+      doc.text(`Claim #: ${claimRef} | Work Order: ${wo} | Submitted by ${subName}`, left, 64);
+      doc.setDrawColor(15, 23, 42); doc.setLineWidth(1.2); doc.line(left, 70, right, 70);
+
+      const photoW = 245, photoH = 185;
+      const col1 = left, col2 = left + photoW + 30;
+      const posList = [{ x: col1, y: 90 }, { x: col2, y: 90 }, { x: col1, y: 310 }, { x: col2, y: 310 }];
+
+      for (let p = 0; p < rebuttalPhotos.length && p < 4; p++) {
+        try {
+          doc.setFontSize(8); doc.setFont("helvetica", "bold"); doc.setTextColor(60, 60, 60);
+          doc.text(`Contractor Proof Photo #${p + 1}`, posList[p].x, posList[p].y);
+          doc.setDrawColor(200, 200, 200); doc.setLineWidth(0.5);
+          doc.rect(posList[p].x, posList[p].y + 5, photoW, photoH, "S");
+          doc.addImage(rebuttalPhotos[p], 'JPEG', posList[p].x + 1, posList[p].y + 6, photoW - 2, photoH - 2);
+        } catch(imgErr) {
+          console.warn("Could not add rebuttal photo to PDF:", imgErr);
+        }
+      }
+    }
+
+    const filename = `Master_Claim_${claimRef}_WO_${wo}_CLOSED.pdf`;
+    doc.save(filename);
+  }
+</script>
+
+</body>
+</html>
