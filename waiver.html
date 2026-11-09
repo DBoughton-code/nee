@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Exterior / Interior Drilling Consent Waiver</title>
 
-  <!-- html2pdf bundle for client-side PDF generation -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <!-- NATIVE jsPDF Library (Bypasses html2canvas completely) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <style>
     *, *::before, *::after {
@@ -34,7 +34,6 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
-    /* Main UI Wrapper */
     #main-ui {
       display: flex;
       justify-content: center;
@@ -72,11 +71,9 @@
     input:focus, select:focus, textarea:focus { border-color: var(--cyan); }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
-    /* Legal Box */
     .legal-box { background: #090e17; border: 1px solid var(--card-border); border-radius: 6px; padding: 10px; font-size: 0.73rem; color: #cbd5e1; line-height: 1.5; max-height: 140px; overflow-y: auto; }
     .legal-box p { margin-bottom: 8px; }
 
-    /* Signature Canvas */
     .sig-wrapper { display: flex; flex-direction: column; gap: 6px; }
     .canvas-container { background: #ffffff; border-radius: 6px; border: 2px dashed var(--cyan); touch-action: none; }
     canvas { width: 100%; height: 160px; display: block; cursor: crosshair; }
@@ -85,29 +82,12 @@
     
     .btn-submit { width: 100%; background: var(--emerald); color: #04121d; border: none; border-radius: var(--radius); padding: 12px; font-size: 0.9rem; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 6px; }
     .btn-submit:hover { background: #34d399; }
-
-    /* HIDDEN PRINTABLE TEMPLATE */
-    #pdf-template {
-      display: none; /* Stays hidden until generation */
-      position: absolute; /* Anchors firmly to top left to prevent scroll bugs */
-      top: 0;
-      left: 0;
-      width: 800px; /* Forces a full-size desktop layout so it never clips */
-      background: #ffffff;
-      color: #000000;
-      padding: 40px;
-      font-family: Arial, sans-serif;
-      font-size: 11pt;
-      line-height: 1.4;
-    }
   </style>
 </head>
 <body>
 
-<!-- MAIN USER INTERFACE -->
 <div id="main-ui">
   <div class="container">
-
     <div class="nav-bar">
       <a href="index.html" class="btn-back">❮ Main Menu</a>
     </div>
@@ -160,7 +140,6 @@
         <input type="text" id="drillNotes" placeholder="e.g. Living room north exterior wall, 6 inches above baseboard">
       </div>
 
-      <!-- Legal Terms -->
       <label>Terms of Authorization &amp; Waiver</label>
       <div class="legal-box">
         <p><strong>1. Authorization to Penetrate Surface:</strong> By signing below, the customer/property owner authorizes the technician to drill the agreed-upon surface hole(s) solely for the routing of telecommunication coaxial/fiber cabling required for service delivery.</p>
@@ -169,7 +148,6 @@
         <p><strong>4. Tenant Representation:</strong> If the signatory is a tenant, they confirm they have obtained explicit consent from the landlord/property owner.</p>
       </div>
 
-      <!-- Signature Pad -->
       <div class="sig-wrapper">
         <div class="sig-actions">
           <label>Customer Signature (Sign Below) *</label>
@@ -180,84 +158,18 @@
         </div>
       </div>
 
-      <button type="button" class="btn-submit" onclick="generateAndSavePDF()">
+      <button type="button" class="btn-submit" onclick="generateAndSaveNativePDF()">
         📄 Sign &amp; Export Signed PDF
       </button>
     </div>
-
   </div>
-</div>
-
-<!-- PDF DOCUMENT LAYOUT (Toggled visible during generation) -->
-<div id="pdf-template">
-  <div style="border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 16px;">
-    <table style="width: 100%; border-collapse: collapse;">
-      <tr>
-        <td style="text-align: left;">
-          <h2 style="margin: 0; font-size: 16pt;">PRINCE TELECOM FIELD OPERATIONS</h2>
-          <div style="font-size: 10pt; color: #444;">Customer Drilling &amp; Surface Penetration Authorization Waiver</div>
-        </td>
-        <td style="text-align: right; font-size: 9pt; vertical-align: top;">
-          <div><strong>Date:</strong> <span id="pdf-date"></span></div>
-          <div><strong>WO #:</strong> <span id="pdf-wo"></span></div>
-        </td>
-      </tr>
-    </table>
-  </div>
-
-  <table style="width: 100%; margin-bottom: 16px; border-collapse: collapse; font-size: 10pt;">
-    <tr>
-      <td style="padding: 6px; border: 1px solid #ccc; width: 20%;"><strong>Customer Name:</strong></td>
-      <td style="padding: 6px; border: 1px solid #ccc; width: 35%;" id="pdf-custname"></td>
-      <td style="padding: 6px; border: 1px solid #ccc; width: 15%;"><strong>Tech ID:</strong></td>
-      <td style="padding: 6px; border: 1px solid #ccc; width: 30%;" id="pdf-techid"></td>
-    </tr>
-    <tr>
-      <td style="padding: 6px; border: 1px solid #ccc;"><strong>Service Address:</strong></td>
-      <td colspan="3" style="padding: 6px; border: 1px solid #ccc;" id="pdf-address"></td>
-    </tr>
-    <tr>
-      <td style="padding: 6px; border: 1px solid #ccc;"><strong>Drill Scope:</strong></td>
-      <td colspan="3" style="padding: 6px; border: 1px solid #ccc;" id="pdf-scope"></td>
-    </tr>
-    <tr>
-      <td style="padding: 6px; border: 1px solid #ccc;"><strong>Location Notes:</strong></td>
-      <td colspan="3" style="padding: 6px; border: 1px solid #ccc;" id="pdf-notes"></td>
-    </tr>
-  </table>
-
-  <div style="font-size: 9.5pt; color: #333; line-height: 1.5; margin-bottom: 30px; border: 1px solid #ddd; padding: 14px;">
-    <strong>TERMS &amp; RELEASE OF LIABILITY:</strong><br><br>
-    The customer represents that they are the legal owner of the premises or an authorized tenant with written permission from the landlord to approve exterior/interior wall, floor, or ceiling penetrations. The technician will practice standard craftsmanship, including pre-inspecting the cavity and sealing all exterior holes with approved silicone/weatherproof bushings. The technician and contractor are released from liability regarding unmapped or concealed structural, electrical, or plumbing lines positioned within wall voids not identifiable through standard pre-drill exterior/interior visual inspection.
-  </div>
-
-  <!-- Signature Block using a Table for perfect PDF rendering -->
-  <table style="width: 100%; margin-top: 40px; border-collapse: collapse;">
-    <tr>
-      <td style="width: 60%; vertical-align: bottom; padding-right: 40px;">
-        <img id="pdf-sig-img" style="max-height: 65px; display: block; margin-bottom: 5px;" alt="Signature">
-        <div style="border-top: 1px solid #000; font-size: 10pt; padding-top: 6px;">
-          <strong>Customer Signature</strong>
-        </div>
-      </td>
-      <td style="width: 40%; vertical-align: bottom; text-align: right;">
-        <div id="pdf-signed-date" style="font-size: 10pt; margin-bottom: 5px;"></div>
-        <div style="border-top: 1px solid #000; font-size: 10pt; padding-top: 6px;">
-          <strong>Date Signed</strong>
-        </div>
-      </td>
-    </tr>
-  </table>
 </div>
 
 <script>
-  // ----------------------------------------------------
-  // SIGNATURE PAD CANVAS ENGINE
-  // ----------------------------------------------------
+  // --- SIGNATURE CANVAS ENGINE ---
   const canvas = document.getElementById('sigCanvas');
   const ctx = canvas.getContext('2d');
-  let isDrawing = false;
-  let hasSigned = false;
+  let isDrawing = false, hasSigned = false;
 
   function resizeCanvas() {
     const ratio = Math.max(window.devicePixelRatio || 1, 1);
@@ -268,11 +180,8 @@
     ctx.lineCap = 'round';
     ctx.strokeStyle = '#04121d';
   }
-
   window.addEventListener('resize', resizeCanvas);
-  document.addEventListener('DOMContentLoaded', () => {
-    resizeCanvas();
-  });
+  document.addEventListener('DOMContentLoaded', resizeCanvas);
 
   function getPos(e) {
     const rect = canvas.getBoundingClientRect();
@@ -281,41 +190,16 @@
     return { x: clientX - rect.left, y: clientY - rect.top };
   }
 
-  function startDraw(e) {
-    isDrawing = true;
-    hasSigned = true;
-    const pos = getPos(e);
-    ctx.beginPath();
-    ctx.moveTo(pos.x, pos.y);
-    e.preventDefault();
-  }
-
-  function draw(e) {
-    if (!isDrawing) return;
-    const pos = getPos(e);
-    ctx.lineTo(pos.x, pos.y);
-    ctx.stroke();
-    e.preventDefault();
-  }
-
+  function startDraw(e) { isDrawing = true; hasSigned = true; const pos = getPos(e); ctx.beginPath(); ctx.moveTo(pos.x, pos.y); e.preventDefault(); }
+  function draw(e) { if (!isDrawing) return; const pos = getPos(e); ctx.lineTo(pos.x, pos.y); ctx.stroke(); e.preventDefault(); }
   function stopDraw() { isDrawing = false; }
 
-  canvas.addEventListener('mousedown', startDraw);
-  canvas.addEventListener('mousemove', draw);
-  window.addEventListener('mouseup', stopDraw);
-  canvas.addEventListener('touchstart', startDraw, { passive: false });
-  canvas.addEventListener('touchmove', draw, { passive: false });
-  window.addEventListener('touchend', stopDraw);
+  canvas.addEventListener('mousedown', startDraw); canvas.addEventListener('mousemove', draw); window.addEventListener('mouseup', stopDraw);
+  canvas.addEventListener('touchstart', startDraw, { passive: false }); canvas.addEventListener('touchmove', draw, { passive: false }); window.addEventListener('touchend', stopDraw);
+  function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); hasSigned = false; }
 
-  function clearCanvas() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    hasSigned = false;
-  }
-
-  // ----------------------------------------------------
-  // BULLETPROOF PDF GENERATION (UI TOGGLE)
-  // ----------------------------------------------------
-  function generateAndSavePDF() {
+  // --- NATIVE PROGRAMMATIC PDF GENERATION (Bypasses UI completely) ---
+  function generateAndSaveNativePDF() {
     const custName = document.getElementById('custName').value.trim();
     const wo = document.getElementById('workOrder').value.trim();
     const address = document.getElementById('serviceAddress').value.trim();
@@ -328,74 +212,129 @@
       alert("Please fill in Customer Name, WO #, Service Address, and Tech ID.");
       return;
     }
-
     if (!hasSigned) {
       alert("Customer signature is required before exporting the waiver.");
       return;
     }
 
-    // Force browser to scroll to absolute top to prevent html2canvas blank space bug
-    window.scrollTo(0, 0);
-
     const now = new Date();
     const dateFormatted = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-    // Populate PDF Template
-    document.getElementById('pdf-date').textContent = dateFormatted;
-    document.getElementById('pdf-wo').textContent = wo;
-    document.getElementById('pdf-custname').textContent = custName;
-    document.getElementById('pdf-techid').textContent = techId;
-    document.getElementById('pdf-address').textContent = address;
-    document.getElementById('pdf-scope').textContent = scope;
-    document.getElementById('pdf-notes').textContent = notes;
-    document.getElementById('pdf-signed-date').textContent = dateFormatted;
-    document.getElementById('pdf-sig-img').src = canvas.toDataURL('image/png');
-
-    const mainUI = document.getElementById('main-ui');
-    const pdfElement = document.getElementById('pdf-template');
-    
-    // TOGGLE: Hide UI, Show Template
-    mainUI.style.display = 'none';
-    document.body.style.backgroundColor = '#ffffff';
-    pdfElement.style.display = 'block';
-
     const filename = `Drill_Waiver_WO_${wo}_${custName.replace(/\s+/g, '_')}.pdf`;
 
-    const opt = {
-      margin:       0.4,
-      filename:     filename,
-      image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2, useCORS: true, scrollY: 0 }, 
-      jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
-    };
+    // Initialize Native jsPDF (Standard Letter Size, Unit: points)
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ format: 'letter', unit: 'pt' });
 
-    html2pdf().set(opt).from(pdfElement).save().then(() => {
-      // TOGGLE: Hide Template, Show UI
-      pdfElement.style.display = 'none';
-      document.body.style.backgroundColor = 'var(--bg)';
-      mainUI.style.display = 'flex';
+    // Document styling defaults
+    const leftMargin = 40;
+    const rightMargin = 570;
 
-      // Delay the email prompt so the browser has time to finish the download
-      setTimeout(() => {
-        if (techEmail) {
-          const sendEmail = confirm(`✅ PDF Downloaded Successfully!\n\n(Check your iPhone 'Files' app or Chrome Downloads).\n\nWould you like to open your email app to send a copy to ${techEmail}?`);
-          
-          if (sendEmail) {
-            const mailSubject = encodeURIComponent(`Drilling Waiver Copy - WO# ${wo} - ${custName}`);
-            const mailBody = encodeURIComponent(
-              `Hi Tech,\n\nThe customer (${custName}) at ${address} has signed the drilling waiver for Work Order #${wo}.\n\n` +
-              `Scope: ${scope}\n` +
-              `Notes: ${notes}\n` +
-              `Date Signed: ${dateFormatted}\n\n` +
-              `The generated PDF (${filename}) has been downloaded to your device downloads folder. Attach it to your job closeout.`
-            );
-            window.location.href = `mailto:${techEmail}?subject=${mailSubject}&body=${mailBody}`;
-          }
-        } else {
-          alert(`✅ Signed waiver downloaded!\n\nFile Name: ${filename}\n\nCheck your 'Files' app or browser downloads folder.`);
+    // --- Draw Header ---
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.text("PRINCE TELECOM FIELD OPERATIONS", leftMargin, 50);
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text("Customer Drilling & Surface Penetration Authorization Waiver", leftMargin, 65);
+
+    // Header Right-Aligned Text
+    doc.setFontSize(9);
+    doc.text(`Date: ${dateFormatted}`, rightMargin, 50, { align: "right" });
+    doc.text(`WO #: ${wo}`, rightMargin, 62, { align: "right" });
+
+    // Divider Line
+    doc.setLineWidth(1.5);
+    doc.line(leftMargin, 75, rightMargin, 75);
+
+    // --- Draw Data Block ---
+    doc.setFontSize(10);
+    let currentY = 110;
+
+    doc.setFont("helvetica", "bold"); doc.text("Customer Name:", leftMargin, currentY);
+    doc.setFont("helvetica", "normal"); doc.text(custName, 140, currentY);
+
+    doc.setFont("helvetica", "bold"); doc.text("Tech ID:", 400, currentY);
+    doc.setFont("helvetica", "normal"); doc.text(techId, 450, currentY);
+
+    currentY += 25;
+    doc.setFont("helvetica", "bold"); doc.text("Service Address:", leftMargin, currentY);
+    doc.setFont("helvetica", "normal"); doc.text(address, 140, currentY);
+
+    currentY += 25;
+    doc.setFont("helvetica", "bold"); doc.text("Drill Scope:", leftMargin, currentY);
+    doc.setFont("helvetica", "normal"); doc.text(scope, 140, currentY);
+
+    currentY += 25;
+    doc.setFont("helvetica", "bold"); doc.text("Location Notes:", leftMargin, currentY);
+    doc.setFont("helvetica", "normal"); doc.text(notes, 140, currentY);
+
+    // Divider Line
+    currentY += 20;
+    doc.setLineWidth(0.5);
+    doc.setDrawColor(200, 200, 200);
+    doc.line(leftMargin, currentY, rightMargin, currentY);
+
+    // --- Draw Legal Text ---
+    currentY += 30;
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "bold");
+    doc.text("TERMS & RELEASE OF LIABILITY:", leftMargin, currentY);
+    
+    currentY += 18;
+    doc.setFont("helvetica", "normal");
+    const legalParagraph = "The customer represents that they are the legal owner of the premises or an authorized tenant with written permission from the landlord to approve exterior/interior wall, floor, or ceiling penetrations. The technician will practice standard craftsmanship, including pre-inspecting the cavity and sealing all exterior holes with approved silicone/weatherproof bushings. The technician and contractor are released from liability regarding unmapped or concealed structural, electrical, or plumbing lines positioned within wall voids not identifiable through standard pre-drill exterior/interior visual inspection.";
+    
+    // Automatically wraps text to fit the page width
+    const wrappedText = doc.splitTextToSize(legalParagraph, 530);
+    doc.text(wrappedText, leftMargin, currentY);
+
+    // --- Draw Signature Section ---
+    currentY += (wrappedText.length * 14) + 60; 
+
+    // Insert Signature Canvas Image
+    const sigData = canvas.toDataURL('image/png');
+    doc.addImage(sigData, 'PNG', leftMargin, currentY - 45, 200, 45);
+
+    // Draw Signature Lines
+    doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(1);
+    
+    // Cust Line
+    doc.line(leftMargin, currentY, 260, currentY);
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "bold");
+    doc.text("Customer Signature", leftMargin, currentY + 12);
+
+    // Date Line
+    doc.setFont("helvetica", "normal");
+    doc.text(dateFormatted, 370, currentY - 5);
+    doc.line(370, currentY, rightMargin, currentY);
+    doc.setFont("helvetica", "bold");
+    doc.text("Date Signed", 370, currentY + 12);
+
+    // --- Save the PDF ---
+    doc.save(filename);
+
+    // Setup email routing
+    setTimeout(() => {
+      if (techEmail) {
+        const sendEmail = confirm(`✅ PDF Downloaded Successfully!\n\n(Check your iPhone 'Files' app or Chrome Downloads).\n\nWould you like to open your email app to send a copy to ${techEmail}?`);
+        
+        if (sendEmail) {
+          const mailSubject = encodeURIComponent(`Drilling Waiver Copy - WO# ${wo} - ${custName}`);
+          const mailBody = encodeURIComponent(
+            `Hi Tech,\n\nThe customer (${custName}) at ${address} has signed the drilling waiver for Work Order #${wo}.\n\n` +
+            `Scope: ${scope}\n` +
+            `Notes: ${notes}\n` +
+            `Date Signed: ${dateFormatted}\n\n` +
+            `The generated PDF (${filename}) has been downloaded to your device downloads folder. Attach it to your job closeout.`
+          );
+          window.location.href = `mailto:${techEmail}?subject=${mailSubject}&body=${mailBody}`;
         }
-      }, 800); // 800ms delay to let the download fire cleanly
-    });
+      } else {
+        alert(`✅ Signed waiver downloaded!\n\nFile Name: ${filename}\n\nCheck your 'Files' app or browser downloads folder.`);
+      }
+    }, 800);
   }
 </script>
 
