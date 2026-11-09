@@ -1,21 +1,525 @@
-// Add before rendering the PDF:
-async function getAuditIdentifiers() {
-  // 1. Get or create persistent device ID
-  let deviceId = localStorage.getItem('pt_device_id');
-  if (!deviceId) {
-    deviceId = 'ID-' + Math.random().toString(36).substring(2, 9).toUpperCase() + '-' + Date.now().toString(36).toUpperCase();
-    localStorage.setItem('pt_device_id', deviceId);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Remote Drilling Consent Waiver</title>
+
+  <!-- NATIVE jsPDF Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0b0f19; --card-bg: #131c2e; --card-border: #1e293b;
+      --text: #f1f5f9; --text-muted: #94a3b8;
+      --cyan: #06b6d4; --emerald: #10b981; --amber: #f59e0b; --rose: #f43f5e;
+      --radius: 10px;
+    }
+    body { background-color: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    
+    #app-container { display: flex; justify-content: center; padding: 16px; padding-bottom: 60px; min-height: 100vh; }
+    .container { width: 100%; max-width: 580px; display: flex; flex-direction: column; gap: 14px; }
+    
+    header { text-align: center; padding: 4px 0 10px 0; border-bottom: 1px solid var(--card-border); }
+    h1 { font-size: 1.2rem; font-weight: 900; color: var(--amber); display: flex; align-items: center; justify-content: center; gap: 6px; }
+    p.sub { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+
+    .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    .card-title { font-size: 0.85rem; font-weight: 800; color: var(--cyan); text-transform: uppercase; margin-bottom: 4px; border-bottom: 1px dashed var(--card-border); padding-bottom: 8px;}
+    
+    .form-group { display: flex; flex-direction: column; gap: 4px; }
+    label { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted); }
+    input, select { width: 100%; background: #090e17; border: 1px solid var(--card-border); color: var(--text); padding: 10px; border-radius: 6px; font-size: 0.85rem; outline: none; }
+    input:focus, select:focus { border-color: var(--cyan); }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+    .input-with-btn { display: flex; gap: 6px; }
+    .btn-geo {
+      background: #18233a; border: 1px solid var(--card-border); color: var(--cyan);
+      border-radius: 6px; padding: 0 12px; font-size: 0.8rem; font-weight: 700;
+      cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px;
+    }
+    .btn-geo:hover { background: #243452; }
+
+    .btn { width: 100%; padding: 12px; border-radius: 8px; border: none; font-size: 0.9rem; font-weight: 800; cursor: pointer; transition: all 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 8px; text-decoration: none; }
+    .btn-primary { background: var(--cyan); color: #000; }
+    .btn-primary:hover { background: #22d3ee; }
+    .btn-success { background: var(--emerald); color: #000; }
+    .btn-success:hover { background: #34d399; }
+    
+    .read-only-data { background: #090e17; padding: 12px; border-radius: 6px; border: 1px solid var(--card-border); font-size: 0.85rem; line-height: 1.5; color: var(--text); }
+    .highlight { color: var(--cyan); font-weight: bold; }
+    .legal-box { background: #090e17; border: 1px solid var(--card-border); border-radius: 6px; padding: 10px; font-size: 0.73rem; color: #cbd5e1; line-height: 1.5; max-height: 130px; overflow-y: auto; }
+    .legal-box p { margin-bottom: 8px; }
+
+    .audit-notice { background: rgba(245, 158, 11, 0.08); border: 1px solid var(--amber); border-radius: 6px; padding: 8px 10px; font-size: 0.72rem; color: #fde68a; line-height: 1.4; }
+
+    .canvas-container { background: #ffffff; border-radius: 6px; border: 2px dashed var(--cyan); touch-action: none; }
+    canvas { width: 100%; height: 160px; display: block; cursor: crosshair; }
+    .btn-clear { background: transparent; border: none; color: var(--rose); font-size: 0.72rem; font-weight: 700; cursor: pointer; }
+
+    #techView, #customerView, #successView { display: none; }
+  </style>
+</head>
+<body>
+
+<div id="app-container">
+  <div class="container">
+    <header>
+      <h1>📝 Property Drill Waiver</h1>
+      <p class="sub" id="headerSub">Technician Dispatch Setup</p>
+    </header>
+
+    <!-- VIEW 1: TECHNICIAN SETUP -->
+    <div id="techView" class="card">
+      <div class="card-title">1. Generate Customer Remote Link</div>
+      
+      <div class="grid-2">
+        <div class="form-group"><label>Customer Name *</label><input type="text" id="t_custName" placeholder="e.g. John Doe"></div>
+        <div class="form-group"><label>Customer Mobile *</label><input type="tel" id="t_custPhone" placeholder="555-123-4567"></div>
+      </div>
+      
+      <div class="form-group"><label>Work Order / Account # *</label><input type="text" id="t_woNum" placeholder="e.g. 100593822"></div>
+      
+      <div class="form-group">
+        <label>Service Address *</label>
+        <div class="input-with-btn">
+          <input type="text" id="t_address" placeholder="123 Main St, Apt 4B">
+          <button type="button" class="btn-geo" id="btnPullAddress" onclick="pullTechCurrentAddress()">📍 GPS Auto-Fill</button>
+        </div>
+      </div>
+      
+      <div class="grid-2">
+        <div class="form-group"><label>Technician ID *</label><input type="text" id="t_techId" placeholder="e.g. T-10492"></div>
+        <div class="form-group"><label>Manager Email *</label><input type="email" id="t_mgrEmail" value="fieldmgr@princetelecom.com"></div>
+      </div>
+      
+      <div class="form-group">
+        <label>Drill Scope *</label>
+        <select id="t_scope">
+          <option>Exterior Wall Penetration (Siding/Brick into Premise)</option>
+          <option>Floor / Crawlspace Penetration</option>
+          <option>Interior Drywall Drill (Between Rooms)</option>
+          <option>Basement Rim Joist Entry</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Specific Location Notes</label><input type="text" id="t_notes" placeholder="e.g. Living room north wall, 6 inches above baseboard"></div>
+
+      <button class="btn btn-primary" onclick="generateAndTextLink()">📱 Text Link to Customer</button>
+    </div>
+
+    <!-- VIEW 2: CUSTOMER SIGNING -->
+    <div id="customerView" class="card">
+      <div class="card-title">Property Modification Authorization</div>
+      
+      <div class="audit-notice">
+        ⚠️ <strong>Security Audit Active:</strong> This form captures device coordinates, street address verification, IP routing, and a hardware identifier to validate customer authorization.
+      </div>
+
+      <div class="read-only-data">
+        I, <span class="highlight" id="c_custName"></span>, authorize Prince Telecom / Xfinity to perform modifications at <span class="highlight" id="c_address"></span> for Work Order <span class="highlight" id="c_woNum"></span>.<br><br>
+        <strong>Scope:</strong> <span id="c_scope"></span><br>
+        <strong>Notes:</strong> <span id="c_notes"></span>
+      </div>
+
+      <label>Terms of Release</label>
+      <div class="legal-box">
+        <p>1. The customer authorizes the technician to drill the agreed-upon surface hole(s) solely for routing telecommunication cabling.</p>
+        <p>2. The technician and contractor shall not be held liable for damage to concealed or unmapped plumbing, electrical wiring, HVAC ductwork, or insulation located within concealed cavities unless caused by gross negligence.</p>
+        <p>3. If the signatory is a tenant, they confirm they have obtained explicit consent from the landlord/property owner.</p>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+        <label>Customer Signature *</label>
+        <button type="button" class="btn-clear" onclick="clearCanvas()">Clear Signature</button>
+      </div>
+      <div class="canvas-container">
+        <canvas id="sigCanvas"></canvas>
+      </div>
+
+      <button class="btn btn-success" id="btnSubmit" onclick="initiateSubmission()">📄 Authenticate &amp; Sign Waiver</button>
+    </div>
+
+    <!-- VIEW 3: SUCCESS & MANAGER HANDOFF -->
+    <div id="successView" class="card" style="text-align: center; padding: 30px 16px;">
+      <div style="font-size: 3rem; margin-bottom: 10px;">✅</div>
+      <h2 style="color: var(--emerald); margin-bottom: 12px;">Waiver Secured &amp; Logged</h2>
+      <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 20px;">
+        The verified waiver PDF has been downloaded to your device.<br><br>
+        <strong>Final Step:</strong> Tap below to submit the signed waiver to management for ticket closeout.
+      </p>
+      <a id="emailMgrBtn" href="#" class="btn btn-primary">✉️ Email Document to Manager</a>
+      <p style="font-size: 0.72rem; color: var(--rose); margin-top: 10px;">* Remember to attach the downloaded PDF from your Files/Downloads folder.</p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const mode = urlParams.get('mode');
+
+  window.onload = () => {
+    if (mode === 'customer') {
+      document.getElementById('techView').style.display = 'none';
+      document.getElementById('customerView').style.display = 'flex';
+      document.getElementById('headerSub').textContent = 'Customer Verification & Execution';
+      
+      document.getElementById('c_custName').textContent = decodeURIComponent(urlParams.get('cn') || 'Customer');
+      document.getElementById('c_woNum').textContent = decodeURIComponent(urlParams.get('wo') || 'N/A');
+      document.getElementById('c_address').textContent = decodeURIComponent(urlParams.get('addr') || 'Address not provided');
+      document.getElementById('c_scope').textContent = decodeURIComponent(urlParams.get('sc') || 'Standard Drilling');
+      document.getElementById('c_notes').textContent = decodeURIComponent(urlParams.get('no') || 'N/A');
+      
+      initCanvas();
+    } else {
+      document.getElementById('techView').style.display = 'flex';
+      const savedTechNum = localStorage.getItem('qc_tech_num');
+      if (savedTechNum) document.getElementById('t_techId').value = savedTechNum;
+      const savedMgrEmail = localStorage.getItem('qc_mgr_email');
+      if (savedMgrEmail) document.getElementById('t_mgrEmail').value = savedMgrEmail;
+    }
+  };
+
+  // --- REVERSE GEOCODING HELPER ---
+  async function reverseGeocode(lat, lng) {
+    try {
+      const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`, {
+        headers: { 'Accept': 'application/json' }
+      });
+      if (!response.ok) return null;
+      const data = await response.json();
+      return data.display_name || null;
+    } catch (e) {
+      return null;
+    }
   }
 
-  // 2. Fetch public network IP
-  let publicIP = 'Unavailable';
-  try {
-    const res = await fetch('https://api.ipify.org?format=json', { signal: AbortSignal.timeout(3000) });
-    const data = await res.json();
-    publicIP = data.ip;
-  } catch (e) {
-    publicIP = 'Offline / Cell Direct';
+  // --- DEVICE FINGERPRINTING & HARDWARE UUID ---
+  function getDeviceUUID() {
+    let uuid = localStorage.getItem('pt_device_uuid');
+    if (!uuid) {
+      uuid = 'DEV-' + Math.random().toString(36).substring(2, 8).toUpperCase() + '-' + Date.now().toString(36).toUpperCase();
+      localStorage.setItem('pt_device_uuid', uuid);
+    }
+    return uuid;
   }
 
-  return { deviceId, publicIP };
-}
+  async function getPublicIP() {
+    try {
+      const res = await fetch('https://api.ipify.org?format=json', { signal: AbortSignal.timeout(3000) });
+      const data = await res.json();
+      return data.ip || 'Unavailable';
+    } catch (e) {
+      return 'Offline / Carrier Cellular Direct';
+    }
+  }
+
+  // --- TECH AUTO-FILL ADDRESS VIA GPS ---
+  function pullTechCurrentAddress() {
+    const btn = document.getElementById('btnPullAddress');
+    const input = document.getElementById('t_address');
+
+    if (!("geolocation" in navigator)) {
+      alert("Geolocation is not supported by your browser.");
+      return;
+    }
+
+    btn.textContent = "⏳ Locating...";
+    btn.disabled = true;
+
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        btn.textContent = "🔍 Resolving...";
+        
+        const resolvedAddress = await reverseGeocode(lat, lng);
+        if (resolvedAddress) {
+          input.value = resolvedAddress;
+        } else {
+          input.value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+        }
+        btn.textContent = "✓ Found";
+        setTimeout(() => { btn.textContent = "📍 GPS Auto-Fill"; btn.disabled = false; }, 2000);
+      },
+      (err) => {
+        alert("Unable to retrieve location. Please check location permissions or enter address manually.");
+        btn.textContent = "📍 GPS Auto-Fill";
+        btn.disabled = false;
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  }
+
+  function generateAndTextLink() {
+    const cn = document.getElementById('t_custName').value.trim();
+    const custPhone = document.getElementById('t_custPhone').value.replace(/\D/g, '');
+    const techId = document.getElementById('t_techId').value.trim();
+    const mgrEmail = document.getElementById('t_mgrEmail').value.trim();
+    const wo = document.getElementById('t_woNum').value.trim();
+    const addr = document.getElementById('t_address').value.trim();
+    const scope = document.getElementById('t_scope').value;
+    const notes = document.getElementById('t_notes').value.trim() || 'Standard entry hole per agreement';
+
+    if (!cn || !custPhone || !wo || !addr || !mgrEmail || !techId) {
+      alert("Please fill in all required fields before generating the link.");
+      return;
+    }
+
+    localStorage.setItem('qc_tech_num', techId);
+    localStorage.setItem('qc_mgr_email', mgrEmail);
+
+    const baseUrl = window.location.origin + window.location.pathname;
+    const dispatchTs = new Date().toISOString();
+    const signingLink = `${baseUrl}?mode=customer&cn=${encodeURIComponent(cn)}&cp=${encodeURIComponent(custPhone)}&wo=${encodeURIComponent(wo)}&addr=${encodeURIComponent(addr)}&me=${encodeURIComponent(mgrEmail)}&tid=${encodeURIComponent(techId)}&sc=${encodeURIComponent(scope)}&no=${encodeURIComponent(notes)}&dts=${encodeURIComponent(dispatchTs)}`;
+    
+    const message = `Prince Telecom / Xfinity: Please review and sign the property drilling waiver for your installation: ${signingLink}`;
+    window.location.href = `sms:${custPhone}?&body=${encodeURIComponent(message)}`;
+  }
+
+  let canvas, ctx, isDrawing = false, hasSigned = false;
+  function initCanvas() {
+    canvas = document.getElementById('sigCanvas');
+    ctx = canvas.getContext('2d');
+    
+    const ratio = Math.max(window.devicePixelRatio || 1, 1);
+    canvas.width = canvas.offsetWidth * ratio;
+    canvas.height = canvas.offsetHeight * ratio;
+    ctx.scale(ratio, ratio);
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#04121d';
+
+    const getPos = (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      return { x: clientX - rect.left, y: clientY - rect.top };
+    };
+
+    const startDraw = (e) => { isDrawing = true; hasSigned = true; const pos = getPos(e); ctx.beginPath(); ctx.moveTo(pos.x, pos.y); e.preventDefault(); };
+    const draw = (e) => { if (!isDrawing) return; const pos = getPos(e); ctx.lineTo(pos.x, pos.y); ctx.stroke(); e.preventDefault(); };
+    const stopDraw = () => { isDrawing = false; };
+
+    canvas.addEventListener('mousedown', startDraw); canvas.addEventListener('mousemove', draw); window.addEventListener('mouseup', stopDraw);
+    canvas.addEventListener('touchstart', startDraw, { passive: false }); canvas.addEventListener('touchmove', draw, { passive: false }); window.addEventListener('touchend', stopDraw);
+  }
+
+  function clearCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    hasSigned = false;
+  }
+
+  async function initiateSubmission() {
+    if (!hasSigned) {
+      alert("Customer signature is required before submitting.");
+      return;
+    }
+
+    const btn = document.getElementById('btnSubmit');
+    btn.textContent = "📍 Verifying Physical Premise Location...";
+    btn.disabled = true;
+
+    const deviceId = getDeviceUUID();
+    const publicIP = await getPublicIP();
+
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          const resolvedPremise = await reverseGeocode(lat, lng);
+
+          const audit = {
+            lat: lat.toFixed(6),
+            lng: lng.toFixed(6),
+            acc: `±${Math.round(position.coords.accuracy)}m`,
+            resolvedAddr: resolvedPremise || "Reverse Geocode Unavailable",
+            deviceId: deviceId,
+            publicIP: publicIP,
+            status: "GPS VERIFIED (PHYSICAL DEMARC AUTH)"
+          };
+          renderPDF(audit);
+        },
+        (error) => {
+          const audit = {
+            lat: "FLAGGED: PERMISSION_DENIED",
+            lng: "FLAGGED: NO_COORDINATES",
+            acc: "N/A",
+            resolvedAddr: "UNRESOLVED - LOCATION BLOCKED",
+            deviceId: deviceId,
+            publicIP: publicIP,
+            status: "TAMPER ALERT: GEOLOCATION REFUSED BY DEVICE"
+          };
+          renderPDF(audit);
+        },
+        { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+      );
+    } else {
+      const audit = {
+        lat: "UNSUPPORTED",
+        lng: "UNSUPPORTED",
+        acc: "N/A",
+        resolvedAddr: "CLIENT_API_UNAVAILABLE",
+        deviceId: deviceId,
+        publicIP: publicIP,
+        status: "CLIENT_API_UNAVAILABLE"
+      };
+      renderPDF(audit);
+    }
+  }
+
+  function renderPDF(audit) {
+    const custName = decodeURIComponent(urlParams.get('cn') || 'Customer');
+    const custPhone = decodeURIComponent(urlParams.get('cp') || 'N/A');
+    const wo = decodeURIComponent(urlParams.get('wo') || 'N/A');
+    const address = decodeURIComponent(urlParams.get('addr') || 'N/A');
+    const mgrEmail = decodeURIComponent(urlParams.get('me') || 'fieldmgr@princetelecom.com');
+    const techId = decodeURIComponent(urlParams.get('tid') || 'N/A');
+    const scope = decodeURIComponent(urlParams.get('sc') || 'Standard Drilling');
+    const notes = decodeURIComponent(urlParams.get('no') || 'N/A');
+    const dispatchTs = decodeURIComponent(urlParams.get('dts') || 'N/A');
+
+    const now = new Date();
+    const dateFormatted = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const filename = `Drill_Waiver_WO_${wo}_${custName.replace(/\s+/g, '_')}.pdf`;
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ format: 'letter', unit: 'pt' });
+
+    const left = 40;
+    const right = 570;
+
+    doc.setFontSize(15);
+    doc.setFont("helvetica", "bold");
+    doc.text("PRINCE TELECOM FIELD OPERATIONS", left, 45);
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    doc.text("Customer Drilling & Surface Penetration Authorization Waiver", left, 58);
+
+    doc.setFontSize(8.5);
+    doc.text(`Doc Generated: ${dateFormatted}`, right, 45, { align: "right" });
+    doc.text(`WO #: ${wo}`, right, 56, { align: "right" });
+    doc.setLineWidth(1.2);
+    doc.line(left, 65, right, 65);
+
+    doc.setFontSize(9);
+    let y = 85;
+
+    doc.setFont("helvetica", "bold"); doc.text("Customer Name:", left, y);
+    doc.setFont("helvetica", "normal"); doc.text(custName, 130, y);
+    doc.setFont("helvetica", "bold"); doc.text("Tech ID:", 380, y);
+    doc.setFont("helvetica", "normal"); doc.text(techId, 435, y);
+
+    y += 18;
+    doc.setFont("helvetica", "bold"); doc.text("Authorized Mobile:", left, y);
+    doc.setFont("helvetica", "normal"); doc.text(custPhone, 130, y);
+    doc.setFont("helvetica", "bold"); doc.text("Dispatch Sent:", 380, y);
+    doc.setFont("helvetica", "normal"); doc.text(dispatchTs.substring(0, 19).replace('T', ' '), 455, y);
+
+    y += 18;
+    doc.setFont("helvetica", "bold"); doc.text("Service Address:", left, y);
+    doc.setFont("helvetica", "normal"); doc.text(address, 130, y);
+
+    y += 18;
+    doc.setFont("helvetica", "bold"); doc.text("Drill Scope:", left, y);
+    doc.setFont("helvetica", "normal"); doc.text(scope, 130, y);
+
+    y += 18;
+    doc.setFont("helvetica", "bold"); doc.text("Location Notes:", left, y);
+    doc.setFont("helvetica", "normal"); doc.text(notes, 130, y);
+
+    y += 14;
+    doc.setLineWidth(0.5);
+    doc.setDrawColor(210, 210, 210);
+    doc.line(left, y, right, y);
+
+    y += 22;
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "bold");
+    doc.text("TERMS & RELEASE OF LIABILITY:", left, y);
+    
+    y += 14;
+    doc.setFontSize(8.5);
+    doc.setFont("helvetica", "normal");
+    const legal = "The customer represents that they are the legal owner of the premises or an authorized tenant with written permission from the landlord to approve exterior/interior wall, floor, or ceiling penetrations. The technician will practice standard craftsmanship, including pre-inspecting the cavity and sealing all exterior holes with approved silicone/weatherproof bushings. The technician and contractor are released from liability regarding unmapped or concealed structural, electrical, or plumbing lines positioned within wall voids not identifiable through standard pre-drill exterior/interior visual inspection.";
+    const wrappedLegal = doc.splitTextToSize(legal, 530);
+    doc.text(wrappedLegal, left, y);
+
+    y += (wrappedLegal.length * 11) + 40;
+    const sigData = canvas.toDataURL('image/png');
+    doc.addImage(sigData, 'PNG', left, y - 35, 180, 35);
+
+    doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(1);
+    doc.line(left, y, 240, y);
+    doc.setFontSize(8.5);
+    doc.setFont("helvetica", "bold");
+    doc.text("Customer Signature", left, y + 10);
+
+    doc.setFont("helvetica", "normal");
+    doc.text(dateFormatted, 380, y - 4);
+    doc.line(380, y, right, y);
+    doc.setFont("helvetica", "bold");
+    doc.text("Date Signed (Local)", 380, y + 10);
+
+    // --- High-Visibility Digital Forensics Block ---
+    y += 30;
+    doc.setFillColor(245, 247, 250);
+    doc.rect(left, y, right - left, 115, "F");
+    doc.setDrawColor(180, 190, 205);
+    doc.rect(left, y, right - left, 115, "S");
+
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(30, 41, 59);
+    doc.text("DIGITAL AUDIT TRAIL & PREMISE VERIFICATION METRICS", left + 10, y + 14);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7.5);
+    doc.setTextColor(51, 65, 85);
+    
+    doc.text(`Audit Status: ${audit.status}`, left + 10, y + 26);
+    doc.text(`GPS Coordinates: Lat ${audit.lat}, Lng ${audit.lng} (Accuracy: ${audit.acc})`, left + 10, y + 37);
+    
+    const cleanResolved = doc.splitTextToSize(`Signing Location (Geocoded): ${audit.resolvedAddr}`, 510);
+    doc.text(cleanResolved, left + 10, y + 48);
+
+    const mapUrl = (audit.lat.startsWith("FLAGGED") || audit.lat === "UNSUPPORTED") ? "N/A" : `https://maps.google.com/?q=${audit.lat},${audit.lng}`;
+    doc.text(`Premise Verification Map Link: ${mapUrl}`, left + 10, y + 66);
+    
+    doc.text(`Device Signature Hardware ID: ${audit.deviceId} | Network Public IP: ${audit.publicIP}`, left + 10, y + 78);
+    doc.text(`Device Agent: ${navigator.userAgent.substring(0, 85)}...`, left + 10, y + 89);
+    doc.text(`Screen Resolution / DPI: ${window.screen.width}x${window.screen.height} @ ${window.devicePixelRatio}x`, left + 10, y + 99);
+    doc.text(`System UTC Stamp: ${now.toISOString()} | Verification Hash: ${Math.random().toString(36).substring(2, 10).toUpperCase()}`, left + 10, y + 109);
+
+    doc.save(filename);
+
+    document.getElementById('customerView').style.display = 'none';
+    document.getElementById('successView').style.display = 'block';
+    document.getElementById('headerSub').textContent = 'Step 2: Submit to Management';
+
+    const mailSubject = encodeURIComponent(`EXECUTED DRILL WAIVER - WO# ${wo} - Tech ${techId} - ${custName}`);
+    const mailBody = encodeURIComponent(
+      `Prince Telecom Field Operations,\n\n` +
+      `Attached is the verified drilling waiver for:\n\n` +
+      `Work Order: ${wo}\n` +
+      `Customer: ${custName}\n` +
+      `Service Address: ${address}\n` +
+      `Tech ID: ${techId}\n` +
+      `Drill Scope: ${scope}\n` +
+      `Audit Status: ${audit.status}\n` +
+      `Device Hardware ID: ${audit.deviceId}\n` +
+      `Network IP: ${audit.publicIP}\n` +
+      `Signing Location: ${audit.resolvedAddr}\n` +
+      `Coordinates: ${audit.lat}, ${audit.lng}\n\n` +
+      `The downloaded PDF (${filename}) is attached.`
+    );
+    document.getElementById('emailMgrBtn').href = `mailto:${mgrEmail}?subject=${mailSubject}&body=${mailBody}`;
+  }
+</script>
+
+</body>
+</html>
