@@ -36,6 +36,7 @@
       padding-bottom: 60px;
       display: flex;
       justify-content: center;
+      overflow-x: hidden; /* Prevents scrolling to the hidden template */
     }
 
     .container {
@@ -217,15 +218,20 @@
       box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
     }
 
-    /* Hidden Printable Template that formats into the PDF */
+    /* HIDDEN PRINTABLE TEMPLATE */
     #pdf-template {
-      display: none;
+      /* Pushed off-screen instead of display: none */
+      position: absolute;
+      left: -9999px;
+      top: 0;
+      width: 800px; /* Fixed document width */
       background: #ffffff;
       color: #000000;
-      padding: 24px;
+      padding: 40px;
       font-family: Arial, sans-serif;
       font-size: 11pt;
       line-height: 1.4;
+      z-index: -1;
     }
   </style>
 </head>
@@ -312,7 +318,7 @@
 
 </div>
 
-<!-- HIDDEN PDF DOCUMENT LAYOUT -->
+<!-- HIDDEN PDF DOCUMENT LAYOUT (NOW RENDERED OFF-SCREEN) -->
 <div id="pdf-template">
   <div style="border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 16px; display: flex; justify-content: space-between;">
     <div>
@@ -346,12 +352,12 @@
     </tr>
   </table>
 
-  <div style="font-size: 8.5pt; color: #333; line-height: 1.4; margin-bottom: 20px; border: 1px solid #ddd; padding: 10px;">
+  <div style="font-size: 9.5pt; color: #333; line-height: 1.4; margin-bottom: 20px; border: 1px solid #ddd; padding: 10px;">
     <strong>TERMS &amp; RELEASE OF LIABILITY:</strong><br>
     The customer represents that they are the legal owner of the premises or an authorized tenant with written permission from the landlord to approve exterior/interior wall, floor, or ceiling penetrations. The technician will practice standard craftsmanship, including pre-inspecting the cavity and sealing all exterior holes with approved silicone/weatherproof bushings. The technician and contractor are released from liability regarding unmapped or concealed structural, electrical, or plumbing lines positioned within wall voids not identifiable through standard pre-drill exterior/interior visual inspection.
   </div>
 
-  <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 30px;">
+  <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 40px;">
     <div style="width: 60%;">
       <div style="border-bottom: 1px solid #000; height: 70px;">
         <img id="pdf-sig-img" style="max-height: 65px;" alt="Signature">
@@ -396,10 +402,7 @@
     const rect = canvas.getBoundingClientRect();
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    return {
-      x: clientX - rect.left,
-      y: clientY - rect.top
-    };
+    return { x: clientX - rect.left, y: clientY - rect.top };
   }
 
   function startDraw(e) {
@@ -419,14 +422,11 @@
     e.preventDefault();
   }
 
-  function stopDraw() {
-    isDrawing = false;
-  }
+  function stopDraw() { isDrawing = false; }
 
   canvas.addEventListener('mousedown', startDraw);
   canvas.addEventListener('mousemove', draw);
   window.addEventListener('mouseup', stopDraw);
-
   canvas.addEventListener('touchstart', startDraw, { passive: false });
   canvas.addEventListener('touchmove', draw, { passive: false });
   window.addEventListener('touchend', stopDraw);
@@ -442,7 +442,7 @@
   }
 
   // ----------------------------------------------------
-  // PDF GENERATION & COPY TO TECH
+  // PDF GENERATION & EXPORT
   // ----------------------------------------------------
   function generateAndSavePDF() {
     const custName = document.getElementById('custName').value.trim();
@@ -478,22 +478,19 @@
     document.getElementById('pdf-sig-img').src = canvas.toDataURL('image/png');
 
     const pdfElement = document.getElementById('pdf-template');
-    pdfElement.style.display = 'block';
-
-    const filename = `Drill_Waiver_WO_${wo}_${custName.replace(/\\s+/g, '_')}.pdf`;
+    const filename = `Drill_Waiver_WO_${wo}_${custName.replace(/\s+/g, '_')}.pdf`;
 
     const opt = {
       margin:       0.4,
       filename:     filename,
       image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2 },
+      html2canvas:  { scale: 2, useCORS: true, windowWidth: 800 }, // Forces a desktop width capture
       jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
 
+    // No need to un-hide the element; it's already rendered off-screen!
     html2pdf().set(opt).from(pdfElement).save().then(() => {
-      pdfElement.style.display = 'none';
-
-      // Open email draft with metadata prepopulated for the technician's records
+      // Open email draft with metadata prepopulated
       if (techEmail) {
         const mailSubject = encodeURIComponent(`Drilling Waiver Copy - WO# ${wo} - ${custName}`);
         const mailBody = encodeURIComponent(
