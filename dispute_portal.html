@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prince Telecom - Shared Dispute & Claim Portal</title>
+
+  <!-- jsPDF & Supabase Client -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0b0f19; --card: #131c2e; --border: #1e293b;
+      --text: #f1f5f9; --text-muted: #94a3b8;
+      --cyan: #06b6d4; --amber: #f59e0b; --emerald: #10b981; --rose: #f43f5e;
+      --radius: 10px;
+    }
+    body { background-color: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    #app { display: flex; justify-content: center; padding: 16px; padding-bottom: 70px; min-height: 100vh; }
+    .container { width: 100%; max-width: 640px; display: flex; flex-direction: column; gap: 14px; }
+    
+    header { text-align: center; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+    h1 { font-size: 1.25rem; font-weight: 900; color: var(--cyan); display: flex; align-items: center; justify-content: center; gap: 6px; }
+    p.sub { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+    .card-title { font-size: 0.8rem; font-weight: 800; color: var(--cyan); text-transform: uppercase; border-bottom: 1px dashed var(--border); padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
+    
+    .status-pill { padding: 4px 10px; border-radius: 999px; font-weight: 900; font-size: 0.75rem; text-transform: uppercase; }
+    .status-PENDING { background: rgba(245, 158, 11, 0.2); color: var(--amber); border: 1px solid var(--amber); }
+    .status-APPROVED { background: rgba(244, 63, 94, 0.2); color: var(--rose); border: 1px solid var(--rose); }
+    .status-CLOSED { background: rgba(16, 185, 129, 0.2); color: var(--emerald); border: 1px solid var(--emerald); }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .form-group { display: flex; flex-direction: column; gap: 4px; }
+    label { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted); }
+    input, select, textarea { width: 100%; background: #090e17; border: 1px solid var(--border); color: var(--text); padding: 8px 10px; border-radius: 6px; font-size: 0.85rem; outline: none; }
+    input:focus, select:focus, textarea:focus { border-color: var(--cyan); }
+
+    /* Timeline Stream */
+    .timeline { display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
+    .timeline-item { background: #090e17; border: 1px solid var(--border); border-radius: 8px; padding: 10px; font-size: 0.8rem; display: flex; flex-direction: column; gap: 4px; }
+    .timeline-item.supervisor { border-left: 3px solid var(--cyan); }
+    .timeline-item.contractor { border-left: 3px solid var(--amber); }
+    .timeline-header { display: flex; justify-content: space-between; font-weight: 800; font-size: 0.72rem; }
+    .text-supervisor { color: var(--cyan); }
+    .text-contractor { color: var(--amber); }
+    .timeline-meta { color: var(--text-muted); font-size: 0.68rem; }
+    .timeline-body { color: #cbd5e1; line-height: 1.4; white-space: pre-wrap; margin-top: 2px; }
+
+    .thumb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 6px; margin-top: 6px; }
+    .thumb-wrap { position: relative; width: 100%; padding-top: 100%; border-radius: 6px; overflow: hidden; border: 1px solid var(--border); background: #000; }
+    .thumb-wrap img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+
+    .btn { width: 100%; border: none; border-radius: var(--radius); padding: 11px; font-size: 0.88rem; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .btn-cyan { background: var(--cyan); color: #000; }
+    .btn-emerald { background: var(--emerald); color: #000; }
+  </style>
+</head>
+<body>
+
+<div id="app">
+  <div class="container">
+    <header>
+      <h1>🛡️ Prince Telecom Claim Collaboration</h1>
+      <p class="sub">Live Multi-User Dispute &amp; Escalation Tracker</p>
+    </header>
+
+    <!-- CASE OVERVIEW -->
+    <div class="card">
+      <div class="card-title">
+        <span>Claim Summary: <strong id="lblClaimId">Loading...</strong></span>
+        <span id="lblStatus" class="status-pill status-PENDING">PENDING REVIEW</span>
+      </div>
+      <div class="grid-2" style="font-size: 0.8rem;">
+        <div><strong>WO #:</strong> <span id="lblWO">-</span></div>
+        <div><strong>Contractor:</strong> <span id="lblSub">-</span></div>
+        <div><strong>Premise:</strong> <span id="lblAddress">-</span></div>
+        <div><strong>Chargeback:</strong> <span id="lblAmount">$0.00</span></div>
+      </div>
+    </div>
+
+    <!-- LIVE CONVERSATION & AUDIT STREAM -->
+    <div class="card">
+      <div class="card-title">
+        <span>Dispute Communication Stream</span>
+        <span style="font-size: 0.7rem; color: var(--text-muted);" id="lblUpdateCount">0 Entries</span>
+      </div>
+      <div class="timeline" id="timelineStream">
+        <p style="font-size:0.75rem; color:var(--text-muted); text-align:center;">Loading conversation...</p>
+      </div>
+    </div>
+
+    <!-- POST NEW UPDATE & PHOTOS -->
+    <div class="card">
+      <div class="card-title">Log Response or Status Change</div>
+      
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Your Role *</label>
+          <select id="userRole">
+            <option value="CONTRACTOR">Contractor / Sub</option>
+            <option value="PRINCE_SUPERVISOR">Prince Operations</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Your Name / Tech ID *</label>
+          <input type="text" id="userName" placeholder="e.g. Dave M. / T-10492">
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Update Status</label>
+          <select id="updateStatus">
+            <option value="KEEP_CURRENT">Keep Current Status</option>
+            <option value="REBUTTAL SUBMITTED">Contractor Rebuttal Submitted</option>
+            <option value="REPAIRED / RESOLVED">Work Completed / Repaired</option>
+            <option value="APPROVED (DEDUCT)">Prince Approved (Chargeback)</option>
+            <option value="CLOSED - DISMISSED">Closed - Claim Dismissed</option>
+            <option value="CLOSED - RESOLVED">Closed - Case Resolved</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Chargeback ($)</label>
+          <input type="text" id="updateAmount" placeholder="Keep or update amount">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Notes / Finding / Rebuttal *</label>
+        <textarea id="updateMsg" rows="3" placeholder="Type message, inspection findings, corrective action, or rebuttal facts..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Attach Photos (Optional - Max 3)</label>
+        <input type="file" accept="image/*" multiple id="photoInput" onchange="handlePhotos(this)">
+        <div class="thumb-grid" id="newPhotoGallery"></div>
+      </div>
+
+      <button type="button" class="btn btn-cyan" onclick="submitUpdate()">
+        💬 Post Update to Live File
+      </button>
+    </div>
+
+    <!-- MASTER CLOSEOUT EXPORT -->
+    <div class="card">
+      <button type="button" class="btn btn-emerald" onclick="exportFullDossierPDF()">
+        📑 Export Complete Master Dossier (PDF)
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ==========================================
+  // SUPABASE CREDENTIALS CONFIGURED
+  // ==========================================
+  const SUPABASE_URL = "https://vopprpqdnepzsjnhnstd.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_ryRaA8Kg3gSyAZ3rDfKZng_wrT03lCJ";
+
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const claimId = urlParams.get('claim') || 'PT-CLM-849102';
+  let currentClaimData = null;
+  let allClaimUpdates = [];
+  let tempPhotos = [];
+
+  window.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('lblClaimId').textContent = claimId;
+    loadClaimData();
+    loadUpdatesStream();
+
+    // Subscribe to real-time changes
+    supabaseClient
+      .channel('claim_live')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'claim_updates' }, () => {
+        loadUpdatesStream();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'claims' }, () => {
+        loadClaimData();
+      })
+      .subscribe();
+  });
+
+  async function loadClaimData() {
+    const { data, error } = await supabaseClient.from('claims').select('*').eq('id', claimId).single();
+    if (error || !data) {
+      console.warn("Claim record not found in database. Initializing UI...");
+      return;
+    }
+    currentClaimData = data;
+    document.getElementById('lblWO').textContent = data.work_order || 'N/A';
+    document.getElementById('lblSub').textContent = data.contractor_name || 'N/A';
+    document.getElementById('lblAddress').textContent = data.address || 'N/A';
+    document.getElementById('lblAmount').textContent = data.chargeback_amount || '$0.00';
+    
+    const pill = document.getElementById('lblStatus');
+    const st = data.status || 'PENDING REVIEW';
+    pill.textContent = st;
+    pill.className = 'status-pill ' + (st.includes('CLOSED') ? 'status-CLOSED' : (st.includes('APPROVED') ? 'status-APPROVED' : 'status-PENDING'));
+  }
+
+  async function loadUpdatesStream() {
+    const { data, error } = await supabaseClient.from('claim_updates').select('*').eq('claim_id', claimId).order('created_at', { ascending: true });
+    if (error || !data) return;
+
+    allClaimUpdates = data;
+    document.getElementById('lblUpdateCount').textContent = `${data.length} Updates`;
+    const stream = document.getElementById('timelineStream');
+    stream.innerHTML = '';
+
+    if (data.length === 0) {
+      stream.innerHTML = '<p style="font-size:0.75rem; color:var(--text-muted); text-align:center;">No entries yet. Post the first update below.</p>';
+      return;
+    }
+
+    data.forEach(item => {
+      const isSupervisor = item.author_role === 'PRINCE_SUPERVISOR';
+      const roleLabel = isSupervisor ? 'Prince Telecom Operations' : 'Contractor';
+      const cssClass = isSupervisor ? 'supervisor' : 'contractor';
+      const dateStr = new Date(item.created_at).toLocaleString([], { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+      let photosHtml = '';
+      if (item.photos && item.photos.length > 0) {
+        photosHtml = `<div class="thumb-grid">${item.photos.map(p => `<div class="thumb-wrap"><img src="${p}"></div>`).join('')}</div>`;
+      }
+
+      const entry = document.createElement('div');
+      entry.className = `timeline-item ${cssClass}`;
+      entry.innerHTML = `
+        <div class="timeline-header">
+          <span class="${isSupervisor ? 'text-supervisor' : 'text-contractor'}">${roleLabel} (${item.author_name})</span>
+          <span class="timeline-meta">${dateStr}</span>
+        </div>
+        <div class="timeline-body">${item.message}</div>
+        ${photosHtml}
+      `;
+      stream.appendChild(entry);
+    });
+  }
+
+  function handlePhotos(input) {
+    const files = input.files;
+    if (!files || files.length === 0) return;
+
+    for (let i = 0; i < files.length; i++) {
+      if (tempPhotos.length >= 3) break;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const maxDim = 800;
+          let w = img.width, h = img.height;
+          if (w > h) { if (w > maxDim) { h = Math.round((h * maxDim) / w); w = maxDim; } }
+          else { if (h > maxDim) { w = Math.round((w * maxDim) / h); h = maxDim; } }
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          tempPhotos.push(canvas.toDataURL('image/jpeg', 0.8));
+          renderTempPhotos();
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(files[i]);
+    }
+    input.value = "";
+  }
+
+  function renderTempPhotos() {
+    const grid = document.getElementById('newPhotoGallery');
+    grid.innerHTML = tempPhotos.map(p => `<div class="thumb-wrap"><img src="${p}"></div>`).join('');
+  }
+
+  async function submitUpdate() {
+    const role = document.getElementById('userRole').value;
+    const name = document.getElementById('userName').value.trim();
+    const msg = document.getElementById('updateMsg').value.trim();
+    const statusChoice = document.getElementById('updateStatus').value;
+    const amountVal = document.getElementById('updateAmount').value.trim();
+
+    if (!name || !msg) {
+      alert("Please enter your name and a message.");
+      return;
+    }
+
+    // Insert update record into Supabase
+    const { error: insErr } = await supabaseClient.from('claim_updates').insert([{
+      claim_id: claimId,
+      author_role: role,
+      author_name: name,
+      message: msg,
+      photos: tempPhotos
+    }]);
+
+    if (insErr) {
+      alert("Error posting update: " + insErr.message);
+      return;
+    }
+
+    // Update claim status/amount if changed
+    const updates = {};
+    if (statusChoice !== 'KEEP_CURRENT') updates.status = statusChoice;
+    if (amountVal) updates.chargeback_amount = amountVal;
+    if (Object.keys(updates).length > 0) {
+      await supabaseClient.from('claims').update(updates).eq('id', claimId);
+    }
+
+    // Reset inputs
+    document.getElementById('updateMsg').value = '';
+    tempPhotos = [];
+    renderTempPhotos();
+    loadUpdatesStream();
+    loadClaimData();
+  }
+
+  // --- EXPORT DOSSIER COMPILATION ---
+  function exportFullDossierPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ format: 'letter', unit: 'pt' });
+    const left = 45, right = 567, width = right - left;
+    const now = new Date().toLocaleString();
+
+    doc.setFontSize(16); doc.setFont("helvetica", "bold"); doc.setTextColor(15, 23, 42);
+    doc.text("PRINCE TELECOM FIELD OPERATIONS", left, 46);
+    doc.setFontSize(10); doc.setTextColor(6, 182, 212);
+    doc.text("COMPLETE DISPUTE & CLAIM AUDIT DOSSIER", left, 61);
+
+    doc.setFontSize(8.5); doc.setFont("helvetica", "normal"); doc.setTextColor(80, 80, 80);
+    doc.text(`Exported: ${now}`, right, 46, { align: "right" });
+    doc.text(`Claim #: ${claimId}`, right, 59, { align: "right" });
+
+    doc.setDrawColor(15, 23, 42); doc.setLineWidth(1.4); doc.line(left, 68, right, 68);
+
+    let y = 88;
+    doc.setFontSize(9); doc.setTextColor(0, 0, 0);
+    doc.setFont("helvetica", "bold"); doc.text("Work Order:", left, y);
+    doc.setFont("helvetica", "normal"); doc.text(currentClaimData ? currentClaimData.work_order : 'N/A', left + 80, y);
+    doc.setFont("helvetica", "bold"); doc.text("Current Status:", 340, y);
+    doc.setFont("helvetica", "normal"); doc.text(currentClaimData ? currentClaimData.status : 'PENDING REVIEW', 430, y);
+
+    y += 18;
+    doc.setFont("helvetica", "bold"); doc.text("Contractor:", left, y);
+    doc.setFont("helvetica", "normal"); doc.text(currentClaimData ? currentClaimData.contractor_name : 'N/A', left + 80, y);
+    doc.setFont("helvetica", "bold"); doc.text("Chargeback:", 340, y);
+    doc.setFont("helvetica", "normal"); doc.text(currentClaimData ? currentClaimData.chargeback_amount : '$0.00', 430, y);
+
+    y += 24;
+    doc.setFontSize(10); doc.setFont("helvetica", "bold");
+    doc.text("COMMUNICATION & AUDIT TRAIL LOG:", left, y);
+
+    y += 16;
+    doc.setFontSize(8.5); doc.setFont("helvetica", "normal");
+    allClaimUpdates.forEach((u) => {
+      const roleStr = u.author_role === 'PRINCE_SUPERVISOR' ? 'Prince Ops' : 'Contractor';
+      const timeStr = new Date(u.created_at).toLocaleString([], { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+      doc.setFont("helvetica", "bold");
+      doc.text(`[${timeStr}] ${roleStr} (${u.author_name}):`, left, y);
+      y += 12;
+      doc.setFont("helvetica", "normal");
+      const wrapped = doc.splitTextToSize(u.message, width - 10);
+      doc.text(wrapped, left + 10, y);
+      y += (wrapped.length * 11) + 8;
+    });
+
+    doc.save(`Prince_Dispute_Dossier_${claimId}.pdf`);
+  }
+</script>
+
+</body>
+</html>
