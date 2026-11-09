@@ -5,8 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Prince Telecom - Damage Escalation & Dispute Dossier</title>
 
-  <!-- NATIVE jsPDF Library -->
+  <!-- NATIVE jsPDF & Supabase Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -523,19 +524,94 @@
     );
   }
 
+  // ==========================================
+  // SUPABASE CLOUD SYNC CONFIGURATION
+  // ==========================================
+  const SUPABASE_URL = "https://vopprpqdnepzsjnhnstd.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_ryRaA8Kg3gSyAZ3rDfKZng_wrT03lCJ";
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
   // --- ROUTER: EXECUTE ACTION BASED ON STAGE ---
-  function executeCurrentStageAction() {
+  async function executeCurrentStageAction() {
     const claimRef = document.getElementById('claimRefNum').value.trim();
     const wo = document.getElementById('workOrder').value.trim();
     const subName = document.getElementById('subcontractorName').value.trim();
+    const techId = document.getElementById('techId').value.trim();
     const custName = document.getElementById('custName').value.trim();
     const address = document.getElementById('streetAddress').value.trim();
     const csz = document.getElementById('cityStateZip').value.trim();
+    const category = document.getElementById('damageCategory').value;
     const subEmail = document.getElementById('contractorEmail').value.trim();
+    const chargeback = document.getElementById('chargebackAmount') ? document.getElementById('chargebackAmount').value.trim() : '$0.00';
+    const supervisor = document.getElementById('supervisorName') ? document.getElementById('supervisorName').value.trim() : 'Prince Operations';
+    const desc = document.getElementById('incidentDesc').value.trim();
 
     if (!claimRef || !wo || !subName || !custName || !address) {
       alert("Please fill in Claim #, Work Order #, Contractor Name, Customer, and Address.");
       return;
+    }
+
+    // Save/Sync automatically to Supabase database
+    const btn = document.getElementById('btnAction');
+    const originalBtnText = btn.innerHTML;
+    btn.innerHTML = "⏳ Syncing to Cloud Database...";
+
+    try {
+      // 1. Upsert into claims table
+      const { error: claimErr } = await supabaseClient.from('claims').upsert({
+        id: claimRef,
+        work_order: wo,
+        contractor_name: subName,
+        tech_id: techId,
+        customer_name: custName,
+        address: `${address}, ${csz}`,
+        category: category,
+        current_stage: currentStage,
+        status: (currentStage === 4) ? document.getElementById('closeoutDisposition').value : (currentStage >= 2 ? princeRuling : 'PENDING REVIEW'),
+        chargeback_amount: chargeback || '$0.00',
+        contractor_email: subEmail,
+        supervisor_name: supervisor,
+        updated_at: new Date().toISOString()
+      });
+
+      if (claimErr) console.warn("Supabase claims table error:", claimErr.message);
+
+      // 2. Log initial report or update into claim_updates stream
+      if (currentStage === 1 && desc) {
+        await supabaseClient.from('claim_updates').insert([{
+          claim_id: claimRef,
+          author_role: 'PRINCE_SUPERVISOR',
+          author_name: supervisor,
+          message: `[STAGE 1 INITIAL 48-HR NOTICE DISPATCHED]\nCategory: ${category}\nFindings: ${desc}`,
+          stage_at_submission: 1,
+          photos: initialPhotos
+        }]);
+      } else if (currentStage === 2) {
+        const findings = document.getElementById('princeFindings').value.trim();
+        await supabaseClient.from('claim_updates').insert([{
+          claim_id: claimRef,
+          author_role: 'PRINCE_SUPERVISOR',
+          author_name: supervisor,
+          message: `[STAGE 2 PRINCE DETERMINATION: ${princeRuling}]\nChargeback: ${chargeback}\nLiability Rationale: ${findings}`,
+          stage_at_submission: 2,
+          photos: []
+        }]);
+      } else if (currentStage === 4) {
+        const finalDisp = document.getElementById('closeoutDisposition').value;
+        const closeNotes = document.getElementById('closeoutNotes').value.trim();
+        await supabaseClient.from('claim_updates').insert([{
+          claim_id: claimRef,
+          author_role: 'PRINCE_SUPERVISOR',
+          author_name: supervisor,
+          message: `[STAGE 4 CLAIM CLOSED: ${finalDisp}]\nNotes: ${closeNotes}`,
+          stage_at_submission: 4,
+          photos: []
+        }]);
+      }
+    } catch (err) {
+      console.warn("Could not sync to database:", err);
+    } finally {
+      btn.innerHTML = originalBtnText;
     }
 
     if (currentStage === 4) {
@@ -648,7 +724,6 @@
     // Stage 2/3 Content
     if (currentStage >= 2) {
       const chargeback = document.getElementById('chargebackAmount').value.trim() || '$0.00';
-      const supervisor = document.getElementById('supervisorName').value.trim() || 'Prince Operations';
       const findings = document.getElementById('princeFindings').value.trim();
 
       doc.setFontSize(9.5); doc.setFont("helvetica", "bold"); doc.setTextColor(0, 0, 0);
@@ -711,7 +786,8 @@
 
     if (subEmail) {
       setTimeout(() => {
-        const sendMail = confirm(`✅ PDF Downloaded: ${filename}\n\nOpen email app to forward notice to ${subEmail}?`);
+        const portalLink = window.location.origin + window.location.pathname.replace('prince_dispute_dossier.html', 'dispute_portal.html') + `?claim=${claimRef}`;
+        const sendMail = confirm(`✅ Saved to Cloud Database & Downloaded: ${filename}\n\nOpen email client to send 48-hour notice and portal link to ${subEmail}?`);
         if (sendMail) {
           const subject = encodeURIComponent(`[48-HR NOTICE - STAGE ${currentStage}] CLAIM #${claimRef} - WO# ${wo} - ${subName}`);
           const body = encodeURIComponent(
@@ -721,7 +797,9 @@
             `Premise: ${address}, ${csz}\n` +
             `Current Stage: Stage ${currentStage} (48-Hour Response Window Active)\n` +
             `Ruling/Status: ${princeRuling}\n\n` +
-            `The documentation PDF (${filename}) has been generated and attached.`
+            `Live Contractor Dispute Portal Link:\n` +
+            portalLink + `\n\n` +
+            `The official notice PDF (${filename}) has been generated and attached.`
           );
           window.location.href = `mailto:${subEmail}?subject=${subject}&body=${body}`;
         }
@@ -763,171 +841,4 @@
     const dateFormatted = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
     // PAGE 1: MASTER SUMMARY & COMPLETE 48-HR AUDIT TRAIL
-    doc.setFontSize(16); doc.setFont("helvetica", "bold"); doc.setTextColor(15, 23, 42);
-    doc.text("PRINCE TELECOM FIELD OPERATIONS", left, 46);
-
-    doc.setFontSize(9.5); doc.setTextColor(16, 185, 129);
-    doc.text("CLOSED DAMAGE CLAIM MASTER RECORD & AUDIT DOSSIER", left, 61);
-
-    doc.setFontSize(8.5); doc.setFont("helvetica", "normal"); doc.setTextColor(80, 80, 80);
-    doc.text(`Closed Date: ${dateFormatted}`, right, 46, { align: "right" });
-    doc.text(`Claim Ref #: ${claimRef}`, right, 59, { align: "right" });
-
-    doc.setDrawColor(15, 23, 42); doc.setLineWidth(1.4);
-    doc.line(left, 68, right, 68);
-
-    // Final Closed Banner
-    doc.setFillColor(16, 185, 129); // Emerald
-    doc.roundedRect(left, 78, width, 36, 4, 4, "F");
-    doc.setFontSize(11); doc.setFont("helvetica", "bold"); doc.setTextColor(255, 255, 255);
-    doc.text(`FINAL DISPOSITION: ${finalDisp}`, left + 14, 95);
-    doc.setFontSize(8.5); doc.setFont("helvetica", "normal");
-    doc.text(`Settlement / Remittance Amount: ${settledAmount} | Signoff: ${supervisor}`, left + 14, 107);
-
-    // Case Overview Grid
-    let y = 132;
-    doc.setFontSize(9); doc.setTextColor(0, 0, 0);
-    doc.setFont("helvetica", "bold"); doc.text("Contractor:", left, y);
-    doc.setFont("helvetica", "normal"); doc.text(subName, left + 75, y);
-    doc.setFont("helvetica", "bold"); doc.text("Work Order #:", 370, y);
-    doc.setFont("helvetica", "normal"); doc.text(wo, 450, y);
-
-    y += 16;
-    doc.setFont("helvetica", "bold"); doc.text("Tech ID / Name:", left, y);
-    doc.setFont("helvetica", "normal"); doc.text(techId, left + 85, y);
-    doc.setFont("helvetica", "bold"); doc.text("Incident Date:", 370, y);
-    doc.setFont("helvetica", "normal"); doc.text(incidentDate, 450, y);
-
-    y += 16;
-    doc.setFont("helvetica", "bold"); doc.text("Premise / Cust:", left, y);
-    doc.setFont("helvetica", "normal"); doc.text(`${custName} - ${address}, ${csz}`, left + 85, y);
-
-    y += 14;
-    doc.setLineWidth(0.5); doc.setDrawColor(210, 210, 210);
-    doc.line(left, y, right, y);
-
-    // 48-HR Timeline Box
-    y += 18;
-    doc.setFontSize(9.5); doc.setFont("helvetica", "bold"); doc.setTextColor(15, 23, 42);
-    doc.text("48-HOUR DISPUTE ESCALATION LIFECYCLE AUDIT:", left, y);
-
-    y += 14;
-    doc.setFillColor(248, 250, 252); doc.rect(left, y, width, 55, "F");
-    doc.setDrawColor(203, 213, 225); doc.rect(left, y, width, 55, "S");
-    doc.setFontSize(8); doc.setFont("helvetica", "normal"); doc.setTextColor(51, 65, 85);
-    doc.text(`• STEP 1 (48h Window): Dispatched to ${subName} for mandatory 48-hour inspection & corrective action.`, left + 10, y + 14);
-    doc.text(`• STEP 2 (Prince Review): Prince issued formal ruling: ${princeRuling} (Initial Demand: ${chargeback}).`, left + 10, y + 26);
-    doc.text(`• STEP 3 (Rebuttal): Contractor representative (${rep}) filed stance: ${stance}.`, left + 10, y + 38);
-    doc.text(`• STEP 4 (Resolution): Case adjudicated by ${supervisor}. Final closed resolution: ${finalDisp}.`, left + 10, y + 50);
-
-    y += 68;
-    // Phase 1 Narrative
-    doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.setTextColor(0, 0, 0);
-    doc.text("1. INITIAL DAMAGE CLAIM & CUSTOMER STATEMENT:", left, y);
-    y += 12;
-    doc.setFontSize(8); doc.setFont("helvetica", "normal"); doc.setTextColor(50, 50, 50);
-    const wrapP1 = doc.splitTextToSize(initialDesc, width);
-    doc.text(wrapP1, left, y);
-    y += (wrapP1.length * 11) + 10;
-
-    // Phase 2 Narrative
-    doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.setTextColor(0, 0, 0);
-    doc.text("2. PRINCE INVESTIGATION FINDINGS & ROOT CAUSE:", left, y);
-    y += 12;
-    doc.setFontSize(8); doc.setFont("helvetica", "normal"); doc.setTextColor(50, 50, 50);
-    const wrapP2 = doc.splitTextToSize(princeFindings, width);
-    doc.text(wrapP2, left, y);
-    y += (wrapP2.length * 11) + 10;
-
-    // Phase 3 Narrative
-    doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.setTextColor(0, 0, 0);
-    doc.text("3. CONTRACTOR REBUTTAL & PROOF OF ACTION:", left, y);
-    y += 12;
-    doc.setFontSize(8); doc.setFont("helvetica", "normal"); doc.setTextColor(50, 50, 50);
-    const wrapP3 = doc.splitTextToSize(rebuttalNotes, width);
-    doc.text(wrapP3, left, y);
-    y += (wrapP3.length * 11) + 10;
-
-    // Signatures / Authority
-    y += 10;
-    doc.setDrawColor(0, 0, 0); doc.setLineWidth(1);
-    doc.line(left, y, 240, y);
-    doc.setFontSize(8); doc.setFont("helvetica", "bold"); doc.setTextColor(0, 0, 0);
-    doc.text("Prince Authorized Supervisor", left, y + 10);
-    doc.setFont("helvetica", "normal"); doc.text(supervisor, left, y + 19);
-
-    doc.line(360, y, 460, y);
-    doc.setFont("helvetica", "bold"); doc.text("Final Closeout Date", 360, y + 10);
-    doc.setFont("helvetica", "normal"); doc.text(now.toLocaleDateString(), 360, y + 19);
-
-    // PAGE 2: INITIAL INCIDENT PHOTOS (IF ANY)
-    if (initialPhotos.length > 0) {
-      doc.addPage();
-      doc.setFontSize(13); doc.setFont("helvetica", "bold"); doc.setTextColor(15, 23, 42);
-      doc.text("APPENDIX A: INITIAL INCIDENT & DAMAGE PHOTOS", left, 50);
-      doc.setFontSize(8.5); doc.setFont("helvetica", "normal"); doc.setTextColor(80, 80, 80);
-      doc.text(`Claim #: ${claimRef} | Work Order: ${wo} | Captured by Prince Ops`, left, 64);
-      doc.setDrawColor(15, 23, 42); doc.setLineWidth(1.2); doc.line(left, 70, right, 70);
-
-      const photoW = 245, photoH = 185;
-      const col1 = left, col2 = left + photoW + 30;
-      const posList = [{ x: col1, y: 90 }, { x: col2, y: 90 }, { x: col1, y: 310 }, { x: col2, y: 310 }];
-
-      for (let p = 0; p < initialPhotos.length && p < 4; p++) {
-        doc.setFontSize(8); doc.setFont("helvetica", "bold"); doc.setTextColor(60, 60, 60);
-        doc.text(`Initial Evidence Photo #${p + 1}`, posList[p].x, posList[p].y);
-        doc.setDrawColor(200, 200, 200); doc.setLineWidth(0.5);
-        doc.rect(posList[p].x, posList[p].y + 5, photoW, photoH, "S");
-        doc.addImage(initialPhotos[p], 'JPEG', posList[p].x + 1, posList[p].y + 6, photoW - 2, photoH - 2);
-      }
-    }
-
-    // PAGE 3: CONTRACTOR REBUTTAL / REPAIR PHOTOS (IF ANY)
-    if (rebuttalPhotos.length > 0) {
-      doc.addPage();
-      doc.setFontSize(13); doc.setFont("helvetica", "bold"); doc.setTextColor(15, 23, 42);
-      doc.text("APPENDIX B: CONTRACTOR REBUTTAL & REPAIR PHOTOS", left, 50);
-      doc.setFontSize(8.5); doc.setFont("helvetica", "normal"); doc.setTextColor(80, 80, 80);
-      doc.text(`Claim #: ${claimRef} | Work Order: ${wo} | Submitted by ${subName}`, left, 64);
-      doc.setDrawColor(15, 23, 42); doc.setLineWidth(1.2); doc.line(left, 70, right, 70);
-
-      const photoW = 245, photoH = 185;
-      const col1 = left, col2 = left + photoW + 30;
-      const posList = [{ x: col1, y: 90 }, { x: col2, y: 90 }, { x: col1, y: 310 }, { x: col2, y: 310 }];
-
-      for (let p = 0; p < rebuttalPhotos.length && p < 4; p++) {
-        doc.setFontSize(8); doc.setFont("helvetica", "bold"); doc.setTextColor(60, 60, 60);
-        doc.text(`Contractor Proof Photo #${p + 1}`, posList[p].x, posList[p].y);
-        doc.setDrawColor(200, 200, 200); doc.setLineWidth(0.5);
-        doc.rect(posList[p].x, posList[p].y + 5, photoW, photoH, "S");
-        doc.addImage(rebuttalPhotos[p], 'JPEG', posList[p].x + 1, posList[p].y + 6, photoW - 2, photoH - 2);
-      }
-    }
-
-    const filename = `Master_Claim_${claimRef}_WO_${wo}_CLOSED.pdf`;
-    doc.save(filename);
-
-    if (subEmail) {
-      setTimeout(() => {
-        const sendMail = confirm(`✅ Complete Master Dossier Downloaded: ${filename}\n\nWould you like to forward the finalized closeout packet to contractor dispatch (${subEmail})?`);
-        if (sendMail) {
-          const subject = encodeURIComponent(`[CLOSED MASTER DOSSIER] CLAIM #${claimRef} - WO# ${wo} - ${finalDisp}`);
-          const body = encodeURIComponent(
-            `Prince Telecom Claims & Operations,\n\n` +
-            `Attention: ${subName},\n\n` +
-            `The damage claim escalation regarding Work Order #${wo} (Claim Ref #${claimRef}) has been finalized and officially CLOSED.\n\n` +
-            `Final Disposition: ${finalDisp}\n` +
-            `Final Settlement / Chargeback: ${settledAmount}\n` +
-            `Closing Notes: ${closeoutNotes}\n` +
-            `Supervisor Signoff: ${supervisor}\n\n` +
-            `The permanent multi-page Master Dossier (${filename}) containing the full 48-hour audit lifecycle and photographic appendices has been generated and attached.`
-          );
-          window.location.href = `mailto:${subEmail}?subject=${subject}&body=${body}`;
-        }
-      }, 700);
-    }
-  }
-</script>
-
-</body>
-</html>
+    doc.setFontSize(16); doc.setFont("helvetica", "bold"); doc.setTextColor(1
