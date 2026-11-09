@@ -84,6 +84,20 @@
     .legal-box p { margin-bottom: 6px; }
     .legal-box p:last-child { margin-bottom: 0; }
 
+    /* Photo Upload / Capture Box */
+    .photo-section { display: flex; flex-direction: column; gap: 8px; }
+    .photo-btn-group { display: flex; gap: 8px; }
+    .btn-photo {
+      flex: 1; background: #18233a; border: 1px dashed var(--amber); color: var(--text);
+      padding: 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 700;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .btn-photo:hover { background: #243452; border-style: solid; }
+    .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; margin-top: 4px; }
+    .photo-thumb-wrap { position: relative; width: 100%; padding-top: 100%; border-radius: 6px; overflow: hidden; border: 1px solid var(--card-border); background: #090e17; }
+    .photo-thumb-wrap img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+    .btn-del-photo { position: absolute; top: 2px; right: 2px; background: rgba(244, 63, 94, 0.9); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
     /* Signature Canvases */
     .sig-wrapper { display: flex; flex-direction: column; gap: 6px; }
     .canvas-container { background: #ffffff; border-radius: 6px; border: 2px dashed var(--amber); touch-action: none; }
@@ -155,6 +169,24 @@
         <textarea id="workDescription" rows="2" placeholder="e.g. Drill exterior wall on north side, attach RG6 coax cable along baseboard to living room wall plate."></textarea>
       </div>
 
+      <!-- Optional Photo Documentation Section -->
+      <div class="photo-section">
+        <label>Work Area Photos (Optional - Max 4)</label>
+        <div class="photo-btn-group">
+          <!-- Direct Camera Capture -->
+          <label class="btn-photo">
+            📷 Take Photo
+            <input type="file" accept="image/*" capture="environment" id="cameraInput" style="display: none;" onchange="handlePhotoSelect(this)">
+          </label>
+          <!-- Photo Library / File Upload -->
+          <label class="btn-photo">
+            🖼️ Choose from Gallery
+            <input type="file" accept="image/*" multiple id="uploadInput" style="display: none;" onchange="handlePhotoSelect(this)">
+          </label>
+        </div>
+        <div class="photo-grid" id="photoGallery"></div>
+      </div>
+
       <label>Terms of Agreement</label>
       <div class="legal-box">
         <p>I, above named responsible party, do hereby grant permission to drill through or secure to above stated area in the effort to install/repair or restore cable/Internet/telephone services.</p>
@@ -194,6 +226,78 @@
 </div>
 
 <script>
+  // --- PHOTO MANAGEMENT ENGINE ---
+  let attachedPhotos = [];
+
+  function handlePhotoSelect(input) {
+    const files = input.files;
+    if (!files || files.length === 0) return;
+
+    for (let i = 0; i < files.length; i++) {
+      if (attachedPhotos.length >= 4) {
+        alert("Maximum 4 photos allowed per waiver.");
+        break;
+      }
+      resizeAndStoreImage(files[i]);
+    }
+    input.value = "";
+  }
+
+  function resizeAndStoreImage(file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = new Image();
+      img.onload = function() {
+        const maxDim = 800;
+        let w = img.width;
+        let h = img.height;
+        if (w > h) {
+          if (w > maxDim) { h = Math.round((h * maxDim) / w); w = maxDim; }
+        } else {
+          if (h > maxDim) { w = Math.round((w * maxDim) / h); h = maxDim; }
+        }
+
+        const offCanvas = document.createElement('canvas');
+        offCanvas.width = w;
+        offCanvas.height = h;
+        const offCtx = offCanvas.getContext('2d');
+        offCtx.drawImage(img, 0, 0, w, h);
+
+        const dataUrl = offCanvas.toDataURL('image/jpeg', 0.8);
+        attachedPhotos.push(dataUrl);
+        renderPhotoGallery();
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function renderPhotoGallery() {
+    const gallery = document.getElementById('photoGallery');
+    gallery.innerHTML = '';
+    attachedPhotos.forEach((dataUrl, index) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'photo-thumb-wrap';
+
+      const img = document.createElement('img');
+      img.src = dataUrl;
+
+      const delBtn = document.createElement('button');
+      delBtn.className = 'btn-del-photo';
+      delBtn.innerHTML = '✕';
+      delBtn.onclick = () => removePhoto(index);
+
+      wrap.appendChild(img);
+      wrap.appendChild(delBtn);
+      gallery.appendChild(wrap);
+    });
+  }
+
+  function removePhoto(index) {
+    attachedPhotos.splice(index, 1);
+    renderPhotoGallery();
+  }
+
   // --- DUAL SIGNATURE CANVAS ENGINE ---
   const custCanvas = document.getElementById('custSigCanvas');
   const custCtx = custCanvas.getContext('2d');
@@ -264,8 +368,7 @@
         headers: { 'Accept': 'application/json' }
       });
       if (!response.ok) return null;
-      const data = await response.json();
-      return data;
+      return await response.json();
     } catch (e) {
       return null;
     }
@@ -354,7 +457,7 @@
     const rightMargin = 567;
     const contentWidth = rightMargin - leftMargin;
 
-    // --- Header ---
+    // Header
     doc.setFontSize(17);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(20, 30, 50);
@@ -377,24 +480,21 @@
     doc.setLineWidth(1.5);
     doc.line(leftMargin, 78, rightMargin, 78);
 
-    // --- Form Fields Layout ---
+    // Form Fields Layout
     doc.setFontSize(10);
     doc.setTextColor(0, 0, 0);
     let currentY = 105;
 
-    // Field 1: Responsible party
     doc.setFont("helvetica", "bold");
     doc.text("Responsible party :", leftMargin, currentY);
     doc.setFont("helvetica", "normal");
     doc.text(respParty, leftMargin + 125, currentY);
     
-    // Tech ID on right
     doc.setFont("helvetica", "bold");
     doc.text("Technician ID :", 380, currentY);
     doc.setFont("helvetica", "normal");
     doc.text(techId, 465, currentY);
 
-    // Field 2: Street address
     currentY += 24;
     doc.setFont("helvetica", "bold");
     doc.text("Street address:", leftMargin, currentY);
@@ -403,21 +503,18 @@
     doc.text(wrappedStreet, leftMargin + 95, currentY);
     currentY += (wrappedStreet.length - 1) * 12;
 
-    // Field 3: City/state/zip
     currentY += 24;
     doc.setFont("helvetica", "bold");
     doc.text("City/state/zip:", leftMargin, currentY);
     doc.setFont("helvetica", "normal");
     doc.text(cityStateZip, leftMargin + 95, currentY);
 
-    // Field 4: Telephone
     currentY += 24;
     doc.setFont("helvetica", "bold");
     doc.text("Telephone:", leftMargin, currentY);
     doc.setFont("helvetica", "normal");
     doc.text(telephone, leftMargin + 95, currentY);
 
-    // Field 5: Description of work to be performed
     currentY += 24;
     doc.setFont("helvetica", "bold");
     doc.text("Description of work to be performed :", leftMargin, currentY);
@@ -428,13 +525,12 @@
     doc.text(wrappedWork, leftMargin, currentY);
     currentY += wrappedWork.length * 13;
 
-    // Subtle divider
     currentY += 10;
     doc.setLineWidth(0.5);
     doc.setDrawColor(210, 210, 210);
     doc.line(leftMargin, currentY, rightMargin, currentY);
 
-    // --- Terms & Conditions Wording ---
+    // Terms & Conditions Wording
     currentY += 26;
     doc.setFontSize(9.5);
     doc.setFont("helvetica", "normal");
@@ -465,7 +561,7 @@
     doc.text(wrappedP5, leftMargin, currentY);
     currentY += (wrappedP5.length * 13) + 26;
 
-    // --- Signatures Section ---
+    // Signatures Section
     const custSigData = custCanvas.toDataURL('image/png');
     const techSigData = techCanvas.toDataURL('image/png');
 
@@ -508,7 +604,52 @@
     doc.setFont("helvetica", "bold");
     doc.text("Date:", 360, currentY + 12);
 
-    // --- Save Document ---
+    // Optional Attached Photos Appendix (Page 2)
+    if (attachedPhotos.length > 0) {
+      doc.addPage();
+      
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(20, 30, 50);
+      doc.text("AMBER COMMUNICATIONS - PHOTO DOCUMENTATION", leftMargin, 50);
+
+      doc.setFontSize(8.5);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(80, 80, 80);
+      doc.text(`Responsible Party: ${respParty} | WO #: ${workOrder || 'N/A'}`, leftMargin, 66);
+      doc.text(`Captured: ${dateFormatted}`, rightMargin, 66, { align: "right" });
+
+      doc.setDrawColor(30, 41, 59);
+      doc.setLineWidth(1.2);
+      doc.line(leftMargin, 74, rightMargin, 74);
+
+      const photoW = 245;
+      const photoH = 185;
+      const col1 = leftMargin;
+      const col2 = leftMargin + photoW + 30;
+
+      const positions = [
+        { x: col1, y: 95, label: "Photo 1: Proposed Drill Entry / Surface" },
+        { x: col2, y: 95, label: "Photo 2: Interior / Pathway Verification" },
+        { x: col1, y: 315, label: "Photo 3: Additional Work Area Detail" },
+        { x: col2, y: 315, label: "Photo 4: Post-Inspection / Cable Path" }
+      ];
+
+      for (let p = 0; p < attachedPhotos.length && p < 4; p++) {
+        const pos = positions[p];
+        doc.setFontSize(8);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(50, 50, 50);
+        doc.text(pos.label, pos.x, pos.y);
+
+        doc.setDrawColor(200, 200, 200);
+        doc.setLineWidth(0.5);
+        doc.rect(pos.x, pos.y + 6, photoW, photoH, "S");
+        doc.addImage(attachedPhotos[p], 'JPEG', pos.x + 1, pos.y + 7, photoW - 2, photoH - 2);
+      }
+    }
+
+    // Save Document
     doc.save(filename);
 
     btn.textContent = "📄 Sign & Export Completed PDF";
@@ -517,7 +658,8 @@
     // Handoff to Email
     setTimeout(() => {
       if (techEmail) {
-        const sendEmail = confirm(`✅ PDF Downloaded Successfully!\n\n(File: ${filename})\n\nWould you like to open your email app to forward a copy to ${techEmail}?`);
+        const photoNotice = attachedPhotos.length > 0 ? ` (${attachedPhotos.length} photo(s) attached on Page 2)` : '';
+        const sendEmail = confirm(`✅ PDF Downloaded Successfully!${photoNotice}\n\n(File: ${filename})\n\nWould you like to open your email app to forward a copy to ${techEmail}?`);
         if (sendEmail) {
           const mailSubject = encodeURIComponent(`AMBER COMMUNICATIONS DRILL WAIVER - ${respParty} - WO# ${workOrder || 'N/A'}`);
           const mailBody = encodeURIComponent(
@@ -530,6 +672,7 @@
             `Work Order: ${workOrder || 'N/A'}\n` +
             `Tech ID: ${techId}\n` +
             `Work Description: ${workDescription}\n` +
+            `Photos Attached: ${attachedPhotos.length}\n` +
             `Date Signed: ${dateFormatted}\n\n` +
             `The generated PDF (${filename}) has been downloaded to this device.`
           );
