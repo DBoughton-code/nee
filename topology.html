@@ -22,13 +22,13 @@
       --text-sub: #64748b;
       
       --cyan: #06b6d4;
-      --cyan-glow: rgba(6, 182, 212, 0.15);
+      --cyan-glow: rgba(6, 182, 212, 0.18);
       --emerald: #10b981;
-      --emerald-glow: rgba(16, 185, 129, 0.15);
+      --emerald-glow: rgba(16, 185, 129, 0.18);
       --amber: #f59e0b;
-      --amber-glow: rgba(245, 158, 11, 0.15);
+      --amber-glow: rgba(245, 158, 11, 0.18);
       --rose: #f43f5e;
-      --rose-glow: rgba(244, 63, 94, 0.15);
+      --rose-glow: rgba(244, 63, 94, 0.18);
       --purple: #a855f7;
 
       --radius-sm: 6px;
@@ -49,35 +49,6 @@
     .container {
       max-width: 940px;
       margin: 0 auto;
-    }
-
-    /* Navigation Bar */
-    .nav-top-bar {
-      display: flex;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-
-    .btn-back {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: #18233a;
-      color: var(--text-main);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius-md);
-      padding: 8px 14px;
-      font-size: 0.82rem;
-      font-weight: 700;
-      text-decoration: none;
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-
-    .btn-back:hover {
-      background: #243452;
-      border-color: var(--cyan);
-      color: var(--cyan);
     }
 
     /* Header */
@@ -120,25 +91,12 @@
       cursor: pointer;
       border: 1px solid transparent;
       transition: all 0.2s ease;
+      user-select: none;
     }
 
-    .badge-pass {
-      background: rgba(16, 185, 129, 0.12);
-      color: var(--emerald);
-      border-color: var(--emerald);
-    }
-
-    .badge-marginal {
-      background: rgba(245, 158, 11, 0.12);
-      color: var(--amber);
-      border-color: var(--amber);
-    }
-
-    .badge-fail {
-      background: rgba(244, 63, 94, 0.12);
-      color: var(--rose);
-      border-color: var(--rose);
-    }
+    .badge-pass { background: rgba(16, 185, 129, 0.15); color: var(--emerald); border-color: var(--emerald); }
+    .badge-marginal { background: rgba(245, 158, 11, 0.15); color: var(--amber); border-color: var(--amber); }
+    .badge-fail { background: rgba(244, 63, 94, 0.15); color: var(--rose); border-color: var(--rose); }
 
     /* Layout Grid */
     .grid-2col {
@@ -149,9 +107,7 @@
     }
 
     @media (min-width: 700px) {
-      .grid-2col {
-        grid-template-columns: 1fr 1fr;
-      }
+      .grid-2col { grid-template-columns: 1fr 1fr; }
     }
 
     /* Cards */
@@ -174,11 +130,29 @@
       gap: 6px;
     }
 
-    .card-title .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
+    .card-title .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+    /* Buttons & Presets */
+    .preset-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
     }
+    .btn-preset {
+      flex: 1;
+      background: #090e17;
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 8px 4px;
+      border-radius: var(--radius-md);
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-align: center;
+    }
+    .btn-preset:hover { border-color: var(--cyan); color: var(--cyan); }
+    .btn-preset.active { background: rgba(6, 182, 212, 0.12); border-color: var(--cyan); color: var(--cyan); }
 
     /* Inputs & Steppers */
     .input-row {
@@ -186,20 +160,17 @@
       gap: 10px;
       margin-bottom: 12px;
     }
-
     .input-group {
       flex: 1;
       display: flex;
       flex-direction: column;
     }
-
     label {
       font-size: 0.72rem;
       color: var(--text-muted);
       font-weight: 600;
       margin-bottom: 5px;
     }
-
     .stepper-input {
       display: flex;
       align-items: center;
@@ -208,43 +179,34 @@
       border-radius: var(--radius-md);
       overflow: hidden;
     }
-
     .step-btn {
-      background: transparent;
+      background: rgba(255,255,255,0.03);
       border: none;
-      color: var(--text-main);
-      padding: 8px 12px;
-      font-size: 1rem;
+      color: var(--cyan);
+      padding: 0 16px;
+      height: 40px;
+      font-size: 1.25rem;
       font-weight: bold;
       cursor: pointer;
       transition: background 0.15s;
+      user-select: none;
     }
-
-    .step-btn:hover {
-      background: rgba(255, 255, 255, 0.08);
-    }
-
+    .step-btn:hover { background: rgba(255, 255, 255, 0.08); }
+    
     input[type="number"], select {
       width: 100%;
       background: #090e17;
       border: 1px solid var(--card-border);
       color: var(--text-main);
       padding: 8px 10px;
+      height: 40px;
       border-radius: var(--radius-md);
       font-size: 0.9rem;
       font-weight: 700;
       text-align: center;
     }
-
-    .stepper-input input[type="number"] {
-      border: none;
-      background: transparent;
-    }
-
-    input[type="number"]:focus, select:focus {
-      outline: none;
-      border-color: var(--cyan);
-    }
+    .stepper-input input[type="number"] { border: none; border-radius: 0; background: transparent; }
+    input[type="number"]:focus, select:focus { outline: none; border-color: var(--cyan); }
 
     /* Sliders */
     .slider-wrap {
@@ -253,24 +215,14 @@
       flex-direction: column;
       gap: 6px;
     }
-
     .slider-header {
       display: flex;
       justify-content: space-between;
       font-size: 0.72rem;
       color: var(--text-muted);
     }
-
-    .slider-val {
-      font-weight: 800;
-      color: var(--cyan);
-    }
-
-    input[type="range"] {
-      width: 100%;
-      accent-color: var(--cyan);
-      cursor: pointer;
-    }
+    .slider-val { font-weight: 800; color: var(--cyan); }
+    input[type="range"] { width: 100%; accent-color: var(--cyan); cursor: pointer; }
 
     /* Alerts */
     .alert-banner {
@@ -282,80 +234,40 @@
       align-items: flex-start;
       gap: 6px;
     }
+    .alert-oes { background: rgba(244, 63, 94, 0.12); border: 1px solid var(--rose); color: #fda4af; }
+    .alert-terminator { background: rgba(245, 158, 11, 0.12); border: 1px solid var(--amber); color: #fde68a; }
 
-    .alert-oes {
-      background: rgba(244, 63, 94, 0.12);
-      border: 1px solid var(--rose);
-      color: #fda4af;
-    }
-
-    .alert-terminator {
-      background: rgba(245, 158, 11, 0.12);
-      border: 1px solid var(--amber);
-      color: #fde68a;
-      margin-top: 12px;
-    }
-
-    .alert-shortfall {
-      background: rgba(244, 63, 94, 0.12);
-      border: 1px solid var(--rose);
-      color: #fda4af;
-      margin-top: 10px;
-    }
-
-    /* Mode Selection Bar */
-    .mode-bar {
-      display: flex;
+    /* Collapsible Details */
+    details {
       background: #090e17;
-      padding: 4px;
-      border-radius: var(--radius-lg);
       border: 1px solid var(--card-border);
-      margin-bottom: 16px;
-      gap: 6px;
-    }
-
-    .mode-btn {
-      flex: 1;
-      padding: 10px 14px;
       border-radius: var(--radius-md);
-      border: none;
+      padding: 12px;
+      margin-bottom: 16px;
+    }
+    summary {
       font-size: 0.8rem;
       font-weight: 800;
+      color: var(--cyan);
       cursor: pointer;
-      color: var(--text-muted);
-      background: transparent;
-      transition: all 0.2s ease;
+      list-style: none;
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      justify-content: center;
-      gap: 6px;
+      user-select: none;
     }
-
-    .mode-btn.active {
-      background: var(--cyan);
-      color: #04121d;
-      box-shadow: 0 2px 8px rgba(6, 182, 212, 0.35);
-    }
+    summary::-webkit-details-marker { display: none; }
+    details[open] summary { margin-bottom: 12px; border-bottom: 1px solid var(--card-border); padding-bottom: 10px; }
 
     /* Manual Splitter Grid */
     .splitter-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 8px;
-      margin-bottom: 16px;
+      margin-bottom: 8px;
     }
-
-    @media (min-width: 600px) {
-      .splitter-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
-    }
-
-    @media (min-width: 800px) {
-      .splitter-grid {
-        grid-template-columns: repeat(4, 1fr);
-      }
-    }
+    @media (min-width: 600px) { .splitter-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (min-width: 800px) { .splitter-grid { grid-template-columns: repeat(4, 1fr); } }
 
     .splitter-btn {
       background: #090e17;
@@ -370,51 +282,14 @@
       flex-direction: column;
       gap: 3px;
     }
-
-    .splitter-btn:hover {
-      border-color: var(--cyan);
-      background: var(--card-hover);
-    }
-
-    .splitter-btn.selected {
-      border-color: var(--cyan);
-      background: var(--cyan-glow);
-      box-shadow: 0 0 0 1px var(--cyan);
-    }
-
-    .splitter-btn.cascade {
-      border-color: rgba(244, 63, 94, 0.4);
-      background: rgba(244, 63, 94, 0.06);
-    }
-
-    .splitter-btn.cascade.selected {
-      border-color: var(--rose);
-      background: var(--rose-glow);
-      box-shadow: 0 0 0 1px var(--rose);
-    }
-
-    .splitter-btn.disabled {
-      opacity: 0.45;
-      border-style: dashed;
-      cursor: not-allowed;
-    }
-
-    .s-name {
-      font-size: 0.78rem;
-      font-weight: 800;
-      color: #ffffff;
-    }
-
-    .s-meta {
-      font-size: 0.68rem;
-      color: var(--text-muted);
-    }
-
-    .s-loss {
-      font-size: 0.68rem;
-      font-weight: 700;
-      color: var(--cyan);
-    }
+    .splitter-btn:hover { border-color: var(--cyan); background: var(--card-hover); }
+    .splitter-btn.selected { border-color: var(--cyan); background: var(--cyan-glow); box-shadow: 0 0 0 1px var(--cyan); }
+    .splitter-btn.cascade { border-color: rgba(244, 63, 94, 0.4); background: rgba(244, 63, 94, 0.06); }
+    .splitter-btn.cascade.selected { border-color: var(--rose); background: var(--rose-glow); box-shadow: 0 0 0 1px var(--rose); }
+    .splitter-btn.disabled { opacity: 0.45; border-style: dashed; }
+    .s-name { font-size: 0.78rem; font-weight: 800; color: #ffffff; }
+    .s-meta { font-size: 0.68rem; color: var(--text-muted); }
+    .s-loss { font-size: 0.68rem; font-weight: 700; color: var(--cyan); }
 
     /* Hero Banner */
     .hero-banner {
@@ -426,108 +301,11 @@
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
       transition: border-color 0.25s ease;
     }
-
-    .hero-header {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-
-    .hero-title-area {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .hero-tag {
-      font-size: 0.68rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--cyan);
-    }
-
-    .hero-name {
-      font-size: 1.15rem;
-      font-weight: 900;
-      color: #ffffff;
-    }
-
-    .hero-desc {
-      font-size: 0.74rem;
-      color: var(--text-muted);
-      margin-bottom: 14px;
-    }
-
-    /* Ground Block Dedicated Strip */
-    .gb-strip {
-      background: rgba(168, 85, 247, 0.08);
-      border: 1px solid rgba(168, 85, 247, 0.35);
-      border-radius: var(--radius-md);
-      padding: 10px 14px;
-      margin-bottom: 14px;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .gb-strip:hover {
-      background: rgba(168, 85, 247, 0.14);
-      border-color: var(--purple);
-    }
-
-    .gb-label-area {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .gb-badge {
-      background: var(--purple);
-      color: #0b0f19;
-      font-size: 0.65rem;
-      font-weight: 900;
-      padding: 2px 8px;
-      border-radius: var(--radius-sm);
-      text-transform: uppercase;
-    }
-
-    .gb-title {
-      font-size: 0.8rem;
-      font-weight: 800;
-      color: #ffffff;
-    }
-
-    .gb-readings {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    }
-
-    .gb-val-box {
-      text-align: right;
-    }
-
-    .gb-val-tag {
-      font-size: 0.62rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      display: block;
-    }
-
-    .gb-val-num {
-      font-size: 1.05rem;
-      font-weight: 900;
-      color: #e9d5ff;
-    }
+    .hero-header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .hero-title-area { display: flex; flex-direction: column; gap: 2px; }
+    .hero-tag { font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--cyan); }
+    .hero-name { font-size: 1.15rem; font-weight: 900; color: #ffffff; }
+    .hero-desc { font-size: 0.74rem; color: var(--text-muted); margin-bottom: 14px; }
 
     /* 3-Card Device Telemetry Grid */
     .telemetry-grid {
@@ -535,384 +313,196 @@
       grid-template-columns: 1fr;
       gap: 10px;
     }
-
-    @media (min-width: 600px) {
-      .telemetry-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
+    @media (min-width: 600px) { .telemetry-grid { grid-template-columns: repeat(3, 1fr); } }
+    .telemetry-card { 
+      background: #090e17; 
+      border: 1px solid var(--card-border); 
+      border-radius: var(--radius-md); 
+      padding: 12px; 
+      text-align: center; 
+      cursor: pointer; 
+      transition: all 0.2s ease; 
+      position: relative;
     }
-
-    .telemetry-card {
-      background: #090e17;
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius-md);
-      padding: 12px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.2s ease;
+    .telemetry-card:hover { 
+      background: #111a2e; 
+      border-color: var(--cyan); 
+      transform: translateY(-2px); 
     }
-
-    .telemetry-card:hover {
-      background: #111a2e;
-      border-color: var(--cyan);
-      transform: translateY(-2px);
-    }
-
-    .t-label {
+    .t-info-icon {
+      position: absolute;
+      top: 6px;
+      right: 8px;
       font-size: 0.65rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
       color: var(--text-sub);
-      margin-bottom: 4px;
     }
-
-    .t-val {
-      font-size: 1.25rem;
-      font-weight: 900;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      margin-bottom: 2px;
-    }
-
-    .t-sub {
-      font-size: 0.65rem;
-      color: var(--text-muted);
-    }
-
-    .val-ideal { color: var(--emerald); }
-    .val-safe { color: var(--cyan); }
-    .val-warn { color: var(--amber); }
-    .val-fail { color: var(--rose); }
+    .t-label { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-sub); margin-bottom: 4px; }
+    .t-val { font-size: 1.25rem; font-weight: 900; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; margin-bottom: 2px; }
+    .t-sub { font-size: 0.65rem; color: var(--text-muted); font-weight: 600; }
+    .val-ideal { color: var(--emerald); } .val-safe { color: var(--cyan); } .val-warn { color: var(--amber); } .val-fail { color: var(--rose); }
 
     /* Port Guide Box */
-    .port-box {
-      margin-top: 14px;
-      background: #090e17;
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius-md);
-      padding: 12px;
-    }
-
-    .port-box-header {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.68rem;
-      font-weight: 800;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 6px;
-    }
-
-    .port-guide-text {
-      font-size: 0.74rem;
-      color: var(--text-main);
-      line-height: 1.6;
-    }
+    .port-box { margin-top: 14px; background: #090e17; border: 1px solid var(--card-border); border-radius: var(--radius-md); padding: 12px; }
+    .port-box-header { display: flex; justify-content: space-between; font-size: 0.68rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+    .port-guide-text { font-size: 0.74rem; color: var(--text-main); line-height: 1.6; }
 
     /* Evaluated List */
-    .table-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius-lg);
-      padding: 16px;
-      margin-bottom: 16px;
-    }
-
-    .topology-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-top: 10px;
-    }
-
-    .topology-row {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      background: #090e17;
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius-md);
-      padding: 10px 14px;
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-
-    .topology-row:hover {
-      border-color: var(--cyan);
-      background: var(--card-hover);
-    }
-
-    .topology-row.active {
-      border-color: var(--cyan);
-      background: rgba(6, 182, 212, 0.08);
-      box-shadow: 0 0 0 1px var(--cyan);
-    }
-
-    .topology-row.cascade-row {
-      border-color: rgba(244, 63, 94, 0.4);
-      background: rgba(244, 63, 94, 0.04);
-    }
-
-    .row-info {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .row-title {
-      font-size: 0.82rem;
-      font-weight: 800;
-      color: white;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .row-meta {
-      font-size: 0.68rem;
-      color: var(--text-muted);
-    }
-
-    .row-metrics {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 0.76rem;
-      font-weight: 700;
-    }
+    .table-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 16px; }
+    .topology-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+    .topology-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; background: #090e17; border: 1px solid var(--card-border); border-radius: var(--radius-md); padding: 10px 14px; cursor: pointer; transition: all 0.15s ease; }
+    .topology-row:hover { border-color: var(--cyan); background: var(--card-hover); }
+    .topology-row.active { border-color: var(--cyan); background: rgba(6, 182, 212, 0.08); box-shadow: 0 0 0 1px var(--cyan); }
+    .topology-row.cascade-row { border-color: rgba(244, 63, 94, 0.4); background: rgba(244, 63, 94, 0.04); }
+    .row-info { display: flex; flex-direction: column; gap: 2px; }
+    .row-title { font-size: 0.82rem; font-weight: 800; color: white; display: flex; align-items: center; gap: 6px; }
+    .row-meta { font-size: 0.68rem; color: var(--text-muted); }
+    .row-metrics { display: flex; align-items: center; gap: 10px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.76rem; font-weight: 700; }
 
     /* Copy Button */
-    .btn-copy {
-      width: 100%;
-      background: var(--cyan);
-      color: #04121d;
-      border: none;
-      border-radius: var(--radius-lg);
-      padding: 14px;
-      font-size: 0.9rem;
-      font-weight: 900;
-      letter-spacing: 0.02em;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
+    .btn-copy { 
+      width: 100%; 
+      background: var(--cyan); 
+      color: #04121d; 
+      border: none; 
+      border-radius: var(--radius-lg); 
+      padding: 14px; 
+      font-size: 0.9rem; 
+      font-weight: 900; 
+      letter-spacing: 0.02em; 
+      cursor: pointer; 
+      transition: all 0.2s ease; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      gap: 8px; 
     }
+    .btn-copy:hover { background: #22d3ee; box-shadow: 0 4px 15px rgba(6, 182, 212, 0.4); }
 
-    .btn-copy:hover {
-      background: #22d3ee;
-      box-shadow: 0 4px 15px rgba(6, 182, 212, 0.4);
+    /* Modals & Toasts */
+    .modal-backdrop { 
+      position: fixed; 
+      top: 0; 
+      left: 0; 
+      width: 100vw; 
+      height: 100vh; 
+      background: rgba(0, 0, 0, 0.75); 
+      backdrop-filter: blur(4px); 
+      display: none; 
+      align-items: center; 
+      justify-content: center; 
+      padding: 16px; 
+      z-index: 999; 
     }
-
-    /* Modal Backdrop & Popup */
-    .modal-backdrop {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0, 0, 0, 0.75);
-      backdrop-filter: blur(4px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-      z-index: 999;
+    .modal-backdrop.open { display: flex; }
+    .modal-box { 
+      background: #111a2e; 
+      border: 1px solid var(--cyan); 
+      border-radius: var(--radius-lg); 
+      max-width: 560px; 
+      width: 100%; 
+      padding: 22px; 
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7); 
+      animation: modalSlide 0.2s ease-out; 
     }
-
-    .modal-backdrop.open {
-      display: flex;
+    @keyframes modalSlide { from { transform: translateY(16px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+    .modal-category { font-size: 0.68rem; font-weight: 800; color: var(--cyan); text-transform: uppercase; letter-spacing: 0.06em; }
+    .modal-title { font-size: 1.15rem; font-weight: 900; color: white; margin-top: 2px; }
+    .modal-close { 
+      background: #1e293b; 
+      border: none; 
+      color: white; 
+      width: 28px; 
+      height: 28px; 
+      border-radius: 50%; 
+      font-size: 1rem; 
+      font-weight: bold; 
+      cursor: pointer; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
     }
-
-    .modal-box {
-      background: #111a2e;
-      border: 1px solid var(--cyan);
-      border-radius: var(--radius-lg);
-      max-width: 560px;
-      width: 100%;
-      padding: 22px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
-      animation: modalSlide 0.2s ease-out;
-    }
-
-    @keyframes modalSlide {
-      from { transform: translateY(16px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 14px;
-    }
-
-    .modal-category {
-      font-size: 0.68rem;
-      font-weight: 800;
-      color: var(--cyan);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
-
-    .modal-title {
-      font-size: 1.15rem;
-      font-weight: 900;
-      color: white;
-      margin-top: 2px;
-    }
-
-    .modal-close {
-      background: #1e293b;
-      border: none;
-      color: white;
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      font-size: 1rem;
-      font-weight: bold;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .modal-close:hover {
-      background: var(--rose);
-    }
-
-    .modal-body {
-      font-size: 0.8rem;
-      color: #cbd5e1;
-      line-height: 1.65;
-    }
-
-    .modal-body h4 {
-      font-size: 0.82rem;
-      color: var(--cyan);
-      margin-top: 12px;
-      margin-bottom: 4px;
-      font-weight: 800;
-    }
-
-    .modal-body table {
+    .modal-close:hover { background: var(--rose); }
+    .modal-body { font-size: 0.8rem; color: #cbd5e1; line-height: 1.65; }
+    .modal-body h4 { font-size: 0.82rem; color: var(--cyan); margin-top: 12px; margin-bottom: 4px; font-weight: 800; }
+    .modal-spec-table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 8px;
-      margin-bottom: 12px;
-      font-size: 0.72rem;
+      margin: 12px 0;
+      font-size: 0.74rem;
     }
-
-    .modal-body th, .modal-body td {
+    .modal-spec-table th, .modal-spec-table td {
       border: 1px solid var(--card-border);
-      padding: 6px 8px;
+      padding: 6px 10px;
       text-align: left;
     }
-
-    .modal-body th {
+    .modal-spec-table th {
       background: #090e17;
-      color: var(--text-muted);
-    }
-
-    .modal-body p {
-      margin-bottom: 8px;
-    }
-
-    .modal-body ul, .modal-body ol {
-      margin-left: 18px;
-      margin-bottom: 10px;
-    }
-
-    .modal-body li {
-      margin-bottom: 4px;
-    }
-
-    /* Toast */
-    .toast {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--emerald);
-      color: #04121d;
-      padding: 10px 20px;
-      border-radius: var(--radius-full);
-      font-size: 0.8rem;
+      color: var(--cyan);
       font-weight: 800;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
-      display: none;
-      z-index: 1000;
+    }
+    .toast { 
+      position: fixed; 
+      bottom: 24px; 
+      left: 50%; 
+      transform: translateX(-50%); 
+      background: var(--emerald); 
+      color: #04121d; 
+      padding: 10px 20px; 
+      border-radius: var(--radius-full); 
+      font-size: 0.8rem; 
+      font-weight: 800; 
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4); 
+      display: none; 
+      z-index: 1000; 
+      pointer-events: none;
     }
   </style>
 </head>
 <body>
-
   <div class="container">
-
-    <!-- Nav Bar -->
-    <div class="nav-top-bar">
-      <a href="index.html" class="btn-back">❮ Main Menu</a>
-    </div>
 
     <!-- Top Header -->
     <header>
       <div>
-        <div class="brand-title">
-          <span>📶</span> PHT PASS CHECKER
-        </div>
-        <div class="brand-subtitle">
-          Expected Ground Block Levels &bull; Single-Demarc Topologies &bull; Zero Cascades
-        </div>
+        <div class="brand-title"><span>📶</span> PHT PASS CHECKER</div>
+        <div class="brand-subtitle">Optimal Single-Demarc Topologies &amp; RF Verification</div>
       </div>
       <div id="phtBadge" class="pht-header-badge badge-pass" onclick="openModal('pht')">
-        <span>✓ PHT PASSING</span>
+        <span>✓ OPTIMAL PHT PASS</span>
       </div>
     </header>
 
-    <!-- Tap & Premise Inputs -->
     <div class="grid-2col">
-
-      <!-- Tap & Drop Input -->
+      <!-- Tap Inputs with Steppers -->
       <div class="card">
         <div class="card-title">
-          <span class="dot" style="background: var(--cyan);"></span>
-          Tap &amp; Drop Specification
+          <span class="dot" style="background: var(--cyan);"></span> Tap / Node Settings
         </div>
 
-        <!-- Tap 1 GHz Rx Slider -->
-        <div class="slider-wrap" style="margin-top: 0; margin-bottom: 14px;">
-          <div class="slider-header">
-            <span>Tap 1 GHz Rx (Downstream)</span>
-            <span class="slider-val"><span id="tapDsVal">+15.0</span> dBmV</span>
-          </div>
-          <input type="range" id="tapDs" min="-15.0" max="30.0" step="0.5" value="15.0" oninput="handleTapDs(this.value)">
-          <div class="slider-header" style="font-size: 0.65rem; color: var(--text-sub);">
-            <span>-15.0 dBmV</span>
-            <span>Step: 0.5 dB</span>
-            <span>+30.0 dBmV</span>
-          </div>
-        </div>
-
-        <!-- Tap US Tx Slider -->
-        <div class="slider-wrap" style="margin-top: 0; margin-bottom: 14px;">
-          <div class="slider-header">
-            <span>Tap US Tx (Upstream Return)</span>
-            <span class="slider-val" style="color: var(--amber);"><span id="tapTxVal">38.0</span> dBmV</span>
-          </div>
-          <input type="range" id="tapTx" min="20.0" max="54.0" step="0.5" value="38.0" style="accent-color: var(--amber);" oninput="handleTapTx(this.value)">
-          <div class="slider-header" style="font-size: 0.65rem; color: var(--text-sub);">
-            <span>20.0 dBmV</span>
-            <span>Target: ~38-40</span>
-            <span>54.0 dBmV</span>
+        <div class="input-row">
+          <div class="input-group">
+            <label for="tapDsInput">Tap Forward Downstream (1 GHz)</label>
+            <div class="stepper-input">
+              <button class="step-btn" onclick="stepValue('tapDsInput', -0.5)">−</button>
+              <input type="number" id="tapDsInput" step="0.5" value="15.0" onchange="calculate()">
+              <button class="step-btn" onclick="stepValue('tapDsInput', 0.5)">+</button>
+            </div>
           </div>
         </div>
 
         <div class="input-row">
+          <div class="input-group">
+            <label for="tapTxInput">Tap Return Transmit (Required Tx)</label>
+            <div class="stepper-input">
+              <button class="step-btn" style="color:var(--amber)" onclick="stepValue('tapTxInput', -0.5)">−</button>
+              <input type="number" id="tapTxInput" step="0.5" value="38.0" onchange="calculate()">
+              <button class="step-btn" style="color:var(--amber)" onclick="stepValue('tapTxInput', 0.5)">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="input-row" style="margin-top: 16px;">
           <div class="input-group">
             <label for="dropType">Drop Cable Type</label>
             <select id="dropType" onchange="calculate()">
@@ -930,55 +520,46 @@
           <input type="range" id="dropLen" min="20" max="300" step="5" value="100" oninput="handleDropLen(this.value)">
           <div class="slider-header" style="font-size: 0.65rem; color: var(--text-sub);">
             <span>20 ft</span>
-            <span id="dropLossDisplay">Drop Loss: -6.0 dB</span>
+            <span id="dropLossDisplay">Loss: -6.0 dB</span>
             <span>300 ft</span>
-          </div>
-        </div>
-
-        <div id="oesAlert" class="alert-banner alert-oes" style="display: none;">
-          <span>⚠️</span>
-          <div>
-            <strong>OES Standard Violation:</strong> Series 6 (RG6) cannot exceed 150 ft. Must use Series 11 or QR-320 for 151' to 300'.
           </div>
         </div>
       </div>
 
-      <!-- Premise Devices Input -->
+      <!-- Premise Devices -->
       <div class="card">
         <div class="card-title">
-          <span class="dot" style="background: var(--amber);"></span>
-          Premise Devices &amp; Inside Run
+          <span class="dot" style="background: var(--amber);"></span> Premise Devices
         </div>
 
-        <!-- Modem Toggle / Slider -->
-        <div class="slider-wrap" style="margin-top: 0; margin-bottom: 14px;">
-          <div class="slider-header">
-            <span>DOCSIS Gateway (Modem)</span>
-            <span class="slider-val" style="color: var(--cyan);"><span id="modemCountVal">1 Modem Active</span></span>
+        <!-- Quick Presets -->
+        <div class="preset-row">
+          <button id="presetHsd" class="btn-preset active" onclick="setPreset(1, 0, 'presetHsd')">HSD Only</button>
+          <button id="presetDp1" class="btn-preset" onclick="setPreset(1, 1, 'presetDp1')">1 Modem + 1 TV</button>
+          <button id="presetDp3" class="btn-preset" onclick="setPreset(1, 3, 'presetDp3')">1 Modem + 3 TVs</button>
+        </div>
+
+        <!-- Device Steppers -->
+        <div class="input-row">
+          <div class="input-group">
+            <label for="modemCountInput">Active DOCSIS Modems</label>
+            <div class="stepper-input">
+              <button class="step-btn" onclick="stepValue('modemCountInput', -1, 0, 1); clearPresets()">−</button>
+              <input type="number" id="modemCountInput" step="1" min="0" max="1" value="1" onchange="clearPresets(); calculate()">
+              <button class="step-btn" onclick="stepValue('modemCountInput', 1, 0, 1); clearPresets()">+</button>
+            </div>
           </div>
-          <input type="range" id="modemCount" min="0" max="1" step="1" value="1" oninput="handleModemCount(this.value)">
-          <div class="slider-header" style="font-size: 0.65rem; color: var(--text-sub);">
-            <span>0 (No Modem / TV Only)</span>
-            <span>1 Gateway (DOCSIS)</span>
+          <div class="input-group">
+            <label for="tvCountInput">Connected TV Boxes</label>
+            <div class="stepper-input">
+              <button class="step-btn" style="color:var(--emerald)" onclick="stepValue('tvCountInput', -1, 0, 7); clearPresets()">−</button>
+              <input type="number" id="tvCountInput" step="1" min="0" max="7" value="0" onchange="clearPresets(); calculate()">
+              <button class="step-btn" style="color:var(--emerald)" onclick="stepValue('tvCountInput', 1, 0, 7); clearPresets()">+</button>
+            </div>
           </div>
         </div>
 
-        <!-- TV Box Slider (0 to 7) -->
-        <div class="slider-wrap" style="margin-top: 0; margin-bottom: 14px;">
-          <div class="slider-header">
-            <span>Connected TV Boxes (STBs)</span>
-            <span class="slider-val" style="color: var(--emerald);"><span id="tvCountVal">2 TVs</span></span>
-          </div>
-          <input type="range" id="tvCountSlider" min="0" max="7" step="1" value="2" style="accent-color: var(--emerald);" oninput="handleTvSlider(this.value)">
-          <div class="slider-header" style="font-size: 0.65rem; color: var(--text-sub);">
-            <span>0 TVs</span>
-            <span>Slide 0 to 7</span>
-            <span>7 TVs</span>
-          </div>
-        </div>
-
-        <!-- Inside Cable Slider -->
-        <div class="slider-wrap" style="margin-top: 0;">
+        <div class="slider-wrap" style="margin-top: 24px;">
           <div class="slider-header">
             <span>Average Inside Cable Run</span>
             <span class="slider-val" style="color: var(--amber);"><span id="insideLenVal">50</span> ft</span>
@@ -986,406 +567,310 @@
           <input type="range" id="insideLen" min="15" max="150" step="5" value="50" style="accent-color: var(--amber);" oninput="handleInsideLen(this.value)">
           <div class="slider-header" style="font-size: 0.65rem; color: var(--text-sub);">
             <span>15 ft</span>
-            <span id="insideLossDisplay">Inside Loss: -3.0 dB</span>
+            <span id="insideLossDisplay">Loss: -3.0 dB</span>
             <span>150 ft</span>
           </div>
         </div>
+      </div>
+    </div>
 
-        <div id="deviceSummaryBox" class="alert-banner" style="background: #090e17; border: 1px solid var(--card-border); color: var(--text-muted); margin-top: 14px;">
-          <span>ℹ️</span>
-          <div id="deviceSummaryText">
-            Total House Outlets: <strong>3</strong> (1 DOCSIS Modem + 2 TV Outlets).
+    <!-- GROUND BLOCK AUDIT -->
+    <details id="gbDetails">
+      <summary>
+        <span>➕ Ground Block / Drop Health</span>
+        <span id="dropHealthBadge" class="pht-header-badge badge-pass" style="font-size: 0.6rem; padding: 2px 8px;">DROP OK</span>
+      </summary>
+      
+      <div style="padding-top: 10px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <span style="font-size: 0.72rem; color: var(--text-sub);">Meter levels track theoretical physics by default. Override to test real physical drop health.</span>
+          <button id="resetGbBtn" style="display:none; background:none; border:none; color:var(--cyan); font-size:0.72rem; font-weight:700; cursor:pointer;" onclick="resetGb()">↺ Reset to Physics</button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+          <div class="input-group">
+            <label for="measGbRx">Measured GB High Rx</label>
+            <div class="stepper-input">
+              <button class="step-btn" onclick="stepGb('measGbRx', -0.5)">−</button>
+              <input type="number" step="0.5" id="measGbRx" onchange="markGbOverridden(); calculate()">
+              <button class="step-btn" onclick="stepGb('measGbRx', 0.5)">+</button>
+            </div>
+          </div>
+          <div class="input-group">
+            <label for="measGbTx">Measured GB US Tx</label>
+            <div class="stepper-input">
+              <button class="step-btn" style="color:var(--amber)" onclick="stepGb('measGbTx', -0.5)">−</button>
+              <input type="number" step="0.5" id="measGbTx" onchange="markGbOverridden(); calculate()">
+              <button class="step-btn" style="color:var(--amber)" onclick="stepGb('measGbTx', 0.5)">+</button>
+            </div>
           </div>
         </div>
-      </div>
 
-    </div>
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; font-size: 0.74rem; color: var(--text-muted); background: #090e17; padding: 8px 12px; border-radius: var(--radius-md); border: 1px solid var(--card-border);">
+          <span>Expected Physics: <strong id="calcGbRxDisplay" style="color: #e9d5ff;">+9.0 dBmV</strong> / <strong id="calcGbTxDisplay" style="color: #fed7aa;">39.6 dBmV</strong></span>
+          <span>Delta: <strong id="dropDeltaDisplay" style="color: var(--cyan);">0.0 dB</strong></span>
+        </div>
 
-    <!-- Mode Selector -->
-    <div class="mode-bar">
-      <button id="modeAuto" class="mode-btn active" onclick="setMode('auto')">
-        ⚡ Auto-Recommend (Optimal PHT)
-      </button>
-      <button id="modeManual" class="mode-btn" onclick="setMode('manual')">
-        🛠️ Manual Splitter Selection
-      </button>
-    </div>
-
-    <!-- Manual Splitter Grid (Strictly Passive) -->
-    <div id="manualSplitterSection" style="display: none;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-        <span style="font-size: 0.72rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">
-          Select Demarc Splitter Hardware (Passive Only)
-        </span>
-        <span id="manualSelectedMeta" style="font-size: 0.72rem; font-weight: 700; color: var(--cyan);">
-          3-Way Hot (-5.0 dB)
-        </span>
-      </div>
-      <div id="splitterGrid" class="splitter-grid">
-        <!-- Injected via JS -->
-      </div>
-      <div id="portShortfallAlert" class="alert-banner alert-shortfall" style="display: none;">
-        <span>⚠️</span>
-        <div id="portShortfallText">
-          Selected splitter does not have enough ports for total outlets.
+        <div id="dropAlertBanner" class="alert-banner alert-oes" style="display: none; margin-top: 10px;">
+          <span>⚠️</span>
+          <div id="dropAlertText"></div>
         </div>
       </div>
-    </div>
+    </details>
+
+    <!-- Manual Splitter Selection Drawer -->
+    <details style="border-color: rgba(6, 182, 212, 0.3);">
+      <summary style="color: var(--text-main);">
+        <span style="display:flex; align-items:center; gap:6px;">🛠️ Override with Manual Splitter...</span>
+        <span id="manualSelectedMeta" style="font-size: 0.72rem; color: var(--cyan);">Auto-Selection Active</span>
+      </summary>
+      <div id="splitterGrid" class="splitter-grid" style="margin-top: 12px;"></div>
+    </details>
 
     <!-- Hero Results Banner -->
     <div id="heroBanner" class="hero-banner">
       <div class="hero-header">
         <div class="hero-title-area">
           <span id="heroTag" class="hero-tag">RECOMMENDED SINGLE-DEMARC TOPOLOGY</span>
-          <span id="heroName" class="hero-name">Unbalanced 3-Way (Gateway on Hot Leg)</span>
+          <span id="heroName" class="hero-name">Direct Barrel</span>
         </div>
         <div id="heroBadge" class="pht-header-badge badge-pass" onclick="openModal('pht')">
           <span>✓ OPTIMAL PHT PASS</span>
         </div>
       </div>
-      <div id="heroDesc" class="hero-desc">
-        Gateway on -5.0 dB Hot Leg protects return transmit power. STBs utilize -8.5 dB weak legs.
-      </div>
+      <div id="heroDesc" class="hero-desc">Direct drop home-run through PoE ground block. Zero passive split loss.</div>
 
-      <!-- DEDICATED EXPECTED GROUND BLOCK STRIP -->
-      <div class="gb-strip" onclick="openModal('gb')">
-        <div class="gb-label-area">
-          <span class="gb-badge">Ground Block</span>
-          <div>
-            <div class="gb-title">Expected Ground Block Levels (Pre-Split)</div>
-            <div id="gbMatrixCompare" style="font-size: 0.68rem; color: #d8b4fe;">Target: Ideal +8.0 dBmV Rx | Safe: -2.0 to +18.0</div>
-          </div>
-        </div>
-        <div class="gb-readings">
-          <div class="gb-val-box">
-            <span class="gb-val-tag">Expected GB Rx</span>
-            <span id="valGbRx" class="gb-val-num">+9.0 dBmV</span>
-          </div>
-          <div class="gb-val-box">
-            <span class="gb-val-tag">Expected GB Tx</span>
-            <span id="valGbTx" class="gb-val-num" style="color: #fed7aa;">39.6 dBmV</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- 3 Device Telemetry Cards (Rx, Tx, STB Rx) -->
       <div class="telemetry-grid">
         <div class="telemetry-card" onclick="openModal('rx')">
+          <span class="t-info-icon">ⓘ</span>
           <div class="t-label">Delivered Modem 1 GHz Rx</div>
           <div id="valModemRx" class="t-val val-safe">+1.5 dBmV</div>
           <div id="subModemRx" class="t-sub">Target: 0.0 (-10.0 to +10.0)</div>
         </div>
         <div class="telemetry-card" onclick="openModal('tx')">
+          <span class="t-info-icon">ⓘ</span>
           <div class="t-label">Required Modem US Tx</div>
           <div id="valModemTx" class="t-val val-ideal">44.5 dBmV</div>
           <div id="subModemTx" class="t-sub">Safe: 36.0 to 50.0</div>
         </div>
         <div class="telemetry-card" onclick="openModal('stb')">
+          <span class="t-info-icon">ⓘ</span>
           <div class="t-label">Delivered STB 1 GHz Rx</div>
-          <div id="valStbRx" class="t-val val-safe">+1.5 dBmV</div>
-          <div id="subStbRx" class="t-sub">Safe: -10.0 to +10.0</div>
+          <div id="valStbRx" class="t-val val-safe">N/A</div>
+          <div id="subStbRx" class="t-sub">0 TVs connected</div>
         </div>
       </div>
 
-      <!-- Demarc Port Assignment Box -->
       <div class="port-box">
         <div class="port-box-header">
           <span>Demarc Port Wiring Assignment</span>
-          <span id="portCapacityBadge" style="color: var(--cyan);">3-Port Demarc</span>
+          <span id="portCapacityBadge" style="color: var(--cyan);">1-Port Demarc</span>
         </div>
-        <div id="portGuideText" class="port-guide-text">
-          &bull; <strong>HOT LEG (-5.0 dB):</strong> Connect DOCSIS Gateway.<br>
-          &bull; <strong>WEAK LEGS (-8.5 dB):</strong> Connect TV STB 1 &amp; TV STB 2.
-        </div>
-      </div>
-
-      <!-- Terminator Notice -->
-      <div id="terminatorAlert" class="alert-banner alert-terminator" style="display: none;">
-        <span>⚠️</span>
-        <div id="terminatorText">
-          Unused splitter ports must be capped with 75Ω locking terminators to prevent a 7-point TQI-C deduction.
-        </div>
+        <div id="portGuideText" class="port-guide-text"></div>
       </div>
     </div>
 
     <!-- Ranked Topologies Table -->
     <div class="table-card">
-      <div class="card-title">
-        <span class="dot" style="background: var(--emerald);"></span>
-        All Candidate Topologies Evaluated
-      </div>
-      <div id="topologiesList" class="topology-list">
-        <!-- Rendered via JS -->
-      </div>
+      <div class="card-title"><span class="dot" style="background: var(--emerald);"></span> All Candidate Topologies Evaluated</div>
+      <div id="topologiesList" class="topology-list"></div>
     </div>
 
-    <!-- Copy Job Note Button -->
-    <button class="btn-copy" onclick="copyJobSummary()">
-      📋 Copy Wiring Plan &amp; Ground Block Levels to Job Notes
-    </button>
+    <!-- Action Buttons -->
+    <button class="btn-copy" onclick="copyJobSummary()">📋 Copy Wiring Plan &amp; Levels to Job Notes</button>
 
   </div>
 
-  <!-- Interactive Explanatory Modal -->
-  <div id="modalBackdrop" class="modal-backdrop" onclick="closeModalOnBackdrop(event)">
+  <!-- Shared Educational Modal Dialog -->
+  <div id="infoModal" class="modal-backdrop" onclick="closeModalOnBackdrop(event)">
     <div class="modal-box">
       <div class="modal-header">
-        <div class="modal-title-area">
-          <span id="modalCat" class="modal-category">PHT SPECIFICATION</span>
-          <h3 id="modalTitle" class="modal-title">Downstream Power (Rx)</h3>
+        <div>
+          <div id="modalCategory" class="modal-category">PHT SPECIFICATIONS</div>
+          <div id="modalTitle" class="modal-title">Forward Downstream Rx</div>
         </div>
         <button class="modal-close" onclick="closeModal()">&times;</button>
       </div>
-      <div id="modalBody" class="modal-body">
-        <!-- Injected via JS -->
-      </div>
+      <div id="modalBody" class="modal-body"></div>
     </div>
   </div>
 
-  <!-- Toast -->
-  <div id="toast" class="toast">✓ Copied wiring plan to clipboard!</div>
+  <!-- Feedback Toast -->
+  <div id="toast" class="toast">Copied to job notes!</div>
 
   <script>
-    // State
+    // State Management
     const state = {
       mode: 'auto',
-      manualId: '3way_hot',
-      tapDs: 15.0,
-      tapTx: 38.0,
-      dropType: 'rg6',
+      manualId: 'barrel',
       dropLen: 100,
-      modemCount: 1,
-      stbCount: 2,
-      insideLen: 50
+      insideLen: 50,
+      isGbOverridden: false
     };
 
-    // Master Catalog of Strictly Passive Splitters
+    // Master RF Topology Catalog
     const catalog = {
-      barrel: {
-        id: 'barrel',
-        name: 'Direct Barrel (0 dB Insertion Loss)',
-        short: 'Direct Barrel',
-        ports: 1,
-        lossDs: 0.0,
-        lossUs: 0.0,
-        stbLossDs: null,
-        desc: 'Direct drop home-run through PoE ground block. Zero passive split loss.',
-        guide: '&bull; <strong>Port Connection:</strong> Direct drop home-run to DOCSIS Gateway. Terminate all unused house lines.',
-        isCascade: false,
-        matrix: {
-          rxMin: -7.0,
-          rxIdeal: 3.0,
-          rxMax: 13.0,
-          txIdeal: 39.0,
-          txMax: 49.0
-        }
+      barrel: { 
+        id: 'barrel', 
+        name: 'Direct Barrel (0 dB Insertion Loss)', 
+        short: 'Direct Barrel', 
+        ports: 1, 
+        lossDs: 0.0, 
+        lossUs: 0.0, 
+        stbLossDs: null, 
+        desc: 'Direct drop home-run through PoE ground block.', 
+        guide: '&bull; <strong>Port Connection:</strong> Direct drop home-run to DOCSIS Gateway. Terminate all unused house lines with 75Ω caps.', 
+        isCascade: false 
       },
-      '2way': {
-        id: '2way',
-        name: 'Single Balanced 2-Way Splitter (-4.5 dB)',
-        short: 'Balanced 2-Way',
-        ports: 2,
-        lossDs: 4.5,
-        lossUs: 4.5,
-        stbLossDs: 4.5,
-        desc: '1 input, 2 balanced ports (-4.5 dB). Perfectly equalized downstream and return.',
-        guide: '&bull; <strong>Port 1 (-4.5 dB):</strong> Dedicated DOCSIS Gateway.<br>&bull; <strong>Port 2 (-4.5 dB):</strong> TV STB.',
-        isCascade: false,
-        matrix: {
-          rxMin: -2.5,
-          rxIdeal: 7.5,
-          rxMax: 17.5,
-          txIdeal: 34.5,
-          txMax: 44.5
-        }
+      '2way': { 
+        id: '2way', 
+        name: 'Single Balanced 2-Way Splitter (-4.5 dB)', 
+        short: 'Balanced 2-Way', 
+        ports: 2, 
+        lossDs: 4.5, 
+        lossUs: 4.5, 
+        stbLossDs: 4.5, 
+        desc: '1 input, 2 balanced ports (-4.5 dB).', 
+        guide: '&bull; <strong>Port 1 (-4.5 dB):</strong> Dedicated DOCSIS Gateway.<br>&bull; <strong>Port 2 (-4.5 dB):</strong> TV STB outlet.', 
+        isCascade: false 
       },
-      '3way_hot': {
-        id: '3way_hot',
-        name: 'Unbalanced 3-Way (Gateway on Hot Leg)',
-        short: '3-Way Hot Leg',
-        ports: 3,
-        lossDs: 5.0,
-        lossUs: 5.0,
-        stbLossDs: 8.5,
-        desc: 'Gateway on -5.0 dB Hot Leg protects return Tx power. STBs take -8.5 dB weak legs.',
-        guide: '&bull; <strong>HOT LEG (-5.0 dB):</strong> Connect DOCSIS Gateway.<br>&bull; <strong>WEAK LEGS (-8.5 dB):</strong> Connect TV Outlets.',
-        isCascade: false,
-        matrix: {
-          rxMin: -2.0,
-          rxIdeal: 8.0,
-          rxMax: 18.0,
-          txIdeal: 34.0,
-          txMax: 44.0
-        }
+      '3way_hot': { 
+        id: '3way_hot', 
+        name: 'Unbalanced 3-Way (Gateway on Hot Leg)', 
+        short: '3-Way Hot Leg', 
+        ports: 3, 
+        lossDs: 5.0, 
+        lossUs: 5.0, 
+        stbLossDs: 8.5, 
+        desc: 'Gateway on -5.0 dB Hot Leg protects return Tx power from clipping.', 
+        guide: '&bull; <strong>HOT LEG (-5.0 dB):</strong> Connect DOCSIS Gateway.<br>&bull; <strong>WEAK LEGS (-8.5 dB):</strong> Connect TV Outlets or terminate unused.', 
+        isCascade: false 
       },
-      '3way_weak': {
-        id: '3way_weak',
-        name: 'Unbalanced 3-Way (Gateway on Weak Leg)',
-        short: '3-Way Weak Leg',
-        ports: 3,
-        lossDs: 8.5,
-        lossUs: 8.5,
-        stbLossDs: 5.0,
-        desc: 'Gateway on -8.5 dB weak leg. Higher upstream transmit required. Non-optimal if hot leg is open.',
-        guide: '&bull; <strong>HOT LEG (-5.0 dB):</strong> High-loss TV run.<br>&bull; <strong>WEAK LEG (-8.5 dB):</strong> Connect DOCSIS Gateway.<br>&bull; <strong>WEAK LEG 2 (-8.5 dB):</strong> Secondary TV.',
-        isCascade: false,
-        matrix: {
-          rxMin: 1.5,
-          rxIdeal: 11.5,
-          rxMax: 21.5,
-          txIdeal: 30.5,
-          txMax: 40.5
-        }
+      '3way_weak': { 
+        id: '3way_weak', 
+        name: 'Unbalanced 3-Way (Gateway on Weak Leg)', 
+        short: '3-Way Weak Leg', 
+        ports: 3, 
+        lossDs: 8.5, 
+        lossUs: 8.5, 
+        stbLossDs: 5.0, 
+        desc: 'Gateway on -8.5 dB weak leg. Higher upstream transmit required.', 
+        guide: '&bull; <strong>HOT LEG (-5.0 dB):</strong> High-loss TV run.<br>&bull; <strong>WEAK LEG 1 (-8.5 dB):</strong> DOCSIS Gateway.<br>&bull; <strong>WEAK LEG 2 (-8.5 dB):</strong> Secondary TV.', 
+        isCascade: false 
       },
-      '4way': {
-        id: '4way',
-        name: 'Single Balanced 4-Way Splitter (-7.0 dB)',
-        short: 'Balanced 4-Way',
-        ports: 4,
-        lossDs: 7.0,
-        lossUs: 7.0,
-        stbLossDs: 7.0,
-        desc: 'All 4 outlets receive equal -7.0 dB attenuation. Standard balanced demarc architecture.',
-        guide: '&bull; <strong>Port 1 (-7.0 dB):</strong> DOCSIS Gateway.<br>&bull; <strong>Ports 2-4 (-7.0 dB):</strong> TV Outlets.',
-        isCascade: false,
-        matrix: {
-          rxMin: 0.0,
-          rxIdeal: 10.0,
-          rxMax: 20.0,
-          txIdeal: 32.0,
-          txMax: 42.0
-        }
+      '4way': { 
+        id: '4way', 
+        name: 'Single Balanced 4-Way Splitter (-7.5 dB)', 
+        short: 'Balanced 4-Way', 
+        ports: 4, 
+        lossDs: 7.5, 
+        lossUs: 7.2, 
+        stbLossDs: 7.5, 
+        desc: 'All 4 outlets receive equal -7.5 dB nominal attenuation.', 
+        guide: '&bull; <strong>Port 1 (-7.5 dB):</strong> DOCSIS Gateway.<br>&bull; <strong>Ports 2-4 (-7.5 dB):</strong> TV Outlets. Terminate any unassigned ports.', 
+        isCascade: false 
       },
-      '8way': {
-        id: '8way',
-        name: 'Single Balanced 8-Way Splitter (-11.0 dB)',
-        short: 'Balanced 8-Way',
-        ports: 8,
-        lossDs: 11.0,
-        lossUs: 11.0,
-        stbLossDs: 11.0,
-        desc: 'Demarc home-run hub. All ports balanced at -11.0 dB attenuation.',
-        guide: '&bull; <strong>Port 1 (-11.0 dB):</strong> DOCSIS Gateway.<br>&bull; <strong>Active Ports (-11.0 dB):</strong> TV Outlets.<br>&bull; <strong>Unused Ports:</strong> 75Ω locking terminators required.',
-        isCascade: false,
-        matrix: {
-          rxMin: 4.0,
-          rxIdeal: 14.0,
-          rxMax: 24.0,
-          txIdeal: 28.0,
-          txMax: 38.0
-        }
+      '8way': { 
+        id: '8way', 
+        name: 'Single Balanced 8-Way Splitter (-11.5 dB)', 
+        short: 'Balanced 8-Way', 
+        ports: 8, 
+        lossDs: 11.5, 
+        lossUs: 11.0, 
+        stbLossDs: 11.5, 
+        desc: 'Demarc home-run hub. All ports balanced at -11.5 dB.', 
+        guide: '&bull; <strong>Port 1 (-11.5 dB):</strong> DOCSIS Gateway.<br>&bull; <strong>Active Ports (-11.5 dB):</strong> TV Outlets.<br>&bull; <strong>Unused Ports:</strong> 75Ω locking terminators required on all unused legs.', 
+        isCascade: false 
       },
-      cascade: {
-        id: 'cascade',
-        name: 'Cascaded Splitter (⚠️ Anti-Pattern / Avoid)',
-        short: 'Cascaded 2-Way',
-        ports: 6,
-        lossDs: 4.5,
-        lossUs: 4.5,
-        stbLossDs: 11.5,
-        desc: 'Demarc 2-Way feeding secondary splitter. Creates return squeeze and severe MoCA isolation loss.',
-        guide: '⚠️ <strong>Non-Standard:</strong> Re-cable with a single home-run splitter (3-Way, 4-Way, or 8-Way).',
-        isCascade: true,
-        matrix: null
+      cascade: { 
+        id: 'cascade', 
+        name: 'Cascaded Splitter (⚠️ Anti-Pattern)', 
+        short: 'Cascaded 2-Way', 
+        ports: 6, 
+        lossDs: 4.5, 
+        lossUs: 4.5, 
+        stbLossDs: 11.5, 
+        desc: 'Demarc 2-Way feeding secondary inside splitter. High micro-reflections.', 
+        guide: '⚠️ <strong>Non-Standard Architecture:</strong> Cascade topology introduces return-path distortion and impedance mismatches. Re-cable with a single home-run splitter.', 
+        isCascade: true 
       }
     };
 
-    function handleTapDs(val) {
-      state.tapDs = parseFloat(val);
-      const el = document.getElementById('tapDsVal');
-      if (el) el.textContent = (state.tapDs > 0 ? '+' : '') + state.tapDs.toFixed(1);
+    // Generic Stepper Helper
+    function stepValue(id, step, min = -999, max = 999) {
+      const el = document.getElementById(id);
+      let val = parseFloat(el.value) || 0;
+      let newVal = val + step;
+      if (newVal < min) newVal = min;
+      if (newVal > max) newVal = max;
+      el.value = (newVal % 1 === 0) ? newVal : newVal.toFixed(1);
       calculate();
     }
 
-    function handleTapTx(val) {
-      state.tapTx = parseFloat(val);
-      const el = document.getElementById('tapTxVal');
-      if (el) el.textContent = state.tapTx.toFixed(1);
+    // Specialized GB Stepper
+    function stepGb(id, step) {
+      markGbOverridden();
+      stepValue(id, step);
+    }
+
+    function markGbOverridden() {
+      state.isGbOverridden = true;
+    }
+
+    function resetGb() {
+      state.isGbOverridden = false;
       calculate();
     }
 
-    function handleModemCount(val) {
-      state.modemCount = parseInt(val, 10);
-      const el = document.getElementById('modemCountVal');
-      if (el) el.textContent = state.modemCount === 1 ? '1 Modem Active' : 'No Modem (TV Only)';
-      autoAdjustManualId();
-      calculate();
-    }
-
-    function handleTvSlider(val) {
-      state.stbCount = parseInt(val, 10);
-      const el = document.getElementById('tvCountVal');
-      if (el) el.textContent = `${state.stbCount} TV${state.stbCount === 1 ? '' : 's'}`;
-      autoAdjustManualId();
-      calculate();
-    }
-
-    function autoAdjustManualId() {
-      const totalOutlets = state.modemCount + state.stbCount;
-      if (state.mode === 'manual') {
-        const cur = catalog[state.manualId];
-        if (cur && cur.ports < totalOutlets) {
-          if (totalOutlets <= 1) state.manualId = 'barrel';
-          else if (totalOutlets === 2) state.manualId = '2way';
-          else if (totalOutlets === 3) state.manualId = state.modemCount === 1 ? '3way_hot' : '4way';
-          else if (totalOutlets === 4) state.manualId = '4way';
-          else state.manualId = '8way';
-        }
+    function setPreset(modems, tvs, btnId) {
+      document.getElementById('modemCountInput').value = modems;
+      document.getElementById('tvCountInput').value = tvs;
+      
+      document.querySelectorAll('.btn-preset').forEach(b => b.classList.remove('active'));
+      if (btnId) {
+        const btn = document.getElementById(btnId);
+        if (btn) btn.classList.add('active');
       }
+      
+      state.mode = 'auto';
+      calculate();
+    }
+
+    function clearPresets() {
+      document.querySelectorAll('.btn-preset').forEach(b => b.classList.remove('active'));
     }
 
     function handleDropLen(val) {
       state.dropLen = parseInt(val, 10);
-      const el = document.getElementById('dropLenVal');
-      if (el) el.textContent = state.dropLen;
+      document.getElementById('dropLenVal').textContent = state.dropLen;
       calculate();
     }
 
     function handleInsideLen(val) {
       state.insideLen = parseInt(val, 10);
-      const el = document.getElementById('insideLenVal');
-      if (el) el.textContent = state.insideLen;
-      calculate();
-    }
-
-    function setMode(mode) {
-      state.mode = mode;
-      document.getElementById('modeAuto').className = 'mode-btn ' + (mode === 'auto' ? 'active' : '');
-      document.getElementById('modeManual').className = 'mode-btn ' + (mode === 'manual' ? 'active' : '');
-      document.getElementById('manualSplitterSection').style.display = (mode === 'manual' ? 'block' : 'none');
-      document.getElementById('heroTag').textContent = (mode === 'auto' ? 'RECOMMENDED SINGLE-DEMARC TOPOLOGY' : 'MANUALLY SELECTED TOPOLOGY');
+      document.getElementById('insideLenVal').textContent = state.insideLen;
       calculate();
     }
 
     function selectManualSplitter(id) {
+      state.mode = 'manual';
       state.manualId = id;
+      document.getElementById('heroTag').textContent = 'MANUALLY SELECTED TOPOLOGY';
       calculate();
     }
 
-    // Calculation Engine - Thresholds: Hard Fail at +/-15 Rx and 54 Tx
     function calculate() {
-      const dropTypeSelect = document.getElementById('dropType');
-      if (dropTypeSelect) {
-        state.dropType = dropTypeSelect.value;
-      }
-      
-      const totalOutlets = state.modemCount + state.stbCount;
-      const modemLabel = state.modemCount === 1 ? '1 DOCSIS Modem' : '0 Modems';
-      const summaryText = document.getElementById('deviceSummaryText');
-      if (summaryText) {
-        summaryText.innerHTML = 
-          `Total House Outlets: <strong>${totalOutlets}</strong> (${modemLabel} + ${state.stbCount} TV Outlet${state.stbCount === 1 ? '' : 's'}).`;
-      }
+      const tapDs = parseFloat(document.getElementById('tapDsInput').value) || 0;
+      const tapTx = parseFloat(document.getElementById('tapTxInput').value) || 0;
+      const dropType = document.getElementById('dropType').value;
+      const modemCount = parseInt(document.getElementById('modemCountInput').value, 10) || 0;
+      const stbCount = parseInt(document.getElementById('tvCountInput').value, 10) || 0;
+      const totalOutlets = modemCount + stbCount;
 
-      // OES Drop Rule: Series 6 max 150 ft
-      const isOesViolation = (state.dropType === 'rg6' && state.dropLen > 150);
-      const oesAlert = document.getElementById('oesAlert');
-      if (oesAlert) oesAlert.style.display = isOesViolation ? 'flex' : 'none';
-
-      // Attenuation Rates
-      const dropDsRate = state.dropType === 'rg6' ? 0.060 : 0.038; // per ft at 1 GHz
-      const dropUsRate = state.dropType === 'rg6' ? 0.016 : 0.010; // per ft at 55 MHz
-      const insideDsRate = 0.060; // 3.0 dB / 50 ft
+      // Attenuation Rates (dB per foot at 1 GHz Downstream and Sub-Split Upstream)
+      const dropDsRate = dropType === 'rg6' ? 0.060 : 0.038;
+      const dropUsRate = dropType === 'rg6' ? 0.016 : 0.010;
+      const insideDsRate = 0.060; 
       const insideUsRate = 0.015;
 
       const dropLossDs = Number((state.dropLen * dropDsRate).toFixed(1));
@@ -1393,36 +878,89 @@
       const insideLossDs = Number((state.insideLen * insideDsRate).toFixed(1));
       const insideLossUs = Number((state.insideLen * insideUsRate).toFixed(1));
 
-      const dropLossDisp = document.getElementById('dropLossDisplay');
-      if (dropLossDisp) dropLossDisp.textContent = `Drop Loss: -${dropLossDs.toFixed(1)} dB (1G)`;
-      const insideLossDisp = document.getElementById('insideLossDisplay');
-      if (insideLossDisp) insideLossDisp.textContent = `Inside Loss: -${insideLossDs.toFixed(1)} dB (1G)`;
+      document.getElementById('dropLossDisplay').textContent = `Loss: -${dropLossDs.toFixed(1)} dB`;
+      document.getElementById('insideLossDisplay').textContent = `Loss: -${insideLossDs.toFixed(1)} dB`;
 
-      // EXPECTED GROUND BLOCK NUMBERS (Pre-Splitter, after Drop Cable)
-      const gbRx = Number((state.tapDs - dropLossDs).toFixed(1));
-      const gbTx = Number((state.tapTx + dropLossUs).toFixed(1));
+      // Theoretical Ground Block Levels
+      const gbRx = Number((tapDs - dropLossDs).toFixed(1));
+      const gbTx = Number((tapTx + dropLossUs).toFixed(1));
 
-      // Scoring Function - Evaluated with Rx Hard Fail +/-15 & Tx 54
+      document.getElementById('calcGbRxDisplay').textContent = `${gbRx > 0 ? '+' : ''}${gbRx.toFixed(1)} dBmV`;
+      document.getElementById('calcGbTxDisplay').textContent = `${gbTx.toFixed(1)} dBmV`;
+
+      // Handle Measured Inputs Sync
+      const measRxInput = document.getElementById('measGbRx');
+      const measTxInput = document.getElementById('measGbTx');
+      const resetBtn = document.getElementById('resetGbBtn');
+
+      if (!state.isGbOverridden) {
+        measRxInput.value = gbRx.toFixed(1);
+        measTxInput.value = gbTx.toFixed(1);
+        resetBtn.style.display = 'none';
+      } else {
+        resetBtn.style.display = 'inline-block';
+      }
+
+      const measGbRx = parseFloat(measRxInput.value) || 0;
+      const measGbTx = parseFloat(measTxInput.value) || 0;
+
+      // Drop Health Audit
+      const dropHealthBadge = document.getElementById('dropHealthBadge');
+      const dropAlertBanner = document.getElementById('dropAlertBanner');
+      const dropAlertText = document.getElementById('dropAlertText');
+      const dropDeltaEl = document.getElementById('dropDeltaDisplay');
+
+      let dropFault = false;
+      let dropWarnings = [];
+
+      const rxLossDelta = Number((gbRx - measGbRx).toFixed(1));
+      dropDeltaEl.textContent = `${rxLossDelta > 0 ? '-' : '+'}${Math.abs(rxLossDelta).toFixed(1)} dB`;
+
+      if (state.isGbOverridden) {
+        if (rxLossDelta >= 3.0) {
+          dropFault = true;
+          dropWarnings.push(`Excessive forward drop attenuation (<strong>${rxLossDelta} dB worse than calculated</strong>). Check for water intrusion, chewed jacket, or loose tap connection.`);
+        } else if (rxLossDelta <= -3.0) {
+          dropWarnings.push(`Drop reads <strong>${Math.abs(rxLossDelta)} dB hotter</strong> than calculated physics. Verify tap plate value.`);
+        }
+
+        const txDelta = Number((measGbTx - gbTx).toFixed(1));
+        if (txDelta >= 2.5) {
+          dropFault = true;
+          dropWarnings.push(`Excessive upstream return loss (+${txDelta} dB). Suspect center conductor corrosion or high-resistance barrel.`);
+        }
+      }
+
+      if (dropFault) {
+        dropHealthBadge.className = "pht-header-badge badge-fail";
+        dropHealthBadge.textContent = "BAD DROP";
+        dropAlertBanner.style.display = "flex";
+        dropAlertBanner.className = "alert-banner alert-oes";
+        dropAlertText.innerHTML = `<strong>Drop Failure Detected:</strong> ${dropWarnings.join('<br>')}`;
+      } else if (dropWarnings.length > 0) {
+        dropHealthBadge.className = "pht-header-badge badge-marginal";
+        dropHealthBadge.textContent = "MARGINAL DROP";
+        dropAlertBanner.style.display = "flex";
+        dropAlertBanner.className = "alert-banner alert-terminator";
+        dropAlertText.innerHTML = `<strong>Drop Variance:</strong> ${dropWarnings.join('<br>')}`;
+      } else {
+        dropHealthBadge.className = "pht-header-badge badge-pass";
+        dropHealthBadge.textContent = "DROP OK";
+        dropAlertBanner.style.display = "none";
+      }
+
+      // Scoring Engine
       function scoreItem(item) {
-        const mRx = state.modemCount === 1 
-          ? Number((state.tapDs - dropLossDs - item.lossDs - insideLossDs).toFixed(1)) 
-          : null;
-        const mTx = state.modemCount === 1 
-          ? Number((state.tapTx + dropLossUs + item.lossUs + insideLossUs).toFixed(1)) 
-          : null;
-        
-        const stbLossToUse = (state.modemCount === 0) ? item.lossDs : (item.stbLossDs !== null ? item.stbLossDs : item.lossDs);
-        const sRx = (state.stbCount > 0)
-          ? Number((state.tapDs - dropLossDs - stbLossToUse - insideLossDs).toFixed(1))
-          : null;
+        const mRx = modemCount === 1 ? Number((measGbRx - item.lossDs - insideLossDs).toFixed(1)) : null;
+        const mTx = modemCount === 1 ? Number((measGbTx + item.lossUs + insideLossUs).toFixed(1)) : null;
+        const stbLossToUse = (modemCount === 0) ? item.lossDs : (item.stbLossDs !== null ? item.stbLossDs : item.lossDs);
+        const sRx = stbCount > 0 ? Number((measGbRx - stbLossToUse - insideLossDs).toFixed(1)) : null;
 
         let penalty = 0;
-        
-        if (state.modemCount === 1 && mRx !== null) {
+        if (modemCount === 1 && mRx !== null) {
           penalty += Math.abs(mRx - 0.0) * 1.5;
-          
-          if (mTx > 50.0) penalty += (mTx - 50.0) * 30; // marginal border
-          if (mTx >= 54.0) penalty += 750; // HARD FAIL at 54 dBmV
+          if (mTx > 50.0) penalty += (mTx - 50.0) * 30;
+          if (mTx >= 54.0) penalty += 750;
           if (mTx < 36.0) penalty += (36.0 - mTx) * 15;
           if (mTx < 34.0) penalty += 500;
         } else if (sRx !== null) {
@@ -1430,21 +968,13 @@
         }
 
         const portShortfall = Math.max(0, totalOutlets - item.ports);
-        if (portShortfall > 0) {
-          penalty += 2000 + (portShortfall * 300);
-        }
-
-        const excessPorts = Math.max(0, item.ports - totalOutlets);
-        if (excessPorts > 0) {
-          penalty += excessPorts * 5;
-        }
-
-        // Rx Hard Fail at +/-15
+        if (portShortfall > 0) penalty += 2000 + (portShortfall * 300);
+        
         if (mRx !== null && (mRx <= -15.0 || mRx >= 15.0)) penalty += 750;
         if (sRx !== null && (sRx <= -15.0 || sRx >= 15.0)) penalty += 750;
         if (item.isCascade) penalty += 400;
 
-        return { ...item, mRx, mTx, sRx, penalty, portShortfall, excessPorts };
+        return { ...item, mRx, mTx, sRx, penalty, portShortfall };
       }
 
       const candidateKeys = ['barrel', '2way', '3way_hot', '3way_weak', '4way', '8way', 'cascade'];
@@ -1453,464 +983,301 @@
 
       let active;
       if (state.mode === 'auto') {
-        // 1 device must ALWAYS auto-recommend Direct Barrel (No Splitters)
-        if (totalOutlets <= 1) {
-          active = evaluated.find(i => i.id === 'barrel') || sortedForAuto[0];
-        } else {
-          active = sortedForAuto[0];
-        }
+        active = totalOutlets <= 1 ? (evaluated.find(i => i.id === 'barrel') || sortedForAuto[0]) : sortedForAuto[0];
+        document.getElementById('heroTag').textContent = 'RECOMMENDED SINGLE-DEMARC TOPOLOGY';
       } else {
         active = evaluated.find(i => i.id === state.manualId) || evaluated[0];
       }
 
-      // Render Manual Grid
+      // Populate Manual Splitter Grid
       const manualGrid = document.getElementById('splitterGrid');
-      if (manualGrid) {
-        manualGrid.innerHTML = '';
-        candidateKeys.forEach(k => {
-          const item = catalog[k];
-          const isSel = (active.id === k);
-          const hasEnoughPorts = item.ports >= totalOutlets;
-          const btn = document.createElement('div');
-          
-          let cls = 'splitter-btn';
-          if (item.isCascade) cls += ' cascade';
-          if (isSel) cls += ' selected';
-          if (!hasEnoughPorts && !item.isCascade) cls += ' disabled';
+      manualGrid.innerHTML = '';
+      candidateKeys.forEach(k => {
+        const item = catalog[k];
+        const hasEnoughPorts = item.ports >= totalOutlets;
+        const btn = document.createElement('div');
+        let cls = `splitter-btn ${item.isCascade ? 'cascade' : ''} ${active.id === k ? 'selected' : ''} ${!hasEnoughPorts && !item.isCascade ? 'disabled' : ''}`;
+        
+        btn.className = cls;
+        btn.onclick = () => selectManualSplitter(k);
+        btn.innerHTML = `
+          <div class="s-name">${item.short}</div>
+          <div class="s-meta">${item.ports} Port${item.ports > 1 ? 's' : ''} ${!hasEnoughPorts ? '• <span style="color:var(--rose)">Need ' + totalOutlets + '</span>' : ''}</div>
+          <div class="s-loss">${item.isCascade ? '⚠️ Non-Standard' : '-' + item.lossDs.toFixed(1) + ' dB'}</div>
+        `;
+        manualGrid.appendChild(btn);
+      });
 
-          btn.className = cls;
-          btn.onclick = () => selectManualSplitter(k);
+      document.getElementById('manualSelectedMeta').textContent = `${active.short} (-${active.lossDs.toFixed(1)} dB)`;
 
-          btn.innerHTML = `
-            <div class="s-name">${item.short}</div>
-            <div class="s-meta">${item.ports} Port${item.ports > 1 ? 's' : ''} ${!hasEnoughPorts ? '• <span style="color:var(--rose)">Need ' + totalOutlets + '</span>' : ''}</div>
-            <div class="s-loss">${item.isCascade ? '⚠️ Non-Standard' : '-' + item.lossDs.toFixed(1) + ' dB'}</div>
-          `;
-          manualGrid.appendChild(btn);
-        });
-      }
+      // Update Hero Card
+      document.getElementById('heroName').textContent = active.name;
+      document.getElementById('heroDesc').textContent = active.desc;
+      document.getElementById('portCapacityBadge').textContent = `${active.ports}-PORT DEMARC (${totalOutlets} OUTLETS IN USE)`;
+      document.getElementById('portGuideText').innerHTML = active.guide;
 
-      const metaEl = document.getElementById('manualSelectedMeta');
-      if (metaEl) {
-        metaEl.textContent = `${active.short} (-${active.lossDs.toFixed(1)} dB DS)`;
-      }
-
-      // Port shortfall warning
-      const shortfallEl = document.getElementById('portShortfallAlert');
-      if (shortfallEl) {
-        if (active.portShortfall > 0) {
-          shortfallEl.style.display = 'flex';
-          const sfText = document.getElementById('portShortfallText');
-          if (sfText) {
-            sfText.innerHTML = `Selected <strong>${active.short}</strong> has only ${active.ports} port(s), but premise requires ${totalOutlets} outlets. Shortfall: <strong>${active.portShortfall} port(s)</strong>.`;
-          }
-        } else {
-          shortfallEl.style.display = 'none';
-        }
-      }
-
-      // Populate Hero Banner
-      const heroName = document.getElementById('heroName');
-      if (heroName) heroName.textContent = active.name;
-      const heroDesc = document.getElementById('heroDesc');
-      if (heroDesc) heroDesc.textContent = active.desc;
-      const portBadge = document.getElementById('portCapacityBadge');
-      if (portBadge) portBadge.textContent = `${active.ports}-PORT DEMARC (${totalOutlets} OUTLETS IN USE)`;
-      const portGuide = document.getElementById('portGuideText');
-      if (portGuide) portGuide.innerHTML = active.guide;
-
-      // Populate Dedicated Ground Block Telemetry
-      const gbRxEl = document.getElementById('valGbRx');
-      if (gbRxEl) gbRxEl.textContent = `${gbRx > 0 ? '+' : ''}${gbRx.toFixed(1)} dBmV`;
-      const gbTxEl = document.getElementById('valGbTx');
-      if (gbTxEl) gbTxEl.textContent = `${gbTx.toFixed(1)} dBmV`;
-
-      const matrixComp = document.getElementById('gbMatrixCompare');
-      if (matrixComp && active.matrix) {
-        matrixComp.textContent = 
-          `Target: Ideal ${active.matrix.rxIdeal > 0 ? '+' : ''}${active.matrix.rxIdeal.toFixed(1)} dBmV Rx | Safe: ${active.matrix.rxMin > 0 ? '+' : ''}${active.matrix.rxMin.toFixed(1)} to +${active.matrix.rxMax.toFixed(1)}`;
-      }
-
-      // Unused Ports Alert
-      const termAlert = document.getElementById('terminatorAlert');
-      if (termAlert) {
-        const unusedCount = Math.max(0, active.ports - totalOutlets);
-        if (unusedCount > 0 && !active.isCascade) {
-          termAlert.style.display = 'flex';
-          const termText = document.getElementById('terminatorText');
-          if (termText) {
-            termText.innerHTML = `<strong>${unusedCount} unused port${unusedCount > 1 ? 's' : ''}</strong> must be capped with approved 75Ω locking terminators to prevent a 7-point TQI-C deduction and protect against RF noise ingress.`;
-          }
-        } else {
-          termAlert.style.display = 'none';
-        }
-      }
-
-      // Populate Delivered Device Telemetry Cards (Hard Fail: Rx <= -15 or >= 15; Tx >= 54)
-      const rxEl = document.getElementById('valModemRx');
-      const rxSub = document.getElementById('subModemRx');
-      if (rxEl && rxSub) {
-        if (state.modemCount === 1 && active.mRx !== null) {
-          rxEl.textContent = `${active.mRx > 0 ? '+' : ''}${active.mRx.toFixed(1)} dBmV`;
-          if (active.mRx <= -15.0 || active.mRx >= 15.0) {
-            rxEl.className = 't-val val-fail';
-            rxSub.textContent = 'HARD FAIL (≤ -15 or ≥ +15)';
-          } else if (active.mRx < -10.0 || active.mRx > 10.0) {
-            rxEl.className = 't-val val-warn';
-            rxSub.textContent = 'MARGINAL (-15 to -10 / +10 to +15)';
+      // Telemetry Helper
+      const setTelemetry = (elId, subId, val, isRx) => {
+        const el = document.getElementById(elId);
+        const sub = document.getElementById(subId);
+        if (val !== null) {
+          el.textContent = `${isRx && val > 0 ? '+' : ''}${val.toFixed(1)} dBmV`;
+          if (isRx) {
+            if (val <= -15.0 || val >= 15.0) { 
+              el.className = 't-val val-fail'; 
+              sub.textContent = 'HARD FAIL (≤ -15 or ≥ +15)'; 
+            } else if (val < -10.0 || val > 10.0) { 
+              el.className = 't-val val-warn'; 
+              sub.textContent = 'MARGINAL (-10 to +10 window)'; 
+            } else { 
+              el.className = 't-val val-safe'; 
+              sub.textContent = 'PASS (Target: 0.0 dBmV)'; 
+            }
           } else {
-            rxEl.className = 't-val val-safe';
-            rxSub.textContent = 'Target: 0.0 (-10.0 to +10.0)';
+            if (val < 34.0 || val >= 54.0) { 
+              el.className = 't-val val-fail'; 
+              sub.textContent = 'HARD FAIL (< 34 or ≥ 54 dBmV)'; 
+            } else if (val < 36.0 || val > 50.0) { 
+              el.className = 't-val val-warn'; 
+              sub.textContent = 'MARGINAL (Safe: 36 to 50)'; 
+            } else { 
+              el.className = 't-val val-ideal'; 
+              sub.textContent = 'OPTIMAL (36.0 to 50.0 dBmV)'; 
+            }
           }
         } else {
-          rxEl.textContent = 'N/A';
-          rxEl.className = 't-val';
-          rxSub.textContent = 'No Modem (TV Only)';
+          el.textContent = 'N/A'; 
+          el.className = 't-val'; 
+          sub.textContent = 'Inactive / No Box';
         }
-      }
+      };
 
-      const txEl = document.getElementById('valModemTx');
-      const txSub = document.getElementById('subModemTx');
-      if (txEl && txSub) {
-        if (state.modemCount === 1 && active.mTx !== null) {
-          txEl.textContent = `${active.mTx.toFixed(1)} dBmV`;
-          if (active.mTx < 34.0 || active.mTx >= 54.0) {
-            txEl.className = 't-val val-fail';
-            txSub.textContent = 'HARD FAIL (< 34 or ≥ 54)';
-          } else if (active.mTx < 36.0 || active.mTx > 50.0) {
-            txEl.className = 't-val val-warn';
-            txSub.textContent = 'MARGINAL (34-36 / 50-54)';
-          } else {
-            txEl.className = 't-val val-ideal';
-            txSub.textContent = 'Safe: 36.0 to 50.0';
-          }
-        } else {
-          txEl.textContent = 'N/A';
-          txEl.className = 't-val';
-          txSub.textContent = 'No Modem (TV Only)';
+      setTelemetry('valModemRx', 'subModemRx', active.mRx, true);
+      setTelemetry('valModemTx', 'subModemTx', active.mTx, false);
+      setTelemetry('valStbRx', 'subStbRx', active.sRx, true);
+
+      // Final Evaluation Status
+      const hasHardFail = dropFault || 
+                          active.portShortfall > 0 || 
+                          (modemCount === 1 && (active.mRx <= -15 || active.mRx >= 15 || active.mTx < 34 || active.mTx >= 54)) || 
+                          (active.sRx !== null && (active.sRx <= -15 || active.sRx >= 15));
+
+      const hasMarginal = !hasHardFail && (
+                            dropWarnings.length > 0 || 
+                            active.isCascade || 
+                            (modemCount === 1 && (active.mRx < -10 || active.mRx > 10 || active.mTx < 36 || active.mTx > 50)) || 
+                            (active.sRx !== null && (active.sRx < -10 || active.sRx > 10))
+                          );
+      
+      const setBadge = (id, cls, text) => {
+        const el = document.getElementById(id);
+        if (el) { 
+          el.className = `pht-header-badge ${cls}`; 
+          el.innerHTML = `<span>${text}</span>`; 
         }
-      }
-
-      const stbEl = document.getElementById('valStbRx');
-      const stbSub = document.getElementById('subStbRx');
-      if (stbEl && stbSub) {
-        if (active.sRx !== null) {
-          stbEl.textContent = `${active.sRx > 0 ? '+' : ''}${active.sRx.toFixed(1)} dBmV`;
-          if (active.sRx <= -15.0 || active.sRx >= 15.0) {
-            stbEl.className = 't-val val-fail';
-            stbSub.textContent = 'HARD FAIL (≤ -15 or ≥ +15)';
-          } else if (active.sRx < -10.0 || active.sRx > 10.0) {
-            stbEl.className = 't-val val-warn';
-            stbSub.textContent = 'MARGINAL (-15 to -10 / +10 to +15)';
-          } else {
-            stbEl.className = 't-val val-safe';
-            stbSub.textContent = 'Safe: -10.0 to +10.0';
-          }
-        } else {
-          stbEl.textContent = 'N/A';
-          stbEl.className = 't-val';
-          stbSub.textContent = '0 TVs connected';
-        }
-      }
-
-      // Overall PHT Status
-      const modemHardFail = state.modemCount === 1 && (active.mRx <= -15.0 || active.mRx >= 15.0 || active.mTx < 34.0 || active.mTx >= 54.0);
-      const stbHardFail = active.sRx !== null && (active.sRx <= -15.0 || active.sRx >= 15.0);
-      const hasHardFail = modemHardFail || stbHardFail || active.portShortfall > 0;
-
-      const modemMarginal = state.modemCount === 1 && (active.mRx < -10.0 || active.mRx > 10.0 || active.mTx < 36.0 || active.mTx > 50.0);
-      const stbMarginal = active.sRx !== null && (active.sRx < -10.0 || active.sRx > 10.0);
-      const hasMarginal = !hasHardFail && (modemMarginal || stbMarginal || active.isCascade);
-
-      const topBadge = document.getElementById('phtBadge');
-      const heroBadge = document.getElementById('heroBadge');
-      const heroBanner = document.getElementById('heroBanner');
+      };
 
       if (hasHardFail) {
-        const text = active.portShortfall > 0 ? '❌ PORT SHORTFALL' : '❌ PHT HARD FAIL';
-        if (topBadge) {
-          topBadge.className = 'pht-header-badge badge-fail';
-          topBadge.innerHTML = `<span>${text}</span>`;
-        }
-        if (heroBadge) {
-          heroBadge.className = 'pht-header-badge badge-fail';
-          heroBadge.innerHTML = `<span>${text}</span>`;
-        }
-        if (heroBanner) heroBanner.style.borderColor = 'var(--rose)';
+        let txt = dropFault ? '❌ BAD DROP' : active.portShortfall > 0 ? '❌ PORT SHORTFALL' : '❌ PHT HARD FAIL';
+        setBadge('phtBadge', 'badge-fail', txt); 
+        setBadge('heroBadge', 'badge-fail', txt);
+        document.getElementById('heroBanner').style.borderColor = 'var(--rose)';
       } else if (hasMarginal) {
-        if (topBadge) {
-          topBadge.className = 'pht-header-badge badge-marginal';
-          topBadge.innerHTML = `<span>⚠️ PHT MARGINAL</span>`;
-        }
-        if (heroBadge) {
-          heroBadge.className = 'pht-header-badge badge-marginal';
-          heroBadge.innerHTML = `<span>⚠️ PHT MARGINAL</span>`;
-        }
-        if (heroBanner) heroBanner.style.borderColor = 'var(--amber)';
+        let txt = active.isCascade ? '⚠️ NON-STANDARD CASCADE' : '⚠️ PHT MARGINAL';
+        setBadge('phtBadge', 'badge-marginal', txt); 
+        setBadge('heroBadge', 'badge-marginal', txt);
+        document.getElementById('heroBanner').style.borderColor = 'var(--amber)';
       } else {
-        if (topBadge) {
-          topBadge.className = 'pht-header-badge badge-pass';
-          topBadge.innerHTML = `<span>✓ OPTIMAL PHT PASS</span>`;
-        }
-        if (heroBadge) {
-          heroBadge.className = 'pht-header-badge badge-pass';
-          heroBadge.innerHTML = `<span>✓ OPTIMAL PHT PASS</span>`;
-        }
-        if (heroBanner) heroBanner.style.borderColor = 'var(--cyan)';
+        setBadge('phtBadge', 'badge-pass', '✓ OPTIMAL PHT PASS'); 
+        setBadge('heroBadge', 'badge-pass', '✓ OPTIMAL PHT PASS');
+        document.getElementById('heroBanner').style.borderColor = 'var(--cyan)';
       }
 
       // Populate Evaluated List
       const topList = document.getElementById('topologiesList');
-      if (topList) {
-        topList.innerHTML = '';
+      topList.innerHTML = '';
+      evaluated.forEach(item => {
+        const row = document.createElement('div');
+        row.className = `topology-row ${item.isCascade ? 'cascade-row' : ''} ${item.id === active.id ? 'active' : ''}`;
+        row.onclick = () => selectManualSplitter(item.id);
+        
+        const isOverallPass = (modemCount === 0 || (item.mTx >= 36 && item.mTx <= 50 && item.mRx >= -10 && item.mRx <= 10)) && 
+                              (item.sRx === null || (item.sRx >= -10 && item.sRx <= 10)) && 
+                              !item.isCascade;
+        
+        const passBadge = item.ports < totalOutlets && !item.isCascade 
+          ? `<span style="color:var(--rose)">[SHORT]</span>` 
+          : isOverallPass 
+            ? `<span style="color:var(--emerald)">[PASS]</span>` 
+            : `<span style="color:var(--amber)">[MARG]</span>`;
+            
+        const dispRx = modemCount === 1 ? item.mRx : item.sRx;
 
-        evaluated.forEach(item => {
-          const isActive = (item.id === active.id);
-          const hasPorts = (item.ports >= totalOutlets);
-          const row = document.createElement('div');
-          
-          let rowCls = 'topology-row';
-          if (item.isCascade) rowCls += ' cascade-row';
-          if (isActive) rowCls += ' active';
-
-          row.className = rowCls;
-          row.onclick = () => {
-            if (state.mode === 'auto') setMode('manual');
-            selectManualSplitter(item.id);
-          };
-
-          const isOverallPass = (state.modemCount === 0 || (item.mTx >= 36.0 && item.mTx <= 50.0 && item.mRx >= -10.0 && item.mRx <= 10.0)) &&
-                                (item.sRx === null || (item.sRx >= -10.0 && item.sRx <= 10.0)) && !item.isCascade;
-
-          const passBadge = (!hasPorts && !item.isCascade)
-            ? `<span style="font-size:0.65rem; color:var(--rose); font-weight:800;">[SHORTFALL]</span>`
-            : isOverallPass
-              ? `<span style="font-size:0.65rem; color:var(--emerald); font-weight:800;">[PASS]</span>`
-              : `<span style="font-size:0.65rem; color:var(--amber); font-weight:800;">[MARGINAL]</span>`;
-
-          const displayRx = state.modemCount === 1 ? item.mRx : item.sRx;
-          const displayTx = state.modemCount === 1 ? item.mTx : null;
-
-          row.innerHTML = `
-            <div class="row-info">
-              <div class="row-title">
-                ${passBadge}
-                <span style="${item.isCascade ? 'text-decoration: line-through; color: var(--rose);' : ''}">${item.name}</span>
-              </div>
-              <div class="row-meta">${item.desc}</div>
+        row.innerHTML = `
+          <div class="row-info">
+            <div class="row-title">
+              ${passBadge} 
+              <span style="${item.isCascade ? 'text-decoration: line-through; color: var(--rose);' : ''}">${item.name}</span>
             </div>
-            <div class="row-metrics">
-              <span style="color:${displayRx !== null && displayRx >= -10 && displayRx <= 10 ? 'var(--cyan)' : 'var(--amber)'}">
-                ${displayRx !== null ? ((displayRx > 0 ? '+' : '') + displayRx.toFixed(1) + ' Rx') : 'N/A'}
-              </span>
-              ${displayTx !== null ? `
-                <span style="color:var(--text-sub)">|</span>
-                <span style="color:${displayTx >= 36 && displayTx <= 50 ? 'var(--emerald)' : (displayTx >= 54 ? 'var(--rose)' : 'var(--amber)')}">
-                  ${displayTx.toFixed(1)} Tx
-                </span>
-              ` : ''}
-            </div>
-          `;
-          topList.appendChild(row);
-        });
-      }
+            <div class="row-meta">${item.desc}</div>
+          </div>
+          <div class="row-metrics">
+            <span style="color:${dispRx !== null && dispRx >= -10 && dispRx <= 10 ? 'var(--cyan)' : 'var(--amber)'}">
+              ${dispRx !== null ? (dispRx > 0 ? '+' : '') + dispRx.toFixed(1) + ' Rx' : 'N/A'}
+            </span>
+            ${modemCount === 1 ? `<span style="color:var(--text-sub)">|</span><span style="color:${item.mTx >= 36 && item.mTx <= 50 ? 'var(--emerald)' : 'var(--amber)'}">${item.mTx.toFixed(1)} Tx</span>` : ''}
+          </div>
+        `;
+        topList.appendChild(row);
+      });
     }
 
-    // Modal Content Generator (Exact Threshold Explanations)
-    function openModal(topic) {
-      const cat = document.getElementById('modalCat');
-      const title = document.getElementById('modalTitle');
-      const body = document.getElementById('modalBody');
-
-      if (topic === 'gb') {
-        cat.textContent = 'CHEAT SHEET • GROUND BLOCK MATRIX';
-        title.textContent = 'Expected Ground Block Reference';
-        body.innerHTML = `
-          <p>The <strong>Ground Block</strong> is measured at the demarcation point directly after the drop cable, <em>before</em> the demarc splitter. It verifies that incoming signal levels can properly feed the home wiring.</p>
-          <h4>Standard Ground Block Safe Windows (Calculated at 50 ft RG6 run with Wider Pass):</h4>
-          <table>
-            <thead>
-              <tr>
-                <th>Configuration</th>
-                <th>Safe Rx Min</th>
-                <th>Ideal Rx</th>
-                <th>Safe Rx Max</th>
-                <th>Ideal Tx</th>
-                <th>Max Tx</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>1 Device (Barrel 0 dB)</strong></td>
-                <td>-7.0 dBmV</td>
-                <td style="color:var(--emerald); font-weight:bold;">+3.0 dBmV</td>
-                <td>+13.0 dBmV</td>
-                <td>39.0 dBmV</td>
-                <td>49.0 dBmV</td>
-              </tr>
-              <tr>
-                <td><strong>2 Devices (2-Way -4.5 dB)</strong></td>
-                <td>-2.5 dBmV</td>
-                <td style="color:var(--emerald); font-weight:bold;">+7.5 dBmV</td>
-                <td>+17.5 dBmV</td>
-                <td>34.5 dBmV</td>
-                <td>44.5 dBmV</td>
-              </tr>
-              <tr>
-                <td><strong>3 Devices (3-Way Hot -5.0 dB)</strong></td>
-                <td>-2.0 dBmV</td>
-                <td style="color:var(--emerald); font-weight:bold;">+8.0 dBmV</td>
-                <td>+18.0 dBmV</td>
-                <td>34.0 dBmV</td>
-                <td>44.0 dBmV</td>
-              </tr>
-              <tr>
-                <td><strong>3 Devices (3-Way Weak -8.5 dB)</strong></td>
-                <td>+1.5 dBmV</td>
-                <td style="color:var(--emerald); font-weight:bold;">+11.5 dBmV</td>
-                <td>+21.5 dBmV</td>
-                <td>30.5 dBmV</td>
-                <td>40.5 dBmV</td>
-              </tr>
-              <tr>
-                <td><strong>4 Devices (4-Way -7.0 dB)</strong></td>
-                <td>0.0 dBmV</td>
-                <td style="color:var(--emerald); font-weight:bold;">+10.0 dBmV</td>
-                <td>+20.0 dBmV</td>
-                <td>32.0 dBmV</td>
-                <td>42.0 dBmV</td>
-              </tr>
-            </tbody>
+    // Modal Inspection Dialog Content
+    const modalContent = {
+      pht: {
+        cat: 'XFINITY SPECIFICATIONS',
+        title: 'Premise Health Test (PHT) Matrix',
+        html: `
+          <p>The Premise Health Test (PHT) verifies physical layer integrity before job closure. Topologies must deliver balanced DOCSIS levels without driving customer premise equipment into non-linear compression or clipping.</p>
+          <table class="modal-spec-table">
+            <tr><th>Metric</th><th>Optimal Range</th><th>Marginal Window</th><th>Hard Fail</th></tr>
+            <tr><td>Modem Downstream Rx</td><td>-8.0 to +8.0 dBmV</td><td>-10.0 to +10.0 dBmV</td><td>&lt; -15 or &gt; +15 dBmV</td></tr>
+            <tr><td>Modem Upstream Tx</td><td>38.0 to 49.0 dBmV</td><td>36.0 to 52.0 dBmV</td><td>&lt; 34 or &ge; 54.0 dBmV</td></tr>
+            <tr><td>STB Video Rx</td><td>-8.0 to +8.0 dBmV</td><td>-10.0 to +10.0 dBmV</td><td>&lt; -15 or &gt; +15 dBmV</td></tr>
+            <tr><td>Drop Delta Variance</td><td>&plusmn; 1.5 dB</td><td>&plusmn; 2.5 dB</td><td>&ge; 3.0 dB Excess Loss</td></tr>
           </table>
-          <p><strong>Field Tip:</strong> If your Ground Block Rx is lower than the Safe Min, your modem Rx will fall below -10.0 dBmV once it passes through the splitter and inside cable run.</p>
-        `;
-      } else if (topic === 'rx') {
-        cat.textContent = 'PHT SPECIFICATION • DOWNSTREAM RF';
-        title.textContent = 'Delivered Modem Downstream Power (Rx)';
-        body.innerHTML = `
-          <p><strong>Downstream Power (Rx)</strong> measures the signal strength delivered to the modem's internal tuner across the 1.0 GHz spectrum.</p>
-          <h4>Threshold Bands:</h4>
-          <ul>
-            <li><strong>Ideal Target:</strong> 0.0 dBmV</li>
-            <li><strong>Pass Window:</strong> -10.0 to +10.0 dBmV</li>
-            <li><strong>Marginal Window:</strong> -15.0 to -10.0 dBmV OR +10.0 to +15.0 dBmV</li>
-            <li><strong>Hard Fail:</strong> &le; -15.0 dBmV OR &ge; +15.0 dBmV</li>
-          </ul>
-          <h4>Technical Root Causes:</h4>
-          <p><strong>Low Rx (&le; -15.0 dBmV):</strong> Signal drops directly into the thermal noise floor. MER/SNR collapses below 33.0 dB, creating severe FEC uncorrectable codeword packet loss.</p>
-          <p><strong>High Rx (&ge; +15.0 dBmV):</strong> Over-amplification over-drives the tuner front-end, inducing non-linear harmonic distortion and OFDM carrier dropouts.</p>
-        `;
-      } else if (topic === 'tx') {
-        cat.textContent = 'PHT SPECIFICATION • UPSTREAM RF';
-        title.textContent = 'Required Modem Upstream Transmit (Tx)';
-        body.innerHTML = `
-          <p><strong>Upstream Transmit Power (Tx)</strong> is the RF level the DOCSIS modem requires to communicate back to the node/CMTS across 5–85 MHz.</p>
-          <h4>Threshold Bands:</h4>
-          <ul>
-            <li><strong>Ideal Target:</strong> ~40.0 dBmV</li>
-            <li><strong>Pass Window:</strong> 36.0 to 50.0 dBmV</li>
-            <li><strong>Marginal Warning:</strong> 34.0 to 36.0 dBmV OR 50.0 to 53.9 dBmV</li>
-            <li><strong>Hard Fail:</strong> &lt; 34.0 dBmV OR &ge; 54.0 dBmV</li>
-          </ul>
-          <h4>Technical Root Causes:</h4>
-          <p><strong>High Transmit (&ge; 54.0 dBmV):</strong> Upstream hits the physical power amplifier compression limit of the modem. Triggers continuous T3/T4 timeouts and drops upstream channel bonding.</p>
-          <p><strong>Low Transmit (&lt; 34.0 dBmV):</strong> The modem cannot overpower premise return noise ingress, allowing ingress packets to disrupt the node upstream receiver.</p>
-        `;
-      } else if (topic === 'pht') {
-        cat.textContent = 'COMPLIANCE AUDIT • TQI-C IMPACT';
-        title.textContent = 'PHT Failure & Craftsmanship Scoring';
-        body.innerHTML = `
-          <p>Under the Comcast <strong>TQI-C (Trust Quality Interactions - Craftsmanship)</strong> standard, customer service and CPE must pass Premise Health Testing (PHT).</p>
-          <h4>Scoring Mechanics:</h4>
-          <ul>
-            <li><strong>Starting Baseline:</strong> 100 Points</li>
-            <li><strong>Passing Threshold:</strong> &gt; 87 Points (88+ is a PASS)</li>
-            <li><strong>Failing Grade:</strong> &le; 86 Points (Instant Audit Failure)</li>
-          </ul>
-          <h4>The Penalty Cascade:</h4>
-          <p>Failing PHT carries an immediate <strong>8-point deduction</strong> ("Service/CPE not working properly"). This lowers the score to 92.</p>
-          <p>A single minor infraction on top of this—such as an un-terminated splitter port (-7 pts) or a missing enclosure latch (-7 pts)—drops the score to <strong>85</strong>, resulting in an automatic audit failure requiring formal follow-up in the TRUST platform.</p>
-        `;
+          <h4>Core Best Practices</h4>
+          <p>&bull; <strong>Always install MoCA PoE filters</strong> directly onto the ground block or demarc input.<br>
+          &bull; <strong>Cap all unused splitter ports</strong> with 75&Omega; locking terminators to prevent ingress/reflections.<br>
+          &bull; <strong>Never cascade splitters:</strong> Cascading amplifies return-path group delay and micro-reflections.</p>
+        `
+      },
+      rx: {
+        cat: 'RF TELEMETRY GUIDE',
+        title: 'DOCSIS Forward Downstream Rx (1 GHz)',
+        html: `
+          <p>Delivered forward power measures optical node / line extender signal delivered to the tuner at 1002 MHz / 1218 MHz.</p>
+          <h4>Target Parameters:</h4>
+          <p>&bull; <strong>Target Sweet Spot:</strong> 0.0 dBmV (&plusmn;5.0 dBmV ideal)<br>
+          &bull; <strong>Operational Pass Window:</strong> -10.0 dBmV to +10.0 dBmV<br>
+          &bull; <strong>High Attenuation Warning:</strong> Below -10 dBmV reduces MER and triggers uncorrectable Codeword Errors (CWCs).</p>
+          <h4>Troubleshooting:</h4>
+          <p>If forward levels are low, swap to a 3-way with the modem on the -5.0 dB hot leg, upgrade RG6 to RG11 on runs over 150 ft, or verify tap port faceplate integrity.</p>
+        `
+      },
+      tx: {
+        cat: 'RF TELEMETRY GUIDE',
+        title: 'DOCSIS Upstream Transmit (US Tx)',
+        html: `
+          <p>The upstream transmit power represents the amplification the DOCSIS modem must exert to reach the CMTS upstream receiver at 0.0 dBmV target input.</p>
+          <h4>Key Thresholds:</h4>
+          <p>&bull; <strong>Safe Target:</strong> 38.0 to 48.0 dBmV<br>
+          &bull; <strong>Clipping Danger Zone:</strong> &gt; 51.0 dBmV (high probability of T3/T4 timeouts and packet loss)<br>
+          &bull; <strong>Laser Noise Floor Risk:</strong> &lt; 35.0 dBmV (prone to upstream plant noise and ingress)</p>
+          <h4>Remediation:</h4>
+          <p>Place modem on lowest attenuation port available. Avoid placing gateways behind 8-way splitters or cascading splitters.</p>
+        `
+      },
+      stb: {
+        cat: 'RF TELEMETRY GUIDE',
+        title: 'Set-Top Box (STB) Power Levels',
+        html: `
+          <p>DOCSIS and QAM tuners in X1 TV set-top boxes (e.g. XG1v4, XiD) require clean forward signal and solid MoCA PHY rates for multi-room DVR pairing.</p>
+          <h4>Specifications:</h4>
+          <p>&bull; <strong>Forward Window:</strong> -10.0 dBmV to +10.0 dBmV<br>
+          &bull; <strong>MoCA PHY Requirement:</strong> &gt; 450 Mbps between all client nodes<br>
+          &bull; <strong>MoCA Isolation:</strong> A 70 dB PoE filter at the ground block reflects MoCA energy back inside the home network.</p>
+        `
       }
+    };
 
-      document.getElementById('modalBackdrop').classList.add('open');
+    function openModal(type) {
+      const data = modalContent[type] || modalContent.pht;
+      document.getElementById('modalCategory').textContent = data.cat;
+      document.getElementById('modalTitle').textContent = data.title;
+      document.getElementById('modalBody').innerHTML = data.html;
+      document.getElementById('infoModal').classList.add('open');
     }
 
     function closeModal() {
-      document.getElementById('modalBackdrop').classList.remove('open');
+      document.getElementById('infoModal').classList.remove('open');
     }
 
-    function closeModalOnBackdrop(e) {
-      if (e.target === document.getElementById('modalBackdrop')) {
+    function closeModalOnBackdrop(event) {
+      if (event.target === document.getElementById('infoModal')) {
         closeModal();
       }
     }
 
+    // Keyboard Accessibility for Modal
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    // Copy to Job Notes
     function copyJobSummary() {
-      const dropType = state.dropType.toUpperCase();
-      const dropLen = state.dropLen;
-      const rec = document.getElementById('heroName').textContent;
-      const gbRx = document.getElementById('valGbRx').textContent;
-      const gbTx = document.getElementById('valGbTx').textContent;
-      const rx = document.getElementById('valModemRx').textContent;
-      const tx = document.getElementById('valModemTx').textContent;
-      const stb = document.getElementById('valStbRx').textContent;
-      const status = document.getElementById('heroBadge').textContent.replace(/[^a-zA-Z ]/g, '').trim();
+      const modemRx = document.getElementById('valModemRx').textContent;
+      const modemTx = document.getElementById('valModemTx').textContent;
+      const stbRx = document.getElementById('valStbRx').textContent;
+      const dropType = document.getElementById('dropType').value.toUpperCase();
+      const heroName = document.getElementById('heroName').textContent;
+      const gbHealth = document.getElementById('dropHealthBadge').textContent;
+      const phtResult = document.getElementById('phtBadge').textContent.trim();
+      const modemCount = document.getElementById('modemCountInput').value;
+      const tvCount = document.getElementById('tvCountInput').value;
 
-      const note = `[XFINITY RF TOPOLOGY AUDIT] Drop: ${dropLen}ft ${dropType} | Ground Block: ${gbRx} / ${gbTx} | Topology: ${rec} | Gateway: ${rx} / ${tx} | STB: ${stb} | Status: ${status}`;
-      
-      const el = document.createElement('textarea');
-      el.value = note;
-      document.body.appendChild(el);
-      el.select();
-      document.execCommand('copy');
-      document.body.removeChild(el);
+      const summaryText = [
+        `====================================`,
+        `XFINITY PREMISE DEMARC & RF AUDIT`,
+        `====================================`,
+        `PHT Status:      ${phtResult}`,
+        `Topology:        ${heroName}`,
+        `Drop Plant:      ${state.dropLen}ft ${dropType} [${gbHealth}]`,
+        `Inside Cable:    ~${state.insideLen}ft RG6`,
+        `Devices:         ${modemCount} Modem(s) | ${tvCount} TV Box(es)`,
+        `------------------------------------`,
+        `DOCSIS Modem Rx: ${modemRx}`,
+        `DOCSIS Modem Tx: ${modemTx}`,
+        `STB Rx Level:    ${stbRx}`,
+        `====================================`
+      ].join('\n');
 
-      const toast = document.getElementById('toast');
-      toast.style.display = 'block';
-      setTimeout(() => { toast.style.display = 'none'; }, 3000);
-    }
+      const showToast = () => {
+        const toast = document.getElementById('toast');
+        toast.style.display = 'block';
+        setTimeout(() => { toast.style.display = 'none'; }, 2400);
+      };
 
-    // Explicit Dual Event Binding for Fluid Touch & Mouse Sliders
-    function attachSliderListeners() {
-      const sliderBindings = [
-        { id: 'tapDs', fn: handleTapDs },
-        { id: 'tapTx', fn: handleTapTx },
-        { id: 'dropLen', fn: handleDropLen },
-        { id: 'modemCount', fn: handleModemCount },
-        { id: 'tvCountSlider', fn: handleTvSlider },
-        { id: 'insideLen', fn: handleInsideLen }
-      ];
-
-      sliderBindings.forEach(binding => {
-        const el = document.getElementById(binding.id);
-        if (el) {
-          ['input', 'change'].forEach(evtType => {
-            el.addEventListener(evtType, (e) => {
-              binding.fn(e.target.value);
-            }, { passive: true });
-          });
+      // Robust clipboard copying with iframe fallback
+      const fallbackCopy = (text) => {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.top = "-9999px";
+        textArea.style.left = "-9999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+          document.execCommand('copy');
+          showToast();
+        } catch (err) {
+          console.error('Fallback clipboard copy failed', err);
         }
-      });
+        document.body.removeChild(textArea);
+      };
 
-      const dropSelect = document.getElementById('dropType');
-      if (dropSelect) {
-        ['change', 'input'].forEach(evtType => {
-          dropSelect.addEventListener(evtType, () => {
-            calculate();
-          });
-        });
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(summaryText)
+          .then(showToast)
+          .catch(() => fallbackCopy(summaryText));
+      } else {
+        fallbackCopy(summaryText);
       }
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
-      attachSliderListeners();
-      calculate();
-    });
-
-    window.onload = function() {
-      calculate();
-    };
+    // Initialize application on page load
+    window.addEventListener('DOMContentLoaded', calculate);
   </script>
 </body>
 </html>
